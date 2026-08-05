@@ -95,11 +95,56 @@ export class RaceScene {
     this._rearviewCamera = null;
     this._rearviewRenderTimer = 0;
     
+
+    // === CYCLE 22: WEATHER / RAIN SYSTEM ===
+    this._rainParticles = null;
+    this._rainData = null;
+    this._rainActive = false;
+    this._rainIntensity = 0;
+    this._rainTargetIntensity = 0;
+    this._lightningTimer = 0;
+    this._lightningFlash = 0;
+    this._weatherDrops = 0;
+    this._weatherPuddles = [];
+    
+    // === CYCLE 22: SKID MARKS ===
+    this._skidMarkPoints = [];
+    this._skidMarkMesh = null;
+    this._maxSkidPoints = 600;
+    this._isSkidding = false;
+    
+    // === CYCLE 22: CAMERA EFFECTS ===
+    this._cameraShakeIntensity = 0;
+    this._cameraShakeDecay = 5.0;
+    this._baseFOV = 65;
+    this._speedFOV = 0;
+    this._collisionSparks = null;
+    this._collisionSparkData = null;
+    
+    // === CYCLE 22: TRACK EDGE CONES ===
+    this._trackCones = null;
+    
     // === CYCLE 21: POSITION TRACKING ===
     this._currentRacePosition = 1;
     this._lastRacePosition = 1;
     this._positionAnnounceTimer = 0;
     
+
+    // === CYCLE 23: ITEM PICKUP SYSTEM ===
+    this._itemPickups = [];
+    this._currentItem = null;
+    this._itemCooldowns = {};
+    this._shieldActive = false;
+    this._shieldTimer = 0;
+    this._shieldMesh = null;
+    this._health = 100;
+    this._missileProjectile = null;
+    this._nearMissTimer = 0;
+    this._nearMissCount = 0;
+    this._totalNearMisses = 0;
+    this._startFinishArch = null;
+    this._holographicSigns = [];
+    this._groundFogPatches = [];
     // FPS counter
     this._fpsFrames = 0;
     this._fpsTime = 0;
@@ -142,6 +187,18 @@ export class RaceScene {
       case 'Space': 
         this._keys.drift = true; 
         if (window.__engine && window.__engine.input) window.__engine.input._setAction('drift', 1);
+        break;
+      case 'KeyR':
+        this._rainActive = !this._rainActive;
+        this._rainTargetIntensity = this._rainActive ? 1.0 : 0.0;
+        if (this._hudRefs && this._hudRefs.weatherIndicator) {
+          this._hudRefs.weatherIndicator.textContent = this._rainActive ? 'RAIN ON' : 'RAIN OFF';
+          this._hudRefs.weatherIndicator.style.opacity = '1';
+          setTimeout(() => { if (this._hudRefs && this._hudRefs.weatherIndicator) this._hudRefs.weatherIndicator.style.opacity = '0'; }, 1500);
+        }
+        break;
+      case 'KeyE':
+        this._useItem();
         break;
       case 'ShiftLeft': case 'ShiftRight':
         this._keys.nitro = true;
@@ -212,13 +269,26 @@ export class RaceScene {
     this._positionVehicleAtStart();
     
     try { this._createScenery(); } catch (e) { console.error('[RaceScene] Scenery failed:', e); }
+    // === CYCLE 22: TRACK EDGE CONES ===
+    try { this._createTrackEdgeCones(); } catch (e) { console.error('[RaceScene] Track cones failed:', e); }
+
     
     // === CYCLE 21: CREATE BOOST PADS ON TRACK ===
     try { this._createBoostPads(); } catch (e) { console.error('[RaceScene] Boost pads failed:', e); }
     
-    // === CYCLE 21: SETUP REAR-VIEW MIRROR ===
+    // === CYCLE 22: CREATE WEATHER SYSTEM ===
+    try { this._createRainSystem(); } catch (e) { console.error('[RaceScene] Rain system failed:', e); }
+    try { this._createLightningSystem(); } catch (e) { console.error('[RaceScene] Lightning failed:', e); }
+    try { this._createSkidMarksSystem(); } catch (e) { console.error('[RaceScene] Skid marks failed:', e); }
+    try { this._createCollisionSparks(); } catch (e) { console.error('[RaceScene] Collision sparks failed:', e); }
+        // === CYCLE 21: SETUP REAR-VIEW MIRROR ===
     try { this._setupRearviewMirror(); } catch (e) { console.error('[RaceScene] Rear-view mirror failed:', e); }
     
+    // === CYCLE 23: NEW FEATURES ===
+    try { this._createItemPickups(); } catch (e) { console.error('[RaceScene] Item pickups failed:', e); }
+    try { this._createStartFinishArch(); } catch (e) { console.error('[RaceScene] Start/Finish arch failed:', e); }
+    try { this._createEnhancedScenery(); } catch (e) { console.error('[RaceScene] Enhanced scenery failed:', e); }
+
     // Spawn AI opponents on the track
     try {
       if (this._trackCurve) {
@@ -349,6 +419,14 @@ export class RaceScene {
       this._hudElement.parentNode.removeChild(this._hudElement);
     }
     
+    // C22 cleanup: dispose skid marks
+    if (this._skidMarkMesh) {
+      this._skidMarkMesh.geometry.dispose();
+      this._skidMarkMesh.material.dispose();
+      this._skidMarkMesh = null;
+    }
+    this._skidMarkPoints = [];
+    
     this._track = null;
     this._vehicle = null;
     this._sky = null;
@@ -356,7 +434,396 @@ export class RaceScene {
     this._hudElement = null;
   }
   
-  _disposeObject(obj) {
+
+  // === CYCLE 22: WEATHER / RAIN SYSTEM ===
+  _createRainSystem() {
+    var rainCount = 3000;
+    var rainGeo = new THREE.BufferGeometry();
+    var rainPositions = new Float32Array(rainCount * 6); // line segments
+    var rainVelocities = new Float32Array(rainCount); // fall speed per drop
+    
+    for (var ri = 0; ri < rainCount; ri++) {
+      var rx = (Math.random() - 0.5) * 200;
+      var ry = Math.random() * 60;
+      var rz = (Math.random() - 0.5) * 200;
+      rainPositions[ri * 6] = rx;
+      rainPositions[ri * 6 + 1] = ry;
+      rainPositions[ri * 6 + 2] = rz;
+      rainPositions[ri * 6 + 3] = rx + 0.1; // slight wind offset
+      rainPositions[ri * 6 + 4] = ry - 1.5;
+      rainPositions[ri * 6 + 5] = rz;
+      rainVelocities[ri] = 25 + Math.random() * 15;
+    }
+    
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+    var rainMat = new THREE.LineBasicMaterial({
+      color: '#8899cc', transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    this._rainParticles = new THREE.LineSegments(rainGeo, rainMat);
+    this._rainParticles.frustumCulled = false;
+    this._scene.add(this._rainParticles);
+    this._rainData = { positions: rainPositions, velocities: rainVelocities, count: rainCount };
+    
+    // Ground puddle reflections (simple flat circles)
+    var puddleCount = 12;
+    var puddleGeo = new THREE.CircleGeometry(2 + Math.random() * 3, 16);
+    var puddleMat = new THREE.MeshStandardMaterial({
+      color: '#223344', metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0
+    });
+    for (var pi = 0; pi < puddleCount; pi++) {
+      var puddle = new THREE.Mesh(
+        new THREE.CircleGeometry(1.5 + Math.random() * 3, 12),
+        puddleMat.clone()
+      );
+      puddle.rotation.x = -Math.PI / 2;
+      puddle.position.set((Math.random() - 0.5) * 160, 0.02, (Math.random() - 0.5) * 200);
+      this._scene.add(puddle);
+      this._weatherPuddles.push(puddle);
+    }
+    
+    console.log('[RaceScene] Rain system created:', rainCount, 'drops,', puddleCount, 'puddles');
+  }
+  
+  _updateRain(dt) {
+    if (!this._rainParticles || !this._rainData) return;
+    
+    // Smooth rain intensity transition
+    this._rainIntensity += (this._rainTargetIntensity - this._rainIntensity) * Math.min(1, dt * 2);
+    
+    // Update rain material opacity
+    this._rainParticles.material.opacity = this._rainIntensity * 0.4;
+    
+    // Update puddle opacity
+    for (var pi = 0; pi < this._weatherPuddles.length; pi++) {
+      this._weatherPuddles[pi].material.opacity = this._rainIntensity * 0.35;
+    }
+    
+    if (this._rainIntensity < 0.01) return;
+    
+    // Move rain drops relative to vehicle position
+    var vx = this._vehicle ? this._vehicle.position.x : 0;
+    var vz = this._vehicle ? this._vehicle.position.z : 0;
+    var rp = this._rainData.positions;
+    var rv = this._rainData.velocities;
+    
+    for (var i = 0; i < this._rainData.count; i++) {
+      // Fall
+      var fallAmount = rv[i] * dt;
+      rp[i * 6 + 1] -= fallAmount;
+      rp[i * 6 + 4] -= fallAmount;
+      
+      // Wind sway
+      var wind = Math.sin(this._clock.getElapsedTime() * 0.5 + i * 0.01) * 2 * dt;
+      rp[i * 6] += wind;
+      rp[i * 6 + 3] += wind;
+      
+      // Reset drops that fell below ground
+      if (rp[i * 6 + 4] < -1) {
+        var nx = vx + (Math.random() - 0.5) * 200;
+        var nz = vz + (Math.random() - 0.5) * 200;
+        var ny = 40 + Math.random() * 20;
+        rp[i * 6] = nx;
+        rp[i * 6 + 1] = ny;
+        rp[i * 6 + 2] = nz;
+        rp[i * 6 + 3] = nx + 0.1;
+        rp[i * 6 + 4] = ny - 1.5;
+        rp[i * 6 + 5] = nz;
+      }
+    }
+    this._rainParticles.geometry.attributes.position.needsUpdate = true;
+    
+    // Darken scene when raining
+    if (this._lights && this._lights.ambient) {
+      this._lights.ambient.intensity = 0.5 - this._rainIntensity * 0.2;
+    }
+    if (this._scene && this._scene.fog) {
+      this._scene.fog.density = 0.008 + this._rainIntensity * 0.006;
+    }
+  }
+  
+  // === CYCLE 22: LIGHTNING SYSTEM ===
+  _createLightningSystem() {
+    // Lightning flash light
+    this._lightningLight = new THREE.PointLight('#ffffff', 0, 500);
+    this._lightningLight.position.set(0, 80, 0);
+    this._scene.add(this._lightningLight);
+  }
+  
+  _updateLightning(dt) {
+    if (!this._rainActive) {
+      this._lightningFlash = 0;
+      if (this._lightningLight) this._lightningLight.intensity = 0;
+      return;
+    }
+    
+    this._lightningTimer -= dt;
+    
+    // Random lightning every 4-12 seconds when raining
+    if (this._lightningTimer <= 0) {
+      this._lightningTimer = 4 + Math.random() * 8;
+      this._lightningFlash = 1.0;
+      
+      // Flash the screen overlay
+      if (this._hudElement) {
+        var flash = this._hudElement.querySelector('.fx-lightning-flash');
+        if (flash) {
+          flash.style.opacity = '1';
+          setTimeout(() => { if (flash) flash.style.opacity = '0'; }, 100);
+          // Double flash
+          setTimeout(() => {
+            if (flash) flash.style.opacity = '0.6';
+            setTimeout(() => { if (flash) flash.style.opacity = '0'; }, 80);
+          }, 150);
+        }
+      }
+    }
+    
+    // Decay flash
+    if (this._lightningFlash > 0) {
+      this._lightningFlash *= 0.85;
+      if (this._lightningLight) {
+        this._lightningLight.intensity = this._lightningFlash * 15;
+        this._lightningLight.position.set(
+          this._vehicle ? this._vehicle.position.x + (Math.random() - 0.5) * 100 : 0,
+          80,
+          this._vehicle ? this._vehicle.position.z + (Math.random() - 0.5) * 100 : 0
+        );
+      }
+    }
+  }
+  
+  // === CYCLE 22: SKID MARKS SYSTEM ===
+  _createSkidMarksSystem() {
+    // Pre-allocate buffer for skid mark line segments
+    var skidGeo = new THREE.BufferGeometry();
+    var skidPositions = new Float32Array(this._maxSkidPoints * 6);
+    var skidColors = new Float32Array(this._maxSkidPoints * 6);
+    
+    // Initialize colors (dark rubber)
+    for (var si = 0; si < this._maxSkidPoints; si++) {
+      for (var ci = 0; ci < 6; ci++) {
+        skidColors[si * 6 + ci] = 0.15;
+      }
+    }
+    
+    skidGeo.setAttribute('position', new THREE.BufferAttribute(skidPositions, 3));
+    skidGeo.setAttribute('color', new THREE.BufferAttribute(skidColors, 3));
+    skidGeo.setDrawRange(0, 0);
+    
+    var skidMat = new THREE.LineBasicMaterial({
+      vertexColors: true, transparent: true, opacity: 0.7,
+      depthWrite: false, blending: THREE.NormalBlending
+    });
+    
+    this._skidMarkMesh = new THREE.LineSegments(skidGeo, skidMat);
+    this._skidMarkMesh.position.y = 0.02; // Just above ground
+    this._scene.add(this._skidMarkMesh);
+  }
+  
+  _updateSkidMarks(dt) {
+    if (!this._vehicle || !this._skidMarkMesh) return;
+    
+    // Detect skidding: drifting + steering at speed
+    var isDrifting = this._keys.drift && Math.abs(this._state.speed) > 10 && Math.abs(this._steerInput || 0) > 0.2;
+    var hardBraking = this._keys.brake && this._state.speed > 30;
+    this._isSkidding = isDrifting || hardBraking;
+    
+    if (this._isSkidding && this._skidMarkPoints.length < this._maxSkidPoints) {
+      // Add left and right tire positions
+      var heading = this._heading || 0;
+      var perpX = Math.cos(heading) * 1.0; // half track width of tires
+      var perpZ = -Math.sin(heading) * 1.0;
+      
+      // Rear axle position (behind vehicle center)
+      var rearX = this._vehicle.position.x - Math.sin(heading) * 1.5;
+      var rearZ = this._vehicle.position.z - Math.cos(heading) * 1.5;
+      
+      // Left tire
+      this._skidMarkPoints.push({
+        x: rearX + perpX, z: rearZ + perpZ
+      });
+      // Right tire
+      this._skidMarkPoints.push({
+        x: rearX - perpX, z: rearZ - perpZ
+      });
+    }
+    
+    // Update geometry
+    var posArr = this._skidMarkMesh.geometry.attributes.position.array;
+    var count = Math.min(this._skidMarkPoints.length, this._maxSkidPoints);
+    
+    for (var i = 0; i < count; i++) {
+      var pt = this._skidMarkPoints[i];
+      posArr[i * 6] = pt.x;
+      posArr[i * 6 + 1] = 0;
+      posArr[i * 6 + 2] = pt.z;
+      // End point (slight offset for line visibility)
+      if (i < count - 1) {
+        var next = this._skidMarkPoints[i + 1];
+        posArr[i * 6 + 3] = next.x;
+        posArr[i * 6 + 4] = 0;
+        posArr[i * 6 + 5] = next.z;
+      } else {
+        posArr[i * 6 + 3] = pt.x;
+        posArr[i * 6 + 4] = 0;
+        posArr[i * 6 + 5] = pt.z;
+      }
+    }
+    
+    this._skidMarkMesh.geometry.attributes.position.needsUpdate = true;
+    this._skidMarkMesh.geometry.setDrawRange(0, count * 2);
+    
+    // Fade old skid marks by reducing point count slowly
+    if (this._skidMarkPoints.length > 100 && !this._isSkidding) {
+      this._skidMarkPoints.splice(0, 2); // Remove oldest pair
+    }
+  }
+  
+  // === CYCLE 22: COLLISION SPARKS ===
+  _createCollisionSparks() {
+    var sparkCount = 40;
+    var sparkGeo = new THREE.BufferGeometry();
+    var sparkPos = new Float32Array(sparkCount * 3);
+    var sparkCol = new Float32Array(sparkCount * 3);
+    var sparkVel = new Float32Array(sparkCount * 3);
+    var sparkLife = new Float32Array(sparkCount);
+    
+    for (var i = 0; i < sparkCount; i++) {
+      sparkLife[i] = 0;
+      sparkCol[i * 3] = 1; sparkCol[i * 3 + 1] = 0.7; sparkCol[i * 3 + 2] = 0.2;
+    }
+    
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    sparkGeo.setAttribute('color', new THREE.BufferAttribute(sparkCol, 3));
+    
+    var sparkMat = new THREE.PointsMaterial({
+      size: 0.3, vertexColors: true, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    
+    this._collisionSparks = new THREE.Points(sparkGeo, sparkMat);
+    this._collisionSparks.frustumCulled = false;
+    this._scene.add(this._collisionSparks);
+    this._collisionSparkData = { positions: sparkPos, velocities: sparkVel, life: sparkLife, count: sparkCount };
+  }
+  
+  _triggerCameraShake(intensity) {
+    this._cameraShakeIntensity = Math.max(this._cameraShakeIntensity, intensity);
+    
+    // Spawn collision sparks at vehicle position
+    if (this._collisionSparks && this._collisionSparkData && this._vehicle) {
+      var sd = this._collisionSparkData;
+      for (var i = 0; i < sd.count; i++) {
+        if (sd.life[i] <= 0) {
+          sd.positions[i * 3] = this._vehicle.position.x + (Math.random() - 0.5) * 2;
+          sd.positions[i * 3 + 1] = 0.5 + Math.random() * 0.5;
+          sd.positions[i * 3 + 2] = this._vehicle.position.z + (Math.random() - 0.5) * 2;
+          sd.velocities[i * 3] = (Math.random() - 0.5) * 15;
+          sd.velocities[i * 3 + 1] = 3 + Math.random() * 8;
+          sd.velocities[i * 3 + 2] = (Math.random() - 0.5) * 15;
+          sd.life[i] = 0.5 + Math.random() * 0.5;
+        }
+      }
+    }
+    
+    // Collision flash effect
+    if (this._hudElement) {
+      var flash = this._hudElement.querySelector('.fx-collision-flash');
+      if (flash) {
+        flash.style.opacity = '0.5';
+        setTimeout(() => { if (flash) flash.style.opacity = '0'; }, 150);
+      }
+    }
+  }
+  
+  _updateCollisionSparks(dt) {
+    if (!this._collisionSparks || !this._collisionSparkData) return;
+    
+    var sd = this._collisionSparkData;
+    var anyActive = false;
+    
+    for (var i = 0; i < sd.count; i++) {
+      if (sd.life[i] > 0) {
+        sd.life[i] -= dt;
+        anyActive = true;
+        
+        // Apply velocity
+        sd.positions[i * 3] += sd.velocities[i * 3] * dt;
+        sd.positions[i * 3 + 1] += sd.velocities[i * 3 + 1] * dt;
+        sd.positions[i * 3 + 2] += sd.velocities[i * 3 + 2] * dt;
+        
+        // Gravity
+        sd.velocities[i * 3 + 1] -= 20 * dt;
+        
+        // Bounce off ground
+        if (sd.positions[i * 3 + 1] < 0.05) {
+          sd.positions[i * 3 + 1] = 0.05;
+          sd.velocities[i * 3 + 1] *= -0.3;
+          sd.velocities[i * 3] *= 0.7;
+          sd.velocities[i * 3 + 2] *= 0.7;
+        }
+      }
+    }
+    
+    this._collisionSparks.geometry.attributes.position.needsUpdate = true;
+    this._collisionSparks.material.opacity = anyActive ? 0.9 : 0;
+  }
+  
+  // === CYCLE 22: TRACK EDGE CONES (for barrel track) ===
+  _createTrackEdgeCones() {
+    if (!this._trackData || !this._trackData.curve) return;
+    
+    var curve = this._trackData.curve;
+    var halfW = (this._trackWidth || 18) / 2 + 2;
+    var coneCount = 40;
+    
+    // Cone geometry
+    var coneGeo = new THREE.ConeGeometry(0.3, 1.0, 6);
+    var coneMat = new THREE.MeshStandardMaterial({
+      color: '#ff6600', emissive: '#ff3300', emissiveIntensity: 0.5,
+      metalness: 0.3, roughness: 0.7
+    });
+    
+    // Glow ring at base
+    var ringGeo = new THREE.TorusGeometry(0.35, 0.05, 4, 8);
+    var ringMat = new THREE.MeshBasicMaterial({ color: '#ff6600' });
+    
+    this._trackCones = new THREE.Group();
+    this._trackCones.name = 'track-cones';
+    
+    for (var i = 0; i < coneCount; i++) {
+      var t = i / coneCount;
+      var point = curve.getPoint(t);
+      var tangent = curve.getTangent(t);
+      var perp = new THREE.Vector3(tangent.z, 0, -tangent.x).normalize();
+      
+      // Left cone
+      var leftPos = point.clone().add(perp.clone().multiplyScalar(halfW));
+      var leftCone = new THREE.Mesh(coneGeo, coneMat);
+      leftCone.position.set(leftPos.x, 0.5, leftPos.z);
+      var leftRing = new THREE.Mesh(ringGeo, ringMat);
+      leftRing.position.set(leftPos.x, 0.05, leftPos.z);
+      leftRing.rotation.x = Math.PI / 2;
+      this._trackCones.add(leftCone);
+      this._trackCones.add(leftRing);
+      
+      // Right cone
+      var rightPos = point.clone().add(perp.clone().multiplyScalar(-halfW));
+      var rightCone = new THREE.Mesh(coneGeo, coneMat);
+      rightCone.position.set(rightPos.x, 0.5, rightPos.z);
+      var rightRing = new THREE.Mesh(ringGeo, ringMat);
+      rightRing.position.set(rightPos.x, 0.05, rightPos.z);
+      rightRing.rotation.x = Math.PI / 2;
+      this._trackCones.add(rightCone);
+      this._trackCones.add(rightRing);
+    }
+    
+    this._scene.add(this._trackCones);
+    console.log('[RaceScene] Track edge cones:', coneCount * 2, 'placed');
+  }
+
+    _disposeObject(obj) {
     if (obj.geometry) obj.geometry.dispose();
     if (obj.material) {
       if (Array.isArray(obj.material)) obj.material.forEach(function(m) { m.dispose(); });
@@ -401,6 +868,18 @@ export class RaceScene {
     this._checkBoostPads(dt);
     this._updateRearviewMirror();
     this._updatePositionTracking();
+    // === CYCLE 22: NEW SYSTEM UPDATES ===
+    this._updateRain(dt);
+    this._updateLightning(dt);
+    this._updateSkidMarks(dt);
+    this._updateCollisionSparks(dt);
+    // === CYCLE 23: NEW SYSTEM UPDATES ===
+    this._updateItemPickups(dt);
+    this._updateShield(dt);
+    this._updateMissile(dt);
+    this._updateNearMissDetection(dt);
+    this._updateHolographicSigns(dt);
+    
   }
   
   _switchToFallbackVehicle() {
@@ -745,10 +1224,12 @@ export class RaceScene {
     if (Math.abs(this._vehicle.position.x) > 150) {
       this._vehicle.position.x = Math.sign(this._vehicle.position.x) * 150;
       this._state.speed *= 0.5;
+      this._triggerCameraShake(0.2);
     }
     if (Math.abs(this._vehicle.position.z) > 250) {
       this._vehicle.position.z = Math.sign(this._vehicle.position.z) * 250;
       this._state.speed *= 0.5;
+      this._triggerCameraShake(0.2);
     }
     
     // Track-bound collision: bounce off barrel track barriers if near track
@@ -2197,6 +2678,15 @@ export class RaceScene {
 
   _updateCamera(dt) {
     if (!this._camera || !this._vehicle) return;
+    
+    // === CYCLE 22: SPEED-DEPENDENT FOV ===
+    var speedRatioFOV = Math.min(1, Math.abs(this._state.speed) / 80);
+    var targetFOV = this._baseFOV + speedRatioFOV * 15;
+    this._speedFOV = this._speedFOV || this._baseFOV;
+    this._speedFOV += (targetFOV - this._speedFOV) * Math.min(1, dt * 3);
+    this._camera.fov = this._speedFOV;
+    this._camera.updateProjectionMatrix();
+
     var vehiclePos = this._vehicle.position;
     var vehicleHeading = this._heading || this._vehicle.rotation.y || 0;
     
@@ -2235,6 +2725,15 @@ export class RaceScene {
     if (!this._cameraLookTarget) this._cameraLookTarget = lookTarget.clone();
     this._cameraLookTarget.lerp(lookTarget, Math.min(1, dt * 6));
     this._camera.lookAt(this._cameraLookTarget);
+    
+    // === CYCLE 22: CAMERA SHAKE ===
+    if (this._cameraShakeIntensity > 0.001) {
+      var shakeX = (Math.random() - 0.5) * this._cameraShakeIntensity;
+      var shakeY = (Math.random() - 0.5) * this._cameraShakeIntensity * 0.5;
+      this._camera.position.x += shakeX;
+      this._camera.position.y += shakeY;
+      this._cameraShakeIntensity *= Math.exp(-this._cameraShakeDecay * dt);
+    }
   }
 
   getState() { return { running: this._state.running, speed: this._state.speed, position: this._state.position, lap: this._state.lap }; }

@@ -807,3 +807,405 @@
   0%, 100% { border-color: var(--border-subtle); box-shadow: none; }
   50% { border-color: var(--accent-secondary, #00e5ff); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
 }
+
+
+/* ==================== CYCLE 22: WEATHER & COLLISION EFFECTS ==================== */
+
+/** Lightning flash - full screen white/blue flash */
+.fx-lightning-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 20%, rgba(180, 200, 255, 0.4) 0%, rgba(100, 130, 255, 0.15) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.08s ease-out;
+}
+
+/** Collision flash - screen edge red flash on barrier hit */
+.fx-collision-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 49;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+  background:
+    radial-gradient(ellipse at 0% 50%, rgba(255, 61, 90, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 50%, rgba(255, 61, 90, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 0%, rgba(255, 150, 50, 0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 150, 50, 0.2) 0%, transparent 40%);
+}
+
+/** Rain overlay - subtle darkening + blur at edges when raining */
+.fx-rain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0, 10, 30, 0.3) 100%);
+}
+
+.fx-rain-overlay.active {
+  opacity: 1;
+}
+
+/** Screen shake keyframes */
+@keyframes screenShakeLight {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2px, 1px); }
+  30% { transform: translate(2px, -1px); }
+  50% { transform: translate(-1px, 2px); }
+  70% { transform: translate(1px, -2px); }
+  90% { transform: translate(-1px, 1px); }
+}
+
+@keyframes screenShakeHeavy {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-4px, 2px); }
+  20% { transform: translate(3px, -3px); }
+  30% { transform: translate(-2px, 4px); }
+  40% { transform: translate(4px, -1px); }
+  50% { transform: translate(-3px, 3px); }
+  60% { transform: translate(2px, -4px); }
+  70% { transform: translate(-4px, 1px); }
+  80% { transform: translate(3px, 3px); }
+  90% { transform: translate(-1px, -2px); }
+}
+
+/** Boost pad hit - enhanced edge glow with directionality */
+.fx-boost-pad-hit.directional-left {
+  background: linear-gradient(to right, rgba(0, 255, 170, 0.3) 0%, transparent 30%);
+}
+
+.fx-boost-pad-hit.directional-right {
+  background: linear-gradient(to left, rgba(0, 255, 170, 0.3) 0%, transparent 30%);
+}
+
+.fx-boost-pad-hit.directional-forward {
+  background: linear-gradient(to bottom, rgba(0, 255, 170, 0.3) 0%, transparent 30%);
+}
+
+/** Skid mark visual feedback - brief tire screech indicator */
+.fx-skid-indicator {
+  position: fixed;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 41;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #ff8800;
+  text-shadow: 0 0 10px rgba(255, 136, 0, 0.5);
+}
+
+.fx-skid-indicator.active {
+  opacity: 0.7;
+  animation: skidPulseText 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes skidPulseText {
+  0% { transform: translateX(-50%) scale(1); }
+  100% { transform: translateX(-50%) scale(1.05); }
+}
+
+/** FOV zoom effect indicator - speed lines at screen edges */
+.fx-speed-vignette-radial {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 38;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    ellipse 70% 60% at center,
+    transparent 50%,
+    rgba(255, 255, 255, 0.03) 70%,
+    rgba(255, 255, 255, 0.06) 85%,
+    transparent 100%
+  );
+}
+
+/** Camera FOV shift visual feedback */
+.fx-fov-shift {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 37;
+  transition: transform 0.15s ease-out;
+}
+
+.fx-fov-shift.wide {
+  transform: perspective(800px) scale(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-lightning-flash { transition: none; }
+  .fx-collision-flash { transition: none; }
+  .fx-rain-overlay { transition: none; }
+  .fx-skid-indicator { animation: none; }
+  .fx-fov-shift { transition: none; }
+}
+
+
+/* ============================================ */
+/* CYCLE 23: ITEM PICKUP EFFECTS                */
+/* ============================================ */
+
+.fx-item-pickup {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  border: 3px solid var(--item-color, #ffffff);
+  border-radius: 0;
+  opacity: 0;
+  animation: itemPickupFlash 0.6s ease-out forwards;
+}
+
+@keyframes itemPickupFlash {
+  0% { opacity: 0.8; box-shadow: inset 0 0 80px var(--item-color, #ffffff); }
+  100% { opacity: 0; box-shadow: inset 0 0 0px var(--item-color, #ffffff); }
+}
+
+/* ============================================ */
+/* CYCLE 23: BOOST ACTIVATION EFFECT             */
+/* ============================================ */
+
+.fx-boost-activation {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 255, 170, 0.3) 100%);
+  opacity: 0;
+  animation: boostActivationPulse 0.8s ease-out forwards;
+}
+
+@keyframes boostActivationPulse {
+  0% { opacity: 0; transform: scale(1.1); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* ============================================ */
+/* CYCLE 23: MISSILE LAUNCH EFFECT               */
+/* ============================================ */
+
+.fx-missile-launch {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  pointer-events: none;
+  z-index: 80;
+  background: linear-gradient(0deg, rgba(255, 68, 68, 0.4), transparent);
+  opacity: 0;
+  animation: missileLaunchFlash 0.4s ease-out forwards;
+}
+
+@keyframes missileLaunchFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ============================================ */
+/* CYCLE 23: NEAR MISS EFFECT                    */
+/* ============================================ */
+
+.fx-near-miss {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 85;
+  font-family: var(--font-mono, monospace);
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffd23f;
+  text-shadow:
+    0 0 12px rgba(255, 210, 63, 0.7),
+    0 0 24px rgba(255, 210, 63, 0.4),
+    0 0 48px rgba(255, 210, 63, 0.2);
+  letter-spacing: 3px;
+  animation: nearMissSlide 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  white-space: nowrap;
+}
+
+@keyframes nearMissSlide {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.5) translateY(20px); }
+  15% { opacity: 1; transform: translateX(-50%) scale(1.1) translateY(0); }
+  30% { transform: translateX(-50%) scale(1) translateY(0); }
+  70% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.9) translateY(-20px); }
+}
+
+/* ============================================ */
+/* CYCLE 23: SHIELD ACTIVATION EFFECT             */
+/* ============================================ */
+
+.fx-shield-activate {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 79;
+  border: 4px solid rgba(68, 136, 255, 0.6);
+  border-radius: 50%;
+  margin: 15%;
+  opacity: 0;
+  animation: shieldActivationRing 0.8s ease-out forwards;
+}
+
+@keyframes shieldActivationRing {
+  0% { opacity: 0.8; transform: scale(0.5); border-width: 8px; }
+  100% { opacity: 0; transform: scale(1.5); border-width: 2px; }
+}
+
+/* ============================================ */
+/* CYCLE 23: ITEM USE FLASH EFFECTS               */
+/* ============================================ */
+
+.fx-item-use-boost {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  background: radial-gradient(circle at center bottom, rgba(0, 255, 170, 0.4) 0%, transparent 60%);
+  opacity: 0;
+  animation: itemUseFlash 0.6s ease-out forwards;
+}
+
+.fx-item-use-shield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  background: radial-gradient(circle at center, rgba(68, 136, 255, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  animation: itemUseFlash 0.6s ease-out forwards;
+}
+
+.fx-item-use-missile {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  background: radial-gradient(circle at center bottom, rgba(255, 68, 68, 0.3) 0%, transparent 50%);
+  opacity: 0;
+  animation: itemUseFlash 0.5s ease-out forwards;
+}
+
+@keyframes itemUseFlash {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* ============================================ */
+/* CYCLE 23: EXPLOSION SCREEN EFFECT              */
+/* ============================================ */
+
+.fx-explosion-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  background: radial-gradient(circle at var(--explosion-x, 50%) var(--explosion-y, 60%), rgba(255, 120, 0, 0.5) 0%, rgba(255, 60, 0, 0.2) 30%, transparent 60%);
+  opacity: 0;
+  animation: explosionFade 0.8s ease-out forwards;
+}
+
+@keyframes explosionFade {
+  0% { opacity: 1; }
+  30% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ============================================ */
+/* CYCLE 23: ENHANCED SCREEN EFFECTS              */
+/* ============================================ */
+
+.fx-lightning-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 75;
+  background: radial-gradient(ellipse at 50% 0%, rgba(180, 200, 255, 0.4) 0%, rgba(100, 120, 255, 0.15) 40%, transparent 70%);
+  transition: opacity 0.1s ease;
+  opacity: 0;
+}
+
+.fx-collision-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 75;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.fx-rain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 74;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 10, 30, 0.35) 100%);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+/* ============================================ */
+/* CYCLE 23: SPEED LINES OVERLAY                 */
+/* ============================================ */
+
+.fx-speed-lines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 73;
+  background:
+    repeating-conic-gradient(
+      transparent 0deg,
+      rgba(255, 255, 255, 0.02) 2deg,
+      transparent 4deg
+    );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================ */
+/* CYCLE 23: RACE COMPLETE OVERLAY                */
+/* ============================================ */
+
+.fx-race-complete {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  background: radial-gradient(ellipse at center, rgba(255, 210, 63, 0.15) 0%, rgba(0, 0, 0, 0.4) 100%);
+  animation: raceCompleteFadeIn 1s ease-out forwards;
+}
+
+@keyframes raceCompleteFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-item-pickup, .fx-boost-activation, .fx-missile-launch,
+  .fx-near-miss, .fx-shield-activate, .fx-item-use-boost,
+  .fx-item-use-shield, .fx-item-use-missile, .fx-explosion-flash,
+  .fx-race-complete {
+    animation: none;
+    opacity: 0;
+  }
+}

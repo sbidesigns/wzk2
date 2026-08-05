@@ -1561,3 +1561,496 @@
 .main-menu-system::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
 }
+
+
+/* ==================== CYCLE 22: ENHANCED MAIN MENU STYLING ==================== */
+
+/** Animated background particles on main menu */
+.main-menu-bg-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.main-menu-bg-particles canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+}
+
+/** Enhanced button hover with neon trail effect */
+.btn-neon-trail {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-neon-trail::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(0, 229, 255, 0.15) 30deg,
+    transparent 60deg
+  );
+  animation: neonTrailSpin 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-neon-trail:hover::after {
+  opacity: 1;
+}
+
+@keyframes neonTrailSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/** Season badge with shimmer effect */
+.season-badge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.season-badge-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: shimmerSlide 3s ease-in-out infinite;
+}
+
+@keyframes shimmerSlide {
+  0% { left: -50%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+/** Enhanced card hover with 3D tilt */
+.card-3d-tilt {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 600px;
+}
+
+.card-3d-tilt:hover {
+  transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 229, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/** Glowing text gradient animation */
+.text-glow-animate {
+  background: linear-gradient(
+    90deg,
+    #00e5ff, #ff3d5a, #00ffaa, #00e5ff
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGlowShift 4s linear infinite;
+}
+
+@keyframes textGlowShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/** News ticker with smooth infinite scroll */
+.ticker-infinite {
+  display: flex;
+  animation: tickerScroll 30s linear infinite;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/** Pulse ring effect for active menu items */
+.menu-item-pulse::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-primary, #00e5ff);
+  box-shadow: 0 0 8px var(--accent-primary, #00e5ff);
+}
+
+.menu-item-pulse::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-primary, #00e5ff);
+  opacity: 0;
+  animation: pulseRingExpand 1.5s ease-out infinite;
+}
+
+@keyframes pulseRingExpand {
+  0% { transform: translateY(-50%) scale(0.5); opacity: 0.8; }
+  100% { transform: translateY(-50%) scale(2); opacity: 0; }
+}
+
+/** Stat card with animated counter */
+.stat-card-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-animated .stat-value {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.stat-card-animated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--stat-fill, 0%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary, #00e5ff), var(--accent-secondary, #ff3d5a));
+  transition: width 1s ease-out;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+/** Glassmorphism level-up for main-menu panels */
+.glass-panel-ultra {
+  background: linear-gradient(
+    135deg,
+    rgba(10, 14, 26, 0.85) 0%,
+    rgba(15, 20, 35, 0.75) 50%,
+    rgba(10, 14, 26, 0.85) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/** Vertical accent bar for sections */
+.accent-bar-left {
+  position: relative;
+  padding-left: 16px;
+}
+
+.accent-bar-left::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent-primary, #00e5ff), transparent);
+  border-radius: 2px;
+}
+
+/** Horizontal divider with gradient fade */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.1) 80%, transparent);
+  border: none;
+  margin: 16px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-neon-trail::after { animation: none; }
+  .season-badge-shimmer::before { animation: none; }
+  .text-glow-animate { animation: none; background-size: 100% 100%; }
+  .ticker-infinite { animation: none; }
+  .menu-item-pulse::after { animation: none; }
+  .stat-card-animated::after { transition: none; }
+}
+
+@media (max-width: 768px) {
+  .glass-panel-ultra { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .card-3d-tilt:hover { transform: translateY(-2px); }
+}
+
+
+/* ==================== CYCLE 23: ENHANCED BACKGROUND ==================== */
+.main-menu-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.main-menu-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 77, 46, 0.04),
+    rgba(0, 229, 255, 0.04),
+    rgba(255, 210, 63, 0.04),
+    rgba(255, 77, 46, 0.04)
+  );
+  animation: heroGradientSpin 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes heroGradientSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================== CYCLE 23: ENHANCED MENU BUTTONS ==================== */
+.main-menu-left .btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-menu-left .btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.15), transparent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
+  z-index: -1;
+}
+
+.main-menu-left .btn:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* ==================== CYCLE 23: ANIMATED SEASON BADGE ==================== */
+.season-badge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.season-badge-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: badgeShimmer 3s ease-in-out infinite;
+}
+
+@keyframes badgeShimmer {
+ 0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* ==================== CYCLE 23: GLASS PANEL ULTRA ==================== */
+.glass-panel-ultra {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  ) !important;
+  backdrop-filter: blur(20px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ==================== CYCLE 23: NEWS TICKER ENHANCEMENT ==================== */
+.ticker-infinite {
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+/* ==================== CYCLE 23: 3D CARD TILT ==================== */
+.card-3d-tilt {
+  transform-style: preserve-3d;
+  perspective: 800px;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-3d-tilt:hover {
+  transform: rotateX(-2deg) rotateY(3deg) translateY(-4px);
+}
+
+/* ==================== CYCLE 23: TEXT GLOW ANIMATION ==================== */
+.text-glow-animate {
+  background: linear-gradient(
+    90deg,
+    #ff4d2e, #00e5ff, #ffd23f, #ff3366, #ff4d2e
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGlowShift 4s linear infinite;
+}
+
+@keyframes textGlowShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ==================== CYCLE 23: ACCENT BAR ==================== */
+.accent-bar-left {
+  position: relative;
+  padding-left: 16px;
+}
+
+.accent-bar-left::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  background: linear-gradient(180deg, #ff4d2e, #00e5ff, #ff4d2e);
+  border-radius: 2px;
+}
+
+/* ==================== CYCLE 23: DIVIDER GRADIENT ==================== */
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  border: none;
+  margin: 16px 0;
+}
+
+/* ==================== CYCLE 23: STAT CARD ANIMATION ==================== */
+.stat-card-animated {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-animated::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: var(--stat-progress, 0%);
+  background: linear-gradient(90deg, #00e5ff, #00ffaa);
+  border-radius: 0 0 var(--radius-m, 8px) var(--radius-m, 8px);
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== CYCLE 23: MENU ITEM PULSE ==================== */
+.menu-item-pulse {
+  position: relative;
+}
+
+.menu-item-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid rgba(0, 229, 255, 0.3);
+  opacity: 0;
+  animation: menuItemPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes menuItemPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* ==================== CYCLE 23: NEON TRAIL BUTTON ==================== */
+.btn-neon-trail {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-neon-trail::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(from var(--trail-angle, 0deg), #ff4d2e, #00e5ff, #ffd23f, #ff3366, #ff4d2e);
+  border-radius: inherit;
+  z-index: -2;
+  animation: neonTrailRotate 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-neon-trail:hover::before {
+  opacity: 1;
+}
+
+@property --trail-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes neonTrailRotate {
+  0% { --trail-angle: 0deg; }
+  100% { --trail-angle: 360deg; }
+}
+
+/* ==================== CYCLE 23: MAIN MENU TITLE ENHANCEMENT ==================== */
+.main-menu-title {
+  position: relative;
+  line-height: 1.1;
+}
+
+.main-menu-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #ff4d2e, transparent);
+  border-radius: 2px;
+}
+
+/* ==================== CYCLE 23: EYEBROW CURSOR ==================== */
+.main-menu-eyebrow {
+  position: relative;
+  display: inline-block;
+}
+
+.main-menu-eyebrow::after {
+  content: '|';
+  animation: cursorBlink 1s step-end infinite;
+  color: #ff4d2e;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-menu-hero::after { animation: none; }
+  .season-badge-shimmer::before { animation: none; }
+  .text-glow-animate { animation: none; background-position: 0% 50%; }
+  .menu-item-pulse::before { animation: none; }
+  .btn-neon-trail::before { animation: none; }
+  .main-menu-eyebrow::after { animation: none; opacity: 1; }
+}
