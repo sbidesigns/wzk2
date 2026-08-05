@@ -4,6 +4,7 @@
 // HUD: Proper DOM structure matching hud.css exactly
 
 import * as THREE from 'three';
+import { AIOpponentSystem } from './ai-opponents.js';
 
 export class RaceScene {
   // Racing mode constants
@@ -102,6 +103,9 @@ export class RaceScene {
         this._keys.drift = true; 
         if (window.__engine && window.__engine.input) window.__engine.input._setAction('drift', 1);
         break;
+      case 'ShiftLeft': case 'ShiftRight':
+        this._keys.nitro = true;
+        break;
     }
   }
   
@@ -123,9 +127,12 @@ export class RaceScene {
         this._keys.steerRight = false; 
         if (window.__engine && window.__engine.input) window.__engine.input._setAction('steerRight', 0);
         break;
-      case 'Space': 
-        this._keys.drift = false; 
+      case 'Space':
+        this._keys.drift = false;
         if (window.__engine && window.__engine.input) window.__engine.input._setAction('drift', 0);
+        break;
+      case 'ShiftLeft': case 'ShiftRight':
+        this._keys.nitro = false;
         break;
     }
   }
@@ -165,6 +172,19 @@ export class RaceScene {
     this._positionVehicleAtStart();
     
     try { this._createScenery(); } catch (e) { console.error('[RaceScene] Scenery failed:', e); }
+    
+    // Spawn AI opponents on the track
+    try {
+      if (this._trackCurve) {
+        this._aiSystem = new AIOpponentSystem(this._scene, this._trackCurve, this._trackWidth, {
+          numOpponents: 5,
+          difficulty: 'normal'
+        });
+        this._aiSystem.spawn();
+        console.log('[RaceScene] AI opponents spawned');
+      }
+    } catch (e) { console.error('[RaceScene] AI spawn failed:', e); }
+    
     try { this._createHUDElements(); } catch (e) { console.error('[RaceScene] HUD failed:', e); }
     
     // AAA FIX: Set camera BEHIND vehicle based on heading (not hardcoded offset)
@@ -259,6 +279,12 @@ export class RaceScene {
     this._state.running = false;
     this._removeInputListeners();
     
+    // Dispose AI opponents
+    if (this._aiSystem) {
+      try { this._aiSystem.dispose(); } catch(e) {}
+      this._aiSystem = null;
+    }
+    
     if (this._barrelVehicle && this._useBarrelVehicle) {
       try { if (typeof this._barrelVehicle.despawn === 'function') this._barrelVehicle.despawn(); } catch(e) {}
       this._barrelVehicle = null;
@@ -301,6 +327,26 @@ export class RaceScene {
       this._updateFallbackVehicle(dt);
     }
     
+    // Update AI opponents
+    if (this._aiSystem && this._trackCurve) {
+      var playerProgress = this._trackProgress;
+      // For open-world mode, estimate progress from position
+      if (this._raceConfig.mode === 'open_world' || !playerProgress) {
+        if (this._trackCurve && this._vehicle) {
+          var minDist = Infinity;
+          for (var st = 0; st < 100; st++) {
+            var t = st / 100;
+            var pt = this._trackCurve.getPoint(t);
+            var dx = this._vehicle.position.x - pt.x;
+            var dz = this._vehicle.position.z - pt.z;
+            var d = dx * dx + dz * dz;
+            if (d < minDist) { minDist = d; playerProgress = t; }
+          }
+        }
+      }
+      this._aiSystem.update(dt, playerProgress);
+    }
+    
     this._updateCamera(dt);
     this._updateHUDDirect();
   }
@@ -339,7 +385,7 @@ export class RaceScene {
           this._minimapUpdateTimer = (this._minimapUpdateTimer || 0) + dt;
           if (this._minimapUpdateTimer > 0.15) {
             this._minimapUpdateTimer = 0;
-            window.__engine.bus.emit('player:positionUpdate', { x: pos.x, y: pos.z, rotation: this._vehicle ? this._vehicle.rotation.y : 0, opponents: [] });
+            window.__engine.bus.emit('player:positionUpdate', { x: pos.x, y: pos.z, rotation: this._vehicle ? this._vehicle.rotation.y : 0, opponents: this._aiSystem ? this._aiSystem.getOpponentData() : [] });
           }
         }
         window.__engine.bus.emit('player:positionChanged', { position: 1, totalRacers: 8 });
@@ -501,7 +547,7 @@ export class RaceScene {
           y: this._vehicle.position.z, 
           rotation: this._heading, 
           progress: this._trackProgress,
-          opponents: [] 
+          opponents: this._aiSystem ? this._aiSystem.getOpponentData() : [] 
         });
       }
     }
@@ -588,6 +634,42 @@ export class RaceScene {
     this._vehiclePitch = this._vehiclePitch || 0;
     this._vehiclePitch += (pitchTarget - this._vehiclePitch) * 0.08;
     this._vehicle.rotation.x = this._vehiclePitch;
+    
+    // === EXHAUST TRAIL ANIMATION ===
+    if (this._exhaustTrailData) {
+      var ep = this._exhaustTrailData.positions;
+      var speedFactor = Math.abs(this._state.speed) / 65;
+      for (var ei = 0; ei < this._exhaustTrailData.count; ei++) {
+        ep[ei * 3 + 2] -= dt * (2 + speedFactor * 8);
+        if (ep[ei * 3 + 2] < -14) {
+          ep[ei * 3 + 2] = -2.05;
+          ep[ei * 3] = (Math.random() - 0.5) * 0.6;
+          ep[ei * 3 + 1] = 0.25 + Math.random() * 0.1;
+        }
+      }
+      this._exhaustTrail.geometry.attributes.position.needsUpdate = true;
+      this._exhaustTrail.material.opacity = 0.2 + speedFactor * 0.5;
+    }
+    
+    // === NITRO BOOST ===
+    if (this._nitroFlames) {
+      var nitroActive = this._keys.nitro && this._state.speed > 5;
+      for (var ni = 0; ni < this._nitroFlames.length; ni++) {
+        this._nitroFlames[ni].visible = nitroActive;
+        if (nitroActive) {
+          var flicker = 0.8 + Math.random() * 0.4;
+          this._nitroFlames[ni].scale.set(flicker, 0.6 + Math.random() * 0.8, flicker);
+        }
+      }
+      if (nitroActive) {
+        this._state.speed = Math.min(90, this._state.speed + 80 * dt);
+        this._exhaustTrail.material.color.set('#00ccff');
+        this._exhaustTrail.material.size = 0.6;
+      } else {
+        this._exhaustTrail.material.color.set('#ff6633');
+        this._exhaustTrail.material.size = 0.35;
+      }
+    }
     
     // Soft world bounds (generous)
     if (Math.abs(this._vehicle.position.x) > 150) {
@@ -702,11 +784,13 @@ export class RaceScene {
       this._minimapUpdateTimer = (this._minimapUpdateTimer || 0) + dt;
       if (this._minimapUpdateTimer > 0.15) {
         this._minimapUpdateTimer = 0;
+        var opponents = this._aiSystem ? this._aiSystem.getOpponentData() : [];
         window.__engine.bus.emit('player:positionUpdate', { 
           x: this._vehicle.position.x, 
           y: this._vehicle.position.z, 
           rotation: this._heading, 
-          opponents: [] 
+          progress: this._trackProgress,
+          opponents: opponents
         });
       }
     }
@@ -1120,6 +1204,47 @@ export class RaceScene {
     this._vehicle.position.set(0, 0.5, 0);
     this._scene.add(this._vehicle);
     
+    // === PLAYER EXHAUST TRAIL ===
+    var trailCount = 20;
+    var trailGeo = new THREE.BufferGeometry();
+    var trailPos = new Float32Array(trailCount * 3);
+    var trailAlpha = new Float32Array(trailCount);
+    for (var ti = 0; ti < trailCount; ti++) {
+      trailPos[ti * 3] = 0;
+      trailPos[ti * 3 + 1] = 0.3;
+      trailPos[ti * 3 + 2] = -2.05 - ti * 0.5;
+      trailAlpha[ti] = Math.max(0, 1 - ti / trailCount);
+    }
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+    var trailMat = new THREE.PointsMaterial({
+      color: '#ff6633', size: 0.35, transparent: true, opacity: 0.5,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    this._exhaustTrail = new THREE.Points(trailGeo, trailMat);
+    this._exhaustTrailData = { positions: trailPos, count: trailCount };
+    this._vehicle.add(this._exhaustTrail);
+    
+    // === NITRO FLAME EFFECTS ===
+    var nitroGeo = new THREE.ConeGeometry(0.3, 2.5, 6);
+    var nitroMat = new THREE.MeshBasicMaterial({ color: '#00ccff', transparent: true, opacity: 0.7 });
+    var nitroMat2 = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.5 });
+    this._nitroFlames = [];
+    [-0.4, 0.4].forEach(function(x) {
+      var flame = new THREE.Mesh(nitroGeo, nitroMat.clone());
+      flame.position.set(x, 0.4, -2.5);
+      flame.rotation.x = Math.PI / 2;
+      flame.visible = false;
+      this._vehicle.add(flame);
+      this._nitroFlames.push(flame);
+      
+      var core = new THREE.Mesh(new THREE.ConeGeometry(0.15, 1.8, 6), nitroMat2.clone());
+      core.position.set(x, 0.4, -2.2);
+      core.rotation.x = Math.PI / 2;
+      core.visible = false;
+      this._vehicle.add(core);
+      this._nitroFlames.push(core);
+    }.bind(this));
+    
     var spotlight = new THREE.SpotLight('#ffffcc', 2, 40, Math.PI / 6, 0.5);
     spotlight.position.set(0, 2, 2);
     spotlight.target.position.set(0, 0, 15);
@@ -1284,6 +1409,13 @@ export class RaceScene {
     var td = document.createElement('div'); td.className = 'timer-display'; td.id = 'hud-timer-display'; td.textContent = '00:00.00';
     var tl = document.createElement('div'); tl.className = 'timer-label'; tl.textContent = 'RACE TIME';
     tp.appendChild(td); tp.appendChild(tl); hud.appendChild(tp);
+    
+    // Nitro indicator
+    var np = document.createElement('div'); np.className = 'hud-panel'; np.style.cssText = 'position:fixed;bottom:80px;right:20px;background:rgba(0,20,40,0.75);border:1px solid rgba(0,204,255,0.3);border-radius:8px;padding:8px 14px;backdrop-filter:blur(8px);';
+    var nl = document.createElement('div'); nl.style.cssText = 'font-size:10px;letter-spacing:2px;color:#00ccff;margin-bottom:4px;text-align:center;'; nl.textContent = 'NITRO [SHIFT]';
+    var nbc = document.createElement('div'); nbc.style.cssText = 'width:120px;height:8px;background:rgba(0,204,255,0.15);border-radius:4px;overflow:hidden;';
+    var nb = document.createElement('div'); nb.id = 'hud-nitro-bar'; nb.style.cssText = 'width:100%;height:100%;background:linear-gradient(90deg,#00ccff,#00ffaa);border-radius:4px;transition:width 0.1s;';
+    nbc.appendChild(nb); np.appendChild(nl); np.appendChild(nbc); hud.appendChild(np);
     
     // Item panel
     var ip = document.createElement('div'); ip.className = 'hud-panel hud-item-panel';
