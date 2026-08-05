@@ -73,6 +73,33 @@ export class RaceScene {
     this._nitroRechargeRate = 8;   // fuel/sec when not in use
     this._nitroDrainRate = 25;      // fuel/sec when active
     
+    // === CYCLE 21: DRIFT SCORING SYSTEM ===
+    this._driftScore = 0;
+    this._driftChain = 0;
+    this._currentDriftScore = 0;
+    this._isDrifting = false;
+    this._driftTimer = 0;
+    this._driftThreshold = 0.25;
+    this._driftFadeTimer = 0;
+    this._totalDriftScore = 0;
+    this._bestDriftScore = 0;
+    
+    // === CYCLE 21: BOOST PADS ===
+    this._boostPads = [];
+    this._boostPadCooldowns = {};
+    this._boostPadEffectTimer = 0;
+    
+    // === CYCLE 21: REAR-VIEW MIRROR ===
+    this._rearviewCanvas = null;
+    this._rearviewCtx = null;
+    this._rearviewCamera = null;
+    this._rearviewRenderTimer = 0;
+    
+    // === CYCLE 21: POSITION TRACKING ===
+    this._currentRacePosition = 1;
+    this._lastRacePosition = 1;
+    this._positionAnnounceTimer = 0;
+    
     // FPS counter
     this._fpsFrames = 0;
     this._fpsTime = 0;
@@ -185,6 +212,12 @@ export class RaceScene {
     this._positionVehicleAtStart();
     
     try { this._createScenery(); } catch (e) { console.error('[RaceScene] Scenery failed:', e); }
+    
+    // === CYCLE 21: CREATE BOOST PADS ON TRACK ===
+    try { this._createBoostPads(); } catch (e) { console.error('[RaceScene] Boost pads failed:', e); }
+    
+    // === CYCLE 21: SETUP REAR-VIEW MIRROR ===
+    try { this._setupRearviewMirror(); } catch (e) { console.error('[RaceScene] Rear-view mirror failed:', e); }
     
     // Spawn AI opponents on the track
     try {
@@ -362,6 +395,12 @@ export class RaceScene {
     
     this._updateCamera(dt);
     this._updateHUDDirect();
+    
+    // === CYCLE 21: NEW FEATURE UPDATES ===
+    this._updateDriftScoring(dt);
+    this._checkBoostPads(dt);
+    this._updateRearviewMirror();
+    this._updatePositionTracking();
   }
   
   _switchToFallbackVehicle() {
@@ -1520,6 +1559,171 @@ export class RaceScene {
     this._vehicle.add(this._nitroLight);
   }
 
+  // === CYCLE 21: BOOST PADS ON TRACK ===
+  _createBoostPads() {
+    if (!this._trackCurve) return;
+    var padPositions = [0.15, 0.38, 0.62, 0.85];
+    var padGeo = new THREE.BoxGeometry(this._trackWidth * 0.6, 0.05, 3);
+    var padGlowGeo = new THREE.BoxGeometry(this._trackWidth * 0.6 + 1, 0.02, 4);
+    for (var pi = 0; pi < padPositions.length; pi++) {
+      var t = padPositions[pi];
+      var point = this._trackCurve.getPoint(t);
+      var tangent = this._trackCurve.getTangent(t);
+      var angle = Math.atan2(tangent.x, tangent.z);
+      var padMat = new THREE.MeshBasicMaterial({ color: '#00ffaa', transparent: true, opacity: 0.35 });
+      var pad = new THREE.Mesh(padGeo, padMat);
+      pad.position.set(point.x, 0.03, point.z); pad.rotation.y = angle; pad.name = 'boost-pad-' + pi;
+      this._scene.add(pad);
+      var glowMat = new THREE.MeshBasicMaterial({ color: '#00ffaa', transparent: true, opacity: 0.15 });
+      var glow = new THREE.Mesh(padGlowGeo, glowMat);
+      glow.position.set(point.x, 0.01, point.z); glow.rotation.y = angle;
+      this._scene.add(glow);
+      for (var ai = 0; ai < 3; ai++) {
+        var arrowGeo = new THREE.ConeGeometry(0.3, 0.8, 4);
+        var arrowMat = new THREE.MeshBasicMaterial({ color: '#00ffaa', transparent: true, opacity: 0.5 });
+        var arrow = new THREE.Mesh(arrowGeo, arrowMat);
+        var arrowOffset = (ai - 1) * 1.2;
+        arrow.position.set(point.x + Math.sin(angle) * arrowOffset, 0.08, point.z + Math.cos(angle) * arrowOffset);
+        arrow.rotation.x = Math.PI / 2; arrow.rotation.z = -angle;
+        this._scene.add(arrow);
+      }
+      var padLight = new THREE.PointLight('#00ffaa', 2, 12);
+      padLight.position.set(point.x, 1, point.z); this._scene.add(padLight);
+      this._boostPads.push({ mesh: pad, glow: glow, light: padLight, x: point.x, z: point.z, radius: 8, id: pi, cooldown: 0 });
+    }
+    console.log('[RaceScene] ' + this._boostPads.length + ' boost pads created');
+  }
+
+  // === CYCLE 21: REAR-VIEW MIRROR ===
+  _setupRearviewMirror() {
+    var container = document.createElement('div'); container.className = 'hud-rearview-container'; container.id = 'hud-rearview-container';
+    var canvas = document.createElement('canvas'); canvas.className = 'rearview-canvas'; canvas.width = 240; canvas.height = 135;
+    container.appendChild(canvas); document.body.appendChild(container);
+    this._rearviewCanvas = canvas; this._rearviewCtx = canvas.getContext('2d');
+    this._rearviewCamera = new THREE.PerspectiveCamera(75, 240 / 135, 0.5, 200);
+    console.log('[RaceScene] Rear-view mirror initialized');
+  }
+
+  _updateRearviewMirror() {
+    if (!this._rearviewCamera || !this._camera || !this._vehicle || !this._renderer) return;
+    this._rearviewRenderTimer++; if (this._rearviewRenderTimer % 3 !== 0) return;
+    var vehPos = this._vehicle.position; var heading = this._heading || 0;
+    this._rearviewCamera.position.set(vehPos.x - Math.sin(heading) * 2, vehPos.y + 2.5, vehPos.z - Math.cos(heading) * 2);
+    var lookBehind = new THREE.Vector3(vehPos.x - Math.sin(heading) * 30, vehPos.y + 1, vehPos.z - Math.cos(heading) * 30);
+    this._rearviewCamera.lookAt(lookBehind);
+    this._renderer.render(this._scene, this._rearviewCamera);
+    var ctx = this._rearviewCtx;
+    ctx.drawImage(this._renderer.domElement, 0, 0, 240, 135);
+    ctx.fillStyle = 'rgba(0, 10, 20, 0.25)'; ctx.fillRect(0, 0, 240, 135);
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)'; ctx.lineWidth = 1; ctx.strokeRect(0, 0, 240, 135);
+  }
+
+  // === CYCLE 21: DRIFT SCORING ===
+  _updateDriftScoring(dt) {
+    var steerAngle = Math.abs(this._steerInput || 0); var isDriftKey = this._keys.drift; var speed = Math.abs(this._state.speed);
+    var isActivelyDrifting = speed > 8 && steerAngle > this._driftThreshold && (isDriftKey || speed > 25);
+    if (isActivelyDrifting) {
+      if (!this._isDrifting) { this._isDrifting = true; this._currentDriftScore = 0; this._driftTimer = 0; }
+      this._driftTimer += dt;
+      var angleBonus = steerAngle * 8; var speedBonus = speed * 0.3; var timeBonus = Math.min(3, this._driftTimer * 0.5);
+      this._currentDriftScore += (angleBonus + speedBonus + timeBonus) * dt * 60;
+      this._showDriftScore(this._currentDriftScore, this._driftTimer);
+    } else if (this._isDrifting) {
+      this._isDrifting = false; this._driftFadeTimer = 2.0;
+      if (this._currentDriftScore > 50) {
+        this._driftChain++; var chainMultiplier = Math.min(5, 1 + (this._driftChain - 1) * 0.5);
+        var finalScore = Math.round(this._currentDriftScore * chainMultiplier);
+        this._totalDriftScore += finalScore; if (finalScore > this._bestDriftScore) this._bestDriftScore = finalScore;
+        this._showDriftPopup(finalScore, chainMultiplier);
+      } else { this._driftChain = 0; }
+      this._currentDriftScore = 0; this._hideDriftScore();
+    }
+    if (this._driftFadeTimer > 0) this._driftFadeTimer -= dt;
+  }
+
+  _showDriftScore(score) {
+    if (!this._driftHUDElement) {
+      var el = document.createElement('div'); el.className = 'hud-drift-score'; el.id = 'hud-drift-score';
+      el.innerHTML = '<div class="drift-score-label">DRIFT SCORE</div><div class="drift-score-value" id="drift-score-value">0</div><div class="drift-score-chain" id="drift-score-chain"></div>';
+      document.body.appendChild(el); this._driftHUDElement = el;
+    }
+    this._driftHUDElement.style.opacity = '1';
+    var valEl = document.getElementById('drift-score-value'); if (valEl) valEl.textContent = String(Math.round(score));
+    var chainEl = document.getElementById('drift-score-chain'); if (chainEl && this._driftChain > 0) chainEl.textContent = 'CHAIN x' + (this._driftChain + 1);
+  }
+
+  _hideDriftScore() { if (this._driftHUDElement) this._driftHUDElement.style.opacity = '0'; }
+
+  _showDriftPopup(score, multiplier) {
+    var popup = document.createElement('div'); popup.className = 'fx-drift-score-popup';
+    popup.textContent = '+' + score + (multiplier > 1 ? ' (x' + multiplier + ')' : '');
+    document.body.appendChild(popup); setTimeout(function() { if (popup.parentNode) popup.parentNode.removeChild(popup); }, 2000);
+  }
+
+  // === CYCLE 21: BOOST PAD COLLISION ===
+  _checkBoostPads(dt) {
+    if (!this._vehicle || !this._boostPads.length) return;
+    var vx = this._vehicle.position.x; var vz = this._vehicle.position.z;
+    for (var pi = 0; pi < this._boostPads.length; pi++) {
+      var pad = this._boostPads[pi];
+      if (pad.cooldown > 0) { pad.cooldown -= dt; pad.mesh.material.opacity = 0.1; pad.glow.material.opacity = 0.05; pad.light.intensity = 0.3; continue; }
+      var dx = vx - pad.x; var dz = vz - pad.z; var dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < pad.radius && this._state.speed > 3) {
+        this._state.speed = Math.min(this._state.speed + 25, 80); pad.cooldown = 5;
+        pad.mesh.material.opacity = 0.8; pad.light.intensity = 8;
+        var fx = document.createElement('div'); fx.className = 'fx-boost-pad-hit'; document.body.appendChild(fx);
+        setTimeout(function() { if (fx.parentNode) fx.parentNode.removeChild(fx); }, 500);
+        if (window.__engine && window.__engine.bus) window.__engine.bus.emit('player:boostPadHit');
+        this._showNotification('SPEED BOOST!', 'success');
+      } else {
+        var pulse = 0.25 + Math.sin(Date.now() * 0.003 + pi * 1.5) * 0.1;
+        pad.mesh.material.opacity = pulse; pad.glow.material.opacity = pulse * 0.4;
+        pad.light.intensity = 1.5 + Math.sin(Date.now() * 0.004 + pi) * 0.5;
+      }
+    }
+  }
+
+  // === CYCLE 21: POSITION TRACKING ===
+  _updatePositionTracking() {
+    if (!this._aiSystem || !this._vehicle) return;
+    var playerProgress = this._getApproxTrackProgress(); var aheadCount = 0;
+    try { var oppData = this._aiSystem.getOpponentData(); if (oppData && oppData.length) { for (var oi = 0; oi < oppData.length; oi++) { if (oppData[oi].mesh && oppData[oi].progress > playerProgress) aheadCount++; } } } catch(e) {}
+    this._currentRacePosition = aheadCount + 1; var totalRacers = 6;
+    if (this._hudRefs) {
+      if (this._hudRefs.positionNumber) this._hudRefs.positionNumber.textContent = String(this._currentRacePosition);
+      if (this._hudRefs.racersCount) this._hudRefs.racersCount.textContent = '/ ' + totalRacers;
+      if (this._hudRefs.positionSuffix) { var suffixes = ['st', 'nd', 'rd', 'th', 'th', 'th']; this._hudRefs.positionSuffix.textContent = suffixes[this._currentRacePosition - 1] || 'th'; }
+      var posDisplay = this._hudRefs.positionNumber ? this._hudRefs.positionNumber.parentElement : null;
+      if (posDisplay) { posDisplay.className = 'position-display'; if (this._currentRacePosition === 1) posDisplay.classList.add('first'); else if (this._currentRacePosition <= 3) posDisplay.classList.add('top3'); }
+    }
+    if (this._currentRacePosition !== this._lastRacePosition && this._lastRacePosition > 0) {
+      var gained = this._lastRacePosition - this._currentRacePosition;
+      if (this._hudRefs && this._hudRefs.positionChange) {
+        this._hudRefs.positionChange.className = 'position-change';
+        if (gained > 0) {
+          this._hudRefs.positionChange.textContent = '+' + gained; this._hudRefs.positionChange.classList.add('up');
+          var fxEl = document.createElement('div'); fxEl.className = 'fx-position-gain'; fxEl.textContent = 'P' + this._currentRacePosition; document.body.appendChild(fxEl);
+          setTimeout(function() { if (fxEl.parentNode) fxEl.parentNode.removeChild(fxEl); }, 1500);
+          if (this._currentRacePosition === 1) this._showNotification('P1 - YOU TOOK THE LEAD!', 'success');
+          else this._showNotification('P' + this._currentRacePosition + ' - OVERTAKE!', 'success');
+          if (window.__engine && window.__engine.bus) window.__engine.bus.emit('player:overtake');
+        } else if (gained < 0) {
+          this._hudRefs.positionChange.textContent = String(gained); this._hudRefs.positionChange.classList.add('down');
+          var fxEl2 = document.createElement('div'); fxEl2.className = 'fx-position-loss'; fxEl2.textContent = 'P' + this._currentRacePosition; document.body.appendChild(fxEl2);
+          setTimeout(function() { if (fxEl2.parentNode) fxEl2.parentNode.removeChild(fxEl2); }, 1500);
+        }
+      }
+      this._lastRacePosition = this._currentRacePosition;
+    }
+  }
+
+  _getApproxTrackProgress() {
+    if (!this._vehicle || !this._trackCurve) return 0;
+    var vx = this._vehicle.position.x; var vz = this._vehicle.position.z; var minDist = Infinity; var closestT = 0;
+    for (var ti = 0; ti <= 40; ti++) { var t = ti / 40; var pt = this._trackCurve.getPoint(t); var dx = vx - pt.x; var dz = vz - pt.z; var d = dx * dx + dz * dz; if (d < minDist) { minDist = d; closestT = t; } }
+    return closestT;
+  }
+
   _createScenery() {
     var scenery = new THREE.Group();
     scenery.name = 'scenery';
@@ -1620,6 +1824,11 @@ export class RaceScene {
   // HUD SYSTEM
   _createHUDElements() {
     if (this._hudElement && this._hudElement.parentNode) this._hudElement.parentNode.removeChild(this._hudElement);
+    if (this._driftHUDElement && this._driftHUDElement.parentNode) this._driftHUDElement.parentNode.removeChild(this._driftHUDElement);
+    var rvEl = document.getElementById("hud-rearview-container");
+    if (rvEl && rvEl.parentNode) rvEl.parentNode.removeChild(rvEl);
+    var vigEl = document.getElementById("speed-vignette");
+    if (vigEl && vigEl.parentNode) vigEl.parentNode.removeChild(vigEl);
     
     // Speed vignette overlay (CSS-based screen edge effect)
     var vignette = document.createElement('div');
@@ -1938,6 +2147,18 @@ export class RaceScene {
     ctx.fillText('W', 3, cy + 3);
     ctx.textAlign = 'right';
     ctx.fillText('E', w - 3, cy + 3);
+    // CYCLE 21: Draw boost pad indicators on minimap
+    if (this._boostPads.length) {
+      for (var bpi = 0; bpi < this._boostPads.length; bpi++) {
+        var bp = this._boostPads[bpi];
+        var bpx = cx + (bp.x / (this._trackWidth * 4)) * (w * 0.4);
+        var bpy = cy + (bp.z / this._trackLength) * (h * 0.4);
+        var bpActive = bp.cooldown <= 0;
+        ctx.fillStyle = bpActive ? 'rgba(0, 255, 170, 0.8)' : 'rgba(0, 255, 170, 0.2)';
+        ctx.beginPath(); ctx.arc(bpx, bpy, bpActive ? 4 : 2, 0, Math.PI * 2); ctx.fill();
+        if (bpActive) { ctx.fillStyle = 'rgba(0, 255, 170, 0.2)'; ctx.beginPath(); ctx.arc(bpx, bpy, 7, 0, Math.PI * 2); ctx.fill(); }
+      }
+    }
   }
   
   _fadeControlsHint() {
