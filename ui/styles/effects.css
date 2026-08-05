@@ -686,3 +686,124 @@
     0 0 40px rgba(168, 85, 247, 0.5);
   text-shadow: 0 0 10px #a855f7;
 }
+
+
+/* ============================================ */
+/* RACING-SPECIFIC EFFECTS                    */
+/* ============================================ */
+
+/**
+ * .fx-screen-shake - Camera shake effect on collision
+ * Apply briefly on impact
+ */
+.fx-screen-shake {
+  animation: screenShake 0.3s ease-out;
+}
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -1px); }
+  80% { transform: translate(1px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/**
+ * .fx-screen-shake-heavy - Stronger camera shake
+ * For major collisions
+ */
+.fx-screen-shake-heavy {
+  animation: screenShakeHeavy 0.5s ease-out;
+}
+
+@keyframes screenShakeHeavy {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  15% { transform: translate(-5px, 3px) rotate(-0.5deg); }
+  30% { transform: translate(5px, -3px) rotate(0.5deg); }
+  45% { transform: translate(-3px, -2px) rotate(-0.3deg); }
+  60% { transform: translate(3px, 1px) rotate(0.2deg); }
+  75% { transform: translate(-1px, -1px); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/**
+ * .fx-chromatic-aberration - RGB split effect
+ * For nitro boost and high speed
+ */
+.fx-chromatic-aberration {
+  animation: chromaticAberration 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes chromaticAberration {
+  0% { filter: none; }
+  100% { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='ca'%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0'/%3E%3CfeOffset in='SourceGraphic' dx='1' dy='0' result='r'/%3E%3CfeOffset in='SourceGraphic' dx='-1' dy='0' result='b'/%3E%3CfeBlend in='r' in2='b' mode='screen'/%3E%3C/filter%3E%3C/svg%3E#ca"); }
+}
+
+/**
+ * .fx-boost-flash - Flash effect on nitro activation
+ */
+.fx-boost-flash::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0, 204, 255, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 44;
+  animation: boostFlash 0.6s ease-out forwards;
+}
+
+@keyframes boostFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/**
+ * .fx-collision-flash - Red flash on collision
+ */
+.fx-collision-flash::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 61, 90, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 44;
+  animation: collisionFlash 0.4s ease-out forwards;
+}
+
+@keyframes collisionFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/**
+ * .fx-lap-complete - Golden burst on lap completion
+ */
+.fx-lap-complete::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 210, 63, 0.25) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 44;
+  animation: lapCompleteBurst 0.8s ease-out forwards;
+}
+
+@keyframes lapCompleteBurst {
+  0% { opacity: 1; transform: scale(0.8); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/**
+ * .fx-pulse-border - Pulsing border glow
+ * For active/warning states
+ */
+.fx-pulse-border {
+  animation: pulseBorder 2s ease-in-out infinite;
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: var(--border-subtle); box-shadow: none; }
+  50% { border-color: var(--accent-secondary, #00e5ff); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+}

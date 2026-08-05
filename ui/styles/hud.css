@@ -932,3 +932,279 @@
     height: 4px;
   }
 }
+
+/* ==================== NITRO PANEL ==================== */
+.hud-nitro-panel {
+  position: fixed;
+  bottom: 80px;
+  right: 40px;
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.85) 0%, rgba(0, 30, 50, 0.8) 100%);
+  border: 1px solid rgba(0, 204, 255, 0.3);
+  border-radius: var(--radius-m);
+  padding: 10px 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 140px;
+  box-shadow: 0 0 20px rgba(0, 204, 255, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hud-nitro-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ccff, transparent);
+  border-radius: var(--radius-pill);
+  opacity: 0.5;
+}
+
+.nitro-label {
+  font-size: 9px;
+  color: #00ccff;
+  letter-spacing: var(--tracking-ultra-wide);
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 600;
+}
+
+.nitro-bar-track {
+  width: 120px;
+  height: 8px;
+  background: rgba(0, 204, 255, 0.12);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.nitro-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00ccff, #00ffaa);
+  border-radius: var(--radius-pill);
+  transition: width 0.15s ease-out;
+  box-shadow: 0 0 8px rgba(0, 204, 255, 0.4);
+}
+
+.nitro-bar-fill.low-fuel {
+  background: linear-gradient(90deg, #ff3d5a, #ff8c00) !important;
+  box-shadow: 0 0 8px rgba(255, 61, 90, 0.4);
+  animation: nitroWarning 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes nitroWarning {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}
+
+.nitro-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(0, 204, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+/* ==================== FPS COUNTER ==================== */
+.hud-fps-counter {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-s);
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--success);
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: calc(var(--z-hud) + 1);
+}
+
+/* ==================== SPEED VIGNETTE ==================== */
+#speed-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 45;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ==================== CONTROLS HINT ==================== */
+.hud-controls-hint {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 20px;
+  background: rgba(10, 12, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0.7;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: calc(var(--z-hud) + 2);
+}
+
+.hud-controls-hint.faded {
+  opacity: 0;
+}
+
+.hud-controls-hint .hint-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.hud-controls-hint .hint-text {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.5px;
+}
+
+.hud-controls-hint .hint-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-controls-hint .hint-separator {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== SECTOR PROGRESS INDICATOR ==================== */
+.hud-sector-progress {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  z-index: calc(var(--z-hud) + 1);
+}
+
+.sector-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.sector-dot.passed {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.sector-dot.current {
+  background: var(--accent-tertiary);
+  border-color: var(--accent-tertiary);
+  box-shadow: 0 0 8px rgba(255, 210, 63, 0.5);
+  animation: sectorPulse 1s ease-in-out infinite;
+}
+
+@keyframes sectorPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* ==================== ENHANCED MINIMAP ==================== */
+.hud-minimap-container {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.1);
+}
+
+/* ==================== ENHANCED SPEED VALUE ANIMATION ==================== */
+.speed-value {
+  transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.1s ease;
+}
+
+.speed-value.bump {
+  transform: scale(1.03);
+}
+
+/* ==================== HUD ENTRY ANIMATIONS ==================== */
+.hud-panel {
+  animation: hudPanelSlideIn 0.5s var(--ease-out-expo) both;
+}
+
+.hud-speed-panel { animation-delay: 0.1s; }
+.hud-position-panel { animation-delay: 0.15s; }
+.hud-timer-panel { animation-delay: 0.2s; }
+.hud-nitro-panel { animation-delay: 0.25s; }
+.hud-item-panel { animation-delay: 0.3s; }
+.hud-status-panel { animation-delay: 0.35s; }
+.hud-lap-times { animation-delay: 0.4s; }
+.hud-minimap-container { animation-delay: 0.2s; }
+.hud-fps-counter { animation: none; }
+
+@keyframes hudPanelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hud-position-panel {
+  animation-name: hudPanelSlideRight;
+}
+
+@keyframes hudPanelSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hud-timer-panel {
+  animation-name: hudPanelSlideDown;
+}
+
+@keyframes hudPanelSlideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
