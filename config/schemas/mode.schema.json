@@ -1,0 +1,26 @@
+{
+  "$id": "mode.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "description", "category", "matchConfig", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string" },
+    "description": { "type": "string", "minLength": 20 },
+    "category":    { "type": "string", "enum": ["race", "combat", "score", "time", "mmo"] },
+    "icon":        { "type": "string" },
+    "matchConfig": {
+      "type": "object",
+      "required": ["laps", "maxPlayers", "allowItems"],
+      "properties": {
+        "laps":         { "type": "integer", "minimum": 0, "maximum": 99 },
+        "maxPlayers":   { "type": "integer", "minimum": 1, "maximum": 24 },
+        "allowItems":   { "type": "boolean" },
+        "allowCombat":  { "type": "boolean" },
+        "timeLimitSec": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "module":      { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["onMatchStart", "onLapComplete", "onItemUsed", "onPlayerFinished", "getScoreboard"],
+  "additionalProperties": false
+}

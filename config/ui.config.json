@@ -1,0 +1,148 @@
+{
+  "_comment": "UI routing graph. Defines every screen, its parent, default transition, and design-token overrides. Add a screen = add a node here + a file in barrel/ui/screens/.",
+  "designTokens": {
+    "color": {
+      "bg-primary":      "#05060a",
+      "bg-secondary":    "#0a0c14",
+      "bg-tertiary":     "#12141f",
+      "surface-glass":   "rgba(255,255,255,0.04)",
+      "border-subtle":   "rgba(255,255,255,0.08)",
+      "text-primary":    "#f5f6fa",
+      "text-secondary":  "#a0a4b0",
+      "text-tertiary":   "#5a5e6a",
+      "accent-primary":  "#ff4d2e",
+      "accent-secondary":"#00e5ff",
+      "accent-tertiary": "#ffd23f",
+      "success":         "#3ddc84",
+      "warning":         "#ffb13d",
+      "danger":          "#ff3d5a",
+      "gradient-hero":   "linear-gradient(135deg, #ff4d2e 0%, #ff8c00 40%, #ffd23f 100%)",
+      "gradient-night":  "linear-gradient(180deg, #05060a 0%, #0a0c14 50%, #12141f 100%)"
+    },
+    "type": {
+      "font-display": "'Bebas Neue', 'Oswald', Impact, sans-serif",
+      "font-heading": "'Inter', 'SF Pro Display', system-ui, sans-serif",
+      "font-body":    "'Inter', system-ui, sans-serif",
+      "font-mono":    "'JetBrains Mono', 'Consolas', monospace",
+      "scale": {
+        "display-xl": "clamp(64px, 9vw, 140px)",
+        "display-l":  "clamp(48px, 6vw, 96px)",
+        "heading-l":  "32px",
+        "heading-m":  "24px",
+        "heading-s":  "18px",
+        "body":       "15px",
+        "body-s":     "13px",
+        "caption":    "11px"
+      },
+      "tracking": {
+        "tight": "-0.02em",
+        "normal": "0",
+        "wide": "0.04em",
+        "ultra-wide": "0.18em"
+      }
+    },
+    "motion": {
+      "duration-fast":   "0.18s",
+      "duration-base":   "0.32s",
+      "duration-slow":   "0.6s",
+      "duration-screen": "0.85s",
+      "ease-out-expo":   "cubic-bezier(0.16, 1, 0.3, 1)",
+      "ease-in-out-circ": "cubic-bezier(0.85, 0, 0.15, 1)",
+      "ease-back-out":   "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    },
+    "spacing": {
+      "xs": "4px", "s": "8px", "m": "16px", "l": "24px", "xl": "40px", "2xl": "64px", "3xl": "96px"
+    },
+    "radius": { "s": "4px", "m": "8px", "l": "16px", "xl": "24px", "pill": "999px" }
+  },
+  "screenGraph": {
+    "splash": {
+      "module": "screen.splash.js",
+      "parent": null,
+      "transition": "fade",
+      "autoAdvanceMs": 3200,
+      "next": "main-menu"
+    },
+    "main-menu": {
+      "module": "screen.main-menu.js",
+      "parent": null,
+      "transition": "parallax-rise",
+      "children": ["mode-select", "career", "garage", "store", "settings.root", "cutscene"]
+    },
+    "mode-select": {
+      "module": "screen.mode-select.js",
+      "parent": "main-menu",
+      "transition": "slide-left",
+      "children": ["track-select"]
+    },
+    "track-select": {
+      "module": "screen.track-select.js",
+      "parent": "mode-select",
+      "transition": "slide-left",
+      "children": ["vehicle-select"]
+    },
+    "vehicle-select": {
+      "module": "screen.vehicle-select.js",
+      "parent": "track-select",
+      "transition": "slide-left",
+      "children": ["character-select"]
+    },
+    "character-select": {
+      "module": "screen.character-select.js",
+      "parent": "vehicle-select",
+      "transition": "slide-left",
+      "children": ["lobby"]
+    },
+    "lobby": {
+      "module": "screen.lobby.js",
+      "parent": "character-select",
+      "transition": "iris",
+      "onStart": "race:start"
+    },
+    "garage": {
+      "module": "screen.garage.js",
+      "parent": "main-menu",
+      "transition": "slide-up"
+    },
+    "career": {
+      "module": "screen.career.js",
+      "parent": "main-menu",
+      "transition": "slide-up"
+    },
+    "store": {
+      "module": "screen.store.js",
+      "parent": "main-menu",
+      "transition": "slide-up"
+    },
+    "settings.root": {
+      "module": "screen.settings.root.js",
+      "parent": "main-menu",
+      "transition": "slide-up",
+      "children": ["settings.audio", "settings.video", "settings.controls", "settings.gameplay", "settings.accessibility"]
+    },
+    "settings.audio":         { "module": "screen.settings.audio.js",         "parent": "settings.root", "transition": "slide-left" },
+    "settings.video":         { "module": "screen.settings.video.js",         "parent": "settings.root", "transition": "slide-left" },
+    "settings.controls":      { "module": "screen.settings.controls.js",      "parent": "settings.root", "transition": "slide-left" },
+    "settings.gameplay":      { "module": "screen.settings.gameplay.js",      "parent": "settings.root", "transition": "slide-left" },
+    "settings.accessibility": { "module": "screen.settings.accessibility.js", "parent": "settings.root", "transition": "slide-left" },
+    "pause": {
+      "module": "screen.pause.js",
+      "parent": null,
+      "transition": "fade-blur",
+      "_comment": "Pause is overlaid on top of race scene, not in the main graph"
+    },
+    "results": {
+      "module": "screen.results.js",
+      "parent": null,
+      "transition": "rise-blur",
+      "_comment": "Shown after race; routes back to main-menu or career"
+    },
+    "cutscene": {
+      "module": "screen.cutscene.js",
+      "parent": "main-menu",
+      "transition": "iris",
+      "_comment": "Plays scripted parallax cutscenes (season intro, post-boss, etc.)"
+    }
+  },
+  "defaultTransition": "fade"
+}

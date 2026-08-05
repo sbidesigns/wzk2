@@ -1,0 +1,95 @@
+/* ui/styles/tokens.css — design tokens. Driven by config/ui.config.json. Single source of truth. */
+
+:root {
+  /* === COLOR === */
+  --bg-primary: #05060a;
+  --bg-secondary: #0a0c14;
+  --bg-tertiary: #12141f;
+  --surface-glass: rgba(255, 255, 255, 0.04);
+  --surface-glass-hover: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --text-primary: #f5f6fa;
+  --text-secondary: #a0a4b0;
+  --text-tertiary: #5a5e6a;
+
+  --accent-primary: #ff4d2e;
+  --accent-secondary: #00e5ff;
+  --accent-tertiary: #ffd23f;
+
+  --success: #3ddc84;
+  --warning: #ffb13d;
+  --danger: #ff3d5a;
+
+  --gradient-hero: linear-gradient(135deg, #ff4d2e 0%, #ff8c00 40%, #ffd23f 100%);
+  --gradient-night: linear-gradient(180deg, #05060a 0%, #0a0c14 50%, #12141f 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+
+  /* === TYPE === */
+  --font-display: 'Bebas Neue', 'Oswald', Impact, sans-serif;
+  --font-heading: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --text-display-xl: clamp(64px, 9vw, 140px);
+  --text-display-l: clamp(48px, 6vw, 96px);
+  --text-heading-l: 32px;
+  --text-heading-m: 24px;
+  --text-heading-s: 18px;
+  --text-body: 15px;
+  --text-body-s: 13px;
+  --text-caption: 11px;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-ultra-wide: 0.18em;
+
+  /* === MOTION === */
+  --duration-fast: 0.18s;
+  --duration-base: 0.32s;
+  --duration-slow: 0.6s;
+  --duration-screen: 0.85s;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease-back-out: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === SPACING === */
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+
+  /* === RADIUS === */
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* === LAYER === */
+  --z-bg: 0;
+  --z-screen: 10;
+  --z-hud: 50;
+  --z-overlay: 80;
+  --z-modal: 90;
+  --z-toast: 100;
+}
+
+/* Global resets */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); font-size: var(--text-body); -webkit-font-smoothing: antialiased; }
+body { user-select: none; -webkit-user-select: none; }
+canvas { display: block; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }

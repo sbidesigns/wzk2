@@ -1,0 +1,533 @@
+/* ui/styles/tutorial.css — Tutorial/Onboarding System Styling */
+
+/* ============================================
+   TUTORIAL OVERLAY
+   ============================================ */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.tutorial-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease;
+}
+
+.tutorial-overlay.hiding {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Backdrop */
+.tutorial-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 6, 10, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Highlight Layer */
+.tutorial-highlight-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tutorial-highlight-layer::before,
+.tutorial-highlight-layer::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.tutorial-highlight-layer.visible {
+  background: rgba(5, 6, 10, 0.5);
+}
+
+.tutorial-highlight-layer.visible::before {
+  top: var(--rect-top, 0);
+  left: var(--rect-left, 0);
+  width: var(--rect-width, 100px);
+  height: var(--rect-height, 50px);
+  border: 3px solid #ff6b35;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 4px rgba(255, 107, 53, 0.2),
+    0 0 30px rgba(255, 107, 53, 0.3),
+    inset 0 0 20px rgba(255, 107, 53, 0.15);
+  animation: highlightPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { 
+    box-shadow:
+      0 0 0 4px rgba(255, 107, 53, 0.2),
+      0 0 30px rgba(255, 107, 53, 0.3);
+  }
+  50% { 
+    box-shadow:
+      0 0 0 6px rgba(255, 107, 53, 0.3),
+      0 0 40px rgba(255, 107, 53, 0.5);
+  }
+}
+
+/* Pulse class for highlighted elements */
+.tutorial-pulse {
+  animation: elementPulse 1s ease-in-out infinite !important;
+}
+
+@keyframes elementPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.tutorial-content {
+  position: relative;
+  z-index: 10;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: all 0.3s ease;
+}
+
+.tutorial-content.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Progress Indicator */
+.tutorial-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: rgba(15, 17, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.progress-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background: #ff6b35;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.5);
+  transform: scale(1.2);
+}
+
+.progress-dot.completed {
+  background: #22c55e;
+}
+
+.progress-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+/* Step Card */
+.tutorial-step-card {
+  background: linear-gradient(165deg, rgba(20, 22, 32, 0.98), rgba(12, 14, 22, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 36px;
+  text-align: center;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(255, 107, 53, 0.05) inset;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.step-icon-wrapper {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), transparent);
+  border: 2px solid rgba(255, 107, 53, 0.25);
+  border-radius: 50%;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.step-icon {
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.step-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.step-content {
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 420px;
+  margin: 0;
+}
+
+/* Tip Box */
+.step-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), transparent);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #fbbf24;
+}
+
+.tip-icon {
+  font-size: 18px;
+}
+
+/* Keybinds Display */
+.keybinds-display {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.keybind-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.keybind-row kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+/* Navigation */
+.tutorial-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tutorial-center-actions {
+  display: flex;
+  align-items: center;
+}
+
+.tutorial-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.tutorial-btn.primary {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  color: #000;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+}
+
+.tutorial-btn.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+}
+
+.tutorial-btn.primary.large {
+  padding: 16px 36px;
+  font-size: 16px;
+}
+
+.tutorial-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-btn.secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.tutorial-btn.secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tutorial-btn.text {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 10px 18px;
+  font-size: 13px;
+  border: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.tutorial-btn.text:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================
+   COMPLETION SCREEN
+   ============================================ */
+.tutorial-completion {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+}
+
+.tutorial-completion.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.tutorial-completion:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+  animation: completionFadeIn 0.5s ease-out;
+}
+
+@keyframes completionFadeIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9) translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.completion-content {
+  text-align: center;
+  padding: 48px;
+  background: linear-gradient(165deg, rgba(20, 22, 32, 0.98), rgba(12, 14, 22, 0.98));
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 28px;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(251, 191, 36, 0.08) inset;
+  max-width: 450px;
+}
+
+.completion-icon {
+  font-size: 72px;
+  animation: completionBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes completionBounce {
+  from { transform: scale(0) rotate(-180deg); }
+  to { transform: scale(1) rotate(0deg); }
+}
+
+.completion-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fbbf24;
+  margin: 20px 0 12px;
+  text-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
+}
+
+.completion-message {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 28px;
+}
+
+.reward-display {
+  display: inline-flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 12px;
+}
+
+.reward-icon {
+  font-size: 22px;
+}
+
+.reward-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fbbf24;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .tutorial-content {
+    width: 96%;
+    gap: 16px;
+  }
+
+  .tutorial-step-card {
+    padding: 28px 20px;
+    min-height: auto;
+  }
+
+  .step-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .step-icon {
+    font-size: 34px;
+  }
+
+  .step-title {
+    font-size: 20px;
+  }
+
+  .step-content {
+    font-size: 14px;
+  }
+
+  .tutorial-nav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .tutorial-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .tutorial-center-actions {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tutorial-btn.text {
+    order: 1;
+  }
+
+  .progress-text {
+    display: none;
+  }
+
+  .keybinds-display {
+    padding: 12px;
+  }
+
+  .keybind-row {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutorial-step-card {
+    padding: 24px 16px;
+    border-radius: 18px;
+  }
+
+  .step-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .step-icon {
+    font-size: 28px;
+  }
+
+  .step-title {
+    font-size: 18px;
+  }
+
+  .completion-content {
+    padding: 32px 20px;
+    border-radius: 20px;
+  }
+
+  .completion-icon {
+    font-size: 56px;
+  }
+
+  .completion-title {
+    font-size: 24px;
+  }
+}

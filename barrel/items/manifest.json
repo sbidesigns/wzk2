@@ -1,0 +1,33 @@
+{
+  "$schema": "../../config/schemas/item.schema.json",
+  "category": "items",
+  "entries": [
+    {
+      "id": "boost",
+      "displayName": "Nitro Boost",
+      "rarity": "common",
+      "category": "boost",
+      "icon": "boost",
+      "dropWeight": 30,
+      "module": "./item.boost.js"
+    },
+    {
+      "id": "shield",
+      "displayName": "Shield",
+      "rarity": "rare",
+      "category": "defensive",
+      "icon": "shield",
+      "dropWeight": 15,
+      "module": "./item.shield.js"
+    },
+    {
+      "id": "missile",
+      "displayName": "Homing Missile",
+      "rarity": "epic",
+      "category": "offensive",
+      "icon": "missile",
+      "dropWeight": 10,
+      "module": "./item.missile.js"
+    }
+  ]
+}

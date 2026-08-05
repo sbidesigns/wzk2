@@ -1,0 +1,597 @@
+/* ui/styles/notification-system.css — Enhanced Notification/Toast Styling */
+
+/* ============================================
+   NOTIFICATION CONTAINER
+   ============================================ */
+.notification-container {
+  position: fixed;
+  z-index: 5000;
+  pointer-events: none; /* Allow clicks through to pass */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+}
+
+.notification-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notification-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 53, 0.3);
+  border-radius: 2px;
+}
+
+/* Position variants (applied to container) */
+.notification-container[data-position="top-left"] {
+  top: 20px;
+  left: 20px;
+  align-items: flex-start;
+}
+
+.notification-container[data-position="top-right"] {
+  top: 20px;
+  right: 20px;
+  align-items: flex-end;
+}
+
+.notification-container[data-position="top-center"] {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+.notification-container[data-position="bottom-center"] {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+/* ============================================
+   BASE NOTIFICATION STYLES
+   ============================================ */
+.notification {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  min-width: 300px;
+  max-width: 380px;
+  background: rgba(15, 17, 25, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  
+  /* Initial state for animation */
+  opacity: 0;
+  transform: translateX(calc(var(--stack-index, 1) * -8px)) translateY(10px) scale(0.96);
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s ease,
+    box-shadow 0.25s ease,
+    margin-top 0.25s ease;
+  pointer-events: auto;
+}
+
+.notification.visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+.notification.removing {
+  opacity: 0;
+  transform: translateX(calc(var(--stack-index, 1) * 10px)) scale(0.96);
+  margin-bottom: calc(var(--stack-index, 1) * -30px);
+}
+
+.notification.removing-immediate {
+  opacity: 0 !important;
+  transform: scale(0.9);
+  transition-duration: 0.1s;
+}
+
+/* Icon */
+.notification-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+/* Body */
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
+}
+
+.notification-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* Close button */
+.notification-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 12px;
+  padding: 0;
+}
+
+.notification-close:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* ============================================
+   SUCCESS NOTIFICATION
+   ============================================ */
+.notification-success {
+  border-color: rgba(34, 197, 94, 0.3);
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: #22c55e;
+}
+
+.notification-success .notification-icon {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), transparent);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.notification-success .notification-title {
+  color: #22c55e;
+}
+
+.notification-success.visible {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+/* Success check animation */
+.notification-success .notification-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: successPulse 1.5s ease-out;
+}
+
+@keyframes successPulse {
+  from { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  to { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+/* ============================================
+   ERROR NOTIFICATION
+   ============================================ */
+.notification-error {
+  border-color: rgba(239, 68, 68, 0.3);
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: #ef4444;
+}
+
+.notification-error .notification-icon {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.notification-error .notification-title {
+  color: #ef4444;
+}
+
+.notification-error.visible {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(239, 68, 68, 0.15);
+
+  animation: errorShake 0.4s ease-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+/* ============================================
+   WARNING NOTIFICATION
+   ============================================ */
+.notification-warning {
+  border-color: rgba(251, 191, 36, 0.3);
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: #fbbf24;
+}
+
+.notification-warning .notification-icon {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), transparent);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.notification-warning .notification-title {
+  color: #fbbf24;
+}
+
+.notification-warning.visible {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(251, 191, 36, 0.15);
+}
+
+/* Warning pulse */
+.notification-warning .notification-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #fbbf24;
+  animation: warningSpin 1s linear infinite;
+}
+
+@keyframes warningSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   INFO NOTIFICATION
+   ============================================ */
+.notification-info {
+  border-color: rgba(59, 130, 246, 0.3);
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: #3b82f6;
+}
+
+.notification-info .notification-icon {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+}
+
+.notification-info .notification-title {
+  color: #3b82f6;
+}
+
+.notification-info.visible {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+/* ============================================
+   ACHIEVEMENT NOTIFICATION
+   ============================================ */
+.notification-achievement {
+  min-width: 340px;
+  background: linear-gradient(165deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.08));
+  border: 2px solid rgba(168, 85, 247, 0.35);
+  border-radius: 16px;
+  padding: 20px;
+  animation: achievementGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes achievementGlow {
+  from { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 30px rgba(168, 85, 247, 0.1) inset; }
+  to { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 40px rgba(168, 85, 247, 0.2) inset; }
+}
+
+.notification-achievement .notification-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  background: radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.3), transparent);
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  animation: achievementIconBounce 0.6s ease-in-out;
+}
+
+@keyframes achievementIconBounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+}
+
+.notification-achievement .notification-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.notification-achievement .notification-message {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+}
+
+/* Achievement sparkle effect */
+.notification-achievement::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--sparkle-angle, 0deg) at 50% 50%,
+    transparent 60deg,
+    rgba(168, 85, 247, 0.15)
+  );
+  z-index: -1;
+  animation: achievementSparkle 3s linear infinite;
+}
+
+@property --sparkle-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes achievementSparkle {
+  to { --sparkle-angle: 360deg; }
+}
+
+/* ============================================
+   REWARD NOTIFICATION
+   ============================================ */
+.notification-reward {
+  min-width: 320px;
+  background: linear-gradient(165deg, rgba(251, 191, 36, 0.12), rgba(245, 158, 11, 0.06));
+  border: 2px solid rgba(251, 191, 36, 0.35);
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+
+.notification-reward .notification-icon {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15));
+  border-color: rgba(251, 191, 36, 0.4);
+  animation: rewardShimmer 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes rewardShimmer {
+  from { filter: brightness(1); transform: scale(1); }
+  to { filter: brightness(1.2); transform: scale(1.05); }
+}
+
+.notification-reward .notification-title {
+  font-size: 16px;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fbbf24;
+}
+
+.notification-reward .notification-message {
+  font-size: 12px;
+  color: rgba(251, 191, 36, 0.7);
+}
+
+/* Reward coin animation */
+.notification-reward::before {
+  content: '✨';
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 14px;
+  animation: rewardSparkleFloat 2s ease-in-out infinite;
+}
+
+@keyframes rewardSparkleFloat {
+  0%, 100% { opacity: 0.5; transform: translate(0, 0) scale(0.8); }
+  50% { opacity: 1; transform: translate(3px, -3px) scale(1.2); }
+}
+
+/* ============================================
+   PROGRESS NOTIFICATION
+   ============================================ */
+.notification-progress {
+  padding: 18px 20px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: #00e5ff;
+}
+
+.notification-progress .notification-icon {
+  color: #00e5ff;
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), transparent);
+  border-color: rgba(0, 229, 255, 0.3);
+}
+
+.notification-progress-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.notification-progress-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.notification-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00e5ff, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.3s ease-out;
+  position: relative;
+}
+
+.notification-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  animation: progressShine 1.5s linear infinite;
+}
+
+@keyframes progressShine {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(200%); }
+}
+
+.notification-progress-text {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #00e5ff;
+  margin-top: 6px;
+}
+
+/* Progress complete state */
+.notification-progress.notification-success {
+  border-left-color: #22c55e;
+  background: linear-gradient(165deg, rgba(34, 197, 94, 0.1), rgba(15, 17, 25, 0.98));
+}
+
+.progress-complete-icon {
+  font-size: 24px;
+  color: #22c55e;
+}
+
+.progress-complete-text {
+  color: #22c55e !important;
+}
+
+.progress-complete-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.notification-action-btn {
+  flex: 1;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notification-action-btn:hover {
+  background: rgba(255, 107, 53, 0.2);
+  border-color: rgba(255, 107, 53, 0.3);
+  color: #fff;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 480px) {
+  .notification {
+    min-width: unset;
+    width: calc(100vw - 48px);
+    max-width: 360px;
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .notification-achievement {
+    min-width: unset;
+    padding: 16px;
+  }
+
+  .notification-reward {
+    min-width: unset;
+    padding: 14px 16px;
+  }
+
+  .notification-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .notification-achievement .notification-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .notification {
+    transition: opacity 0.15s ease !important;
+    transform: none !important;
+  }
+
+  .notification.visible,
+  .notification.removing {
+    transform: none !important;
+  }
+
+  .notification-error.visible {
+    animation: none !important;
+  }
+
+  .notification-achievement,
+  .notification-reward .notification-icon {
+    animation: none !important;
+  }
+}

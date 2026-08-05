@@ -1,0 +1,1285 @@
+/* ui/styles/tournament.css — Tournament and Ranked Mode Styling for Warzone Kart: Neon Underground
+ * Features: Season banner, tier badges, tournament cards, leaderboards, reward tiers
+ */
+
+/* ==================== DESIGN TOKENS (Tournament-specific) ==================== */
+:root {
+  /* Tier/Rank colors with metallic effects */
+  --tier-bronze: #cd7f32;
+  --tier-bronze-dark: #8b5a2b;
+  --tier-silver: #c0c0c0;
+  --tier-silver-dark: #808080;
+  --tier-gold: #ffd700;
+  --tier-gold-dark: #daa520;
+  --tier-platinum: #e5e4e2;
+  --tier-platinum-dark: #a9a9a9;
+  --tier-diamond: #b9f2ff;
+  --tier-diamond-dark: #7dd3fc;
+  --tier-champion: #ff4d2e;
+  --tier-champion-dark: #cc3d22;
+  
+  /* Tournament types */
+  --tour-daily: #3ddc84;
+  --tour-weekly: #00e5ff;
+  --tour-grandprix: #ffd23f;
+  --tour-special: #aa00ff;
+  
+  /* RP (Rank Points) color */
+  --rp-color: #00e5ff;
+}
+
+/* ==================== TOURNAMENT CONTAINER ==================== */
+.tournament-system {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--gradient-night, linear-gradient(180deg, #05060a 0%, #0a0c14 50%, #12141f 100%));
+  padding: var(--space-l, 24px);
+  overflow-y: auto;
+}
+
+.tournament-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl, 40px);
+}
+
+/* ==================== SEASON BANNER ==================== */
+.season-banner {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 18, 30, 0.98) 0%,
+    rgba(25, 28, 45, 0.95) 50%,
+    rgba(15, 18, 30, 0.98) 100%
+  );
+  border-radius: var(--radius-xl, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--space-2xl, 64px) var(--space-xl, 40px);
+  overflow: hidden;
+  text-align: center;
+}
+
+.season-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(255, 77, 46, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Animated particles in season banner */
+.season-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.season-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: particleFloat 8s ease-in-out infinite;
+}
+
+.season-particle:nth-child(odd) {
+  background: var(--accent-primary, #ff4d2e);
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.season-particle:nth-child(even) {
+  background: var(--accent-secondary, #00e5ff);
+  box-shadow: 0 0 10px var(--accent-secondary);
+}
+
+@keyframes particleFloat {
+  0%, 100% { 
+    transform: translateY(0) translateX(0); 
+    opacity: 0.3; 
+  }
+  25% { 
+    transform: translateY(-30px) translateX(10px); 
+    opacity: 0.7; 
+  }
+  50% { 
+    transform: translateY(-15px) translateX(-10px); 
+    opacity: 0.5; 
+  }
+  75% { 
+    transform: translateY(-40px) translateX(5px); 
+    opacity: 0.8; 
+  }
+}
+
+.season-content {
+  position: relative;
+  z-index: 1;
+}
+
+.season-label {
+  font-size: var(--text-body-s, 13px);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-ultra-wide, 0.18em);
+  color: var(--accent-secondary, #00e5ff);
+  font-weight: 600;
+  margin-bottom: var(--space-s, 8px);
+}
+
+.season-name {
+  font-family: var(--font-display, system-ui);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 800;
+  color: var(--text-primary, #f5f6fa);
+  margin: 0 0 var(--space-m, 16px) 0;
+  letter-spacing: var(--tracking-tight, -0.02em);
+  line-height: 1.1;
+  background: linear-gradient(135deg, #fff 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.season-countdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-l, 24px);
+  flex-wrap: wrap;
+  margin-top: var(--space-l, 24px);
+}
+
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.countdown-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-primary, #f5f6fa);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 16px;
+  border-radius: var(--radius-m, 8px);
+  min-width: 56px;
+  text-align: center;
+}
+
+.countdown-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.04em);
+  color: var(--text-tertiary, #5a5e6a);
+  font-weight: 600;
+}
+
+/* Season progress bar */
+.season-progress {
+  margin-top: var(--space-l, 24px);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.season-progress-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill, 999px);
+  overflow: hidden;
+  position: relative;
+}
+
+.season-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-tertiary));
+  border-radius: var(--radius-pill, 999px);
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+  position: relative;
+}
+
+.season-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.season-progress-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #a0a4b0);
+}
+
+/* ==================== RANKED TIER SECTION ==================== */
+.ranked-section {
+  background: linear-gradient(
+    145deg,
+    rgba(15, 18, 30, 0.95) 0%,
+    rgba(22, 26, 42, 0.92) 100%
+  );
+  border-radius: var(--radius-xl, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: var(--space-xl, 40px);
+}
+
+.ranked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl, 40px);
+  flex-wrap: wrap;
+  gap: var(--space-m, 16px);
+}
+
+.ranked-title {
+  font-family: var(--font-display, system-ui);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary, #f5f6fa);
+  margin: 0;
+  letter-spacing: var(--tracking-tight, -0.02em);
+}
+
+/* Current Tier Display */
+.current-tier-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-l, 24px);
+  padding: var(--space-xl, 40px);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-xl, 24px);
+  margin-bottom: var(--space-xl, 40px);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tier-badge {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tier-badge-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Metallic tier effects */
+.tier-badge.tier-bronze .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-bronze) 0%,
+    var(--tier-bronze-dark) 25%,
+    var(--tier-bronze) 50%,
+    #e6a85c 75%,
+    var(--tier-bronze) 100%
+  );
+  box-shadow: 
+    0 0 30px rgba(205, 127, 50, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  animation: metallicShine 4s ease-in-out infinite;
+}
+
+.tier-badge.tier-silver .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-silver) 0%,
+    var(--tier-silver-dark) 25%,
+    var(--tier-silver) 50%,
+    #e8e8e8 75%,
+    var(--tier-silver) 100%
+  );
+  box-shadow: 
+    0 0 35px rgba(192, 192, 192, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.15);
+  animation: metallicShine 3.5s ease-in-out infinite;
+}
+
+.tier-badge.tier-gold .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-gold) 0%,
+    var(--tier-gold-dark) 25%,
+    var(--tier-gold) 50%,
+    #ffee00 75%,
+    var(--tier-gold) 100%
+  );
+  box-shadow: 
+    0 0 40px rgba(255, 215, 0, 0.6),
+    inset 0 0 25px rgba(255, 255, 255, 0.2);
+  animation: metallicShine 3s ease-in-out infinite;
+}
+
+.tier-badge.tier-platinum .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-platinum) 0%,
+    var(--tier-platinum-dark) 25%,
+    var(--tier-platinum) 50%,
+    #ffffff 75%,
+    var(--tier-platinum) 100%
+  );
+  box-shadow: 
+    0 0 45px rgba(229, 228, 226, 0.65),
+    inset 0 0 30px rgba(255, 255, 255, 0.25);
+  animation: metallicShine 2.5s ease-in-out infinite;
+}
+
+.tier-badge.tier-diamond .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-diamond) 0%,
+    var(--tier-diamond-dark) 25%,
+    var(--tier-diamond) 50%,
+    #dcf7ff 75%,
+    var(--tier-diamond) 100%
+  );
+  box-shadow: 
+    0 0 50px rgba(185, 242, 255, 0.7),
+    inset 0 0 30px rgba(255, 255, 255, 0.3);
+  animation: metallicShine 2s ease-in-out infinite, diamondPulse 4s ease-in-out infinite;
+}
+
+.tier-badge.tier-champion .tier-badge-inner {
+  background: conic-gradient(
+    from 180deg,
+    var(--tier-champion) 0%,
+    var(--tier-champion-dark) 25%,
+    var(--tier-champion) 50%,
+    #ff8c42 75%,
+    var(--tier-champion) 100%
+  );
+  box-shadow: 
+    0 0 60px rgba(255, 77, 46, 0.8),
+    inset 0 0 35px rgba(255, 210, 63, 0.2);
+  animation: metallicShine 1.5s ease-in-out infinite, championTierPulse 2s ease-in-out infinite;
+}
+
+@keyframes metallicShine {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+@keyframes diamondPulse {
+  0%, 100% { box-shadow: 0 0 50px rgba(185, 242, 255, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 0 70px rgba(185, 242, 255, 0.9), inset 0 0 40px rgba(255, 255, 255, 0.4); }
+}
+
+@keyframes championTierPulse {
+  0%, 100% { 
+    box-shadow: 0 0 60px rgba(255, 77, 46, 0.8), inset 0 0 35px rgba(255, 210, 63, 0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 80px rgba(255, 77, 46, 1), inset 0 0 45px rgba(255, 210, 63, 0.3);
+    transform: scale(1.02);
+  }
+}
+
+.tier-icon {
+  font-size: 48px;
+  margin-bottom: 4px;
+}
+
+.tier-name {
+  font-family: var(--font-display, system-ui);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.04em);
+  color: #000;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.tier-division {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Animated glow ring around badge */
+.tier-badge::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  animation: tierRingGlow 3s ease-in-out infinite;
+}
+
+.tier-badge.tier-bronze::before { border-color: var(--tier-bronze); }
+.tier-badge.tier-silver::before { border-color: var(--tier-silver); }
+.tier-badge.tier-gold::before { border-color: var(--tier-gold); }
+.tier-badge.tier-platinum::before { border-color: var(--tier-platinum); }
+.tier-badge.tier-diamond::before { border-color: var(--tier-diamond); }
+.tier-badge.tier-champion::before { border-color: var(--tier-champion); }
+
+@keyframes tierRingGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* RP Progress Section */
+.rp-progress-section {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m, 16px);
+}
+
+.rp-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.rp-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary, #a0a4b0);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.04em);
+}
+
+.rp-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--rp-color, #00e5ff);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+
+.rp-bar-container {
+  position: relative;
+}
+
+.rp-bar {
+  height: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-pill, 999px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0, 229, 255, 0.6), var(--rp-color));
+  border-radius: var(--radius-pill, 999px);
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+  position: relative;
+}
+
+/* LP (League Points) indicator markers on bar */
+.rp-markers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.rp-marker {
+  flex: 1;
+  height: 100%;
+  border-right: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.rp-marker:last-child {
+  border-right: none;
+}
+
+.rp-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-tertiary, #5a5e6a);
+}
+
+/* Demotion protection shield */
+.demotion-shield {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(61, 220, 132, 0.1);
+  border: 1px solid rgba(61, 220, 132, 0.3);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--success, #3ddc84);
+  margin-top: 4px;
+}
+
+.demotion-shield-icon {
+  font-size: 12px;
+}
+
+/* Tier Ladder Visualization */
+.tier-ladder {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-s, 8px);
+  margin-top: var(--space-xl, 40px);
+  padding-top: var(--space-xl, 40px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ladder-tier {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--range-m, 8px);
+  transition: all var(--duration-fast, 0.18s) ease;
+}
+
+.ladder-tier.current {
+  background: rgba(255, 77, 46, 0.1);
+  border-color: var(--accent-primary, #ff4d2e);
+  order: -1;
+}
+
+.ladder-tier.completed {
+  opacity: 0.5;
+}
+
+.ladder-tier-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.ladder-tier-icon.tier-bronze { background: linear-gradient(135deg, var(--tier-bronze), var(--tier-bronze-dark)); }
+.ladder-tier-icon.tier-silver { background: linear-gradient(135deg, var(--tier-silver), var(--tier-silver-dark)); }
+.ladder-tier-icon.tier-gold { background: linear-gradient(135deg, var(--tier-gold), var(--tier-gold-dark)); }
+.ladder-tier-icon.tier-platinum { background: linear-gradient(135deg, var(--tier-platinum), var(--tier-platinum-dark)); }
+.ladder-tier-icon.tier-diamond { background: linear-gradient(135deg, var(--tier-diamond), var(--tier-diamond-dark)); }
+
+.ladder-tier-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ladder-tier-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary, #f5f6fa);
+}
+
+.ladder-tier-division {
+  font-size: 10px;
+  color: var(--text-tertiary, #5a5e6a);
+}
+
+.ladder-tier-check {
+  font-size: 14px;
+  color: var(--success, #3ddc84);
+}
+
+/* ==================== TOURNAMENT CARDS GRID ==================== */
+.tournaments-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl, 40px);
+}
+
+.section-header-with-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-m, 16px);
+}
+
+.tournaments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-l, 24px);
+}
+
+/* Individual Tournament Card */
+.tournament-card {
+  background: linear-gradient(
+    145deg,
+    rgba(18, 21, 35, 0.98) 0%,
+    rgba(12, 14, 24, 0.97) 100%
+  );
+  border-radius: var(--radius-xl, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  transition: all var(--duration-base, 0.32s) ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.tournament-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.tournament-card.active {
+  border-color: var(--accent-primary, #ff4d2e);
+  box-shadow: 0 0 30px rgba(255, 77, 46, 0.15);
+}
+
+/* Card header with type icon and gradient accent */
+.tournament-card-header {
+  padding: var(--space-l, 24px) var(--space-l, 24px) 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-m, 16px);
+}
+
+.tournament-type-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-m, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.tournament-card.daily .tournament-type-icon {
+  background: rgba(61, 220, 132, 0.15);
+  color: var(--tour-daily);
+}
+.tournament-card.weekly .tournament-type-icon {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--tour-weekly);
+}
+.tournament-card.grandprix .tournament-type-icon {
+  background: rgba(255, 210, 63, 0.15);
+  color: var(--tour-grandprix);
+}
+.tournament-card.special .tournament-type-icon {
+  background: rgba(170, 0, 255, 0.15);
+  color: var(--tour-special);
+}
+
+.tournament-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tournament-type-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-ultra-wide, 0.18em);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.tournament-card.daily .tournament-type-label { color: var(--tour-daily); }
+.tournament-card.weekly .tournament-type-label { color: var(--tour-weekly); }
+.tournament-card.grandprix .tournament-type-label { color: var(--tour-grandprix); }
+.tournament-card.special .tournament-type-label { color: var(--tour-special); }
+
+.tournament-name {
+  font-family: var(--font-heading, system-ui);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary, #f5f6fa);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.tournament-description {
+  font-size: 13px;
+  color: var(--text-secondary, #a0a4b0);
+  line-height: 1.4;
+}
+
+/* Card body */
+.tournament-card-body {
+  padding: var(--space-m, 16px) var(--space-l, 24px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m, 16px);
+}
+
+/* Timer/Duration row */
+.tournament-duration {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  font-size: 13px;
+  color: var(--text-secondary, #a0a4b0);
+}
+
+.duration-icon {
+  font-size: 14px;
+}
+
+.duration-time {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--text-primary, #f5f6fa);
+}
+
+/* Objective/Progress */
+.tournament-objective {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-m, 8px);
+}
+
+.objective-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary, #f5f6fa);
+}
+
+.objective-progress {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-secondary, #00e5ff);
+}
+
+/* Reward preview */
+.tournament-rewards {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  flex-wrap: wrap;
+}
+
+.reward-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.04em);
+  color: var(--text-tertiary, #5a5e6a);
+  font-weight: 600;
+}
+
+.reward-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 210, 63, 0.1);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-tertiary, #ffd23f);
+}
+
+.reward-icon {
+  font-size: 12px;
+}
+
+/* Card footer with entry button */
+.tournament-card-footer {
+  padding: var(--space-m, 16px) var(--space-l, 24px);
+  padding-top: 0;
+}
+
+.entry-btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: var(--radius-l, 16px);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.04em);
+  cursor: pointer;
+  transition: all var(--duration-fast, 0.18s) ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tournament-card.daily .entry-btn {
+  background: linear-gradient(135deg, rgba(61, 220, 132, 0.2), rgba(61, 220, 132, 0.1));
+  color: var(--tour-daily);
+  border: 1px solid rgba(61, 220, 132, 0.3);
+}
+
+.tournament-card.weekly .entry-btn {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(0, 229, 255, 0.1));
+  color: var(--tour-weekly);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+}
+
+.tournament-card.grandprix .entry-btn {
+  background: linear-gradient(135deg, rgba(255, 210, 63, 0.2), rgba(255, 210, 63, 0.1));
+  color: var(--tour-grandprix);
+  border: 1px solid rgba(255, 210, 63, 0.3);
+}
+
+.tournament-card.special .entry-btn {
+  background: linear-gradient(135deg, rgba(170, 0, 255, 0.2), rgba(170, 0, 255, 0.1));
+  color: var(--tour-special);
+  border: 1px solid rgba(170, 0, 255, 0.3);
+}
+
+.entry-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px currentColor;
+}
+
+.entry-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.entry-btn.entered {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #f5f6fa);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== LEADERBOARD INTEGRATION ==================== */
+.leaderboard-section {
+  background: linear-gradient(
+    145deg,
+    rgba(15, 18, 30, 0.95) 0%,
+    rgba(22, 26, 42, 0.92) 100%
+  );
+  border-radius: var(--radius-xl, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: var(--space-xl, 40px);
+}
+
+.leaderboard-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  border-radius: var(--radius-pill, 999px);
+  margin-bottom: var(--space-l, 24px);
+  width: fit-content;
+}
+
+.leaderboard-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-secondary, #a0a4b0);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast, 0.18s) ease;
+  border: none;
+}
+
+.leaderboard-tab:hover {
+  color: var(--text-primary, #f5f6fa);
+}
+
+.leaderboard-tab.active {
+  background: var(--accent-primary, #ff4d2e);
+  color: #fff;
+}
+
+.leaderboard-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s, 8px);
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 16px);
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-m, 8px);
+  transition: all var(--duration-fast, 0.18s) ease;
+}
+
+.leaderboard-entry:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-entry.highlight {
+  background: rgba(255, 77, 46, 0.1);
+  border-left: 3px solid var(--accent-primary, #ff4d2e);
+}
+
+.lb-position {
+  font-family: var(--font-display, system-ui);
+  font-size: 18px;
+  font-weight: 800;
+  min-width: 32px;
+  text-align: center;
+}
+
+.lb-position.pos-1 { color: var(--tier-gold); }
+.lb-position.pos-2 { color: var(--tier-silver); }
+.lb-position.pos-3 { color: var(--tier-bronze); }
+
+.lb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.lb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lb-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary, #f5f6fa);
+}
+
+.lb-rp {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rp-color, #00e5ff);
+}
+
+/* ==================== REWARD TIER LADDER ==================== */
+.reward-ladder {
+  background: linear-gradient(
+    145deg,
+    rgba(15, 18, 30, 0.95) 0%,
+    rgba(22, 26, 42, 0.92) 100%
+  );
+  border-radius: var(--radius-xl, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: var(--space-xl, 40px);
+}
+
+.reward-tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s, 8px);
+  margin-top: var(--space-l, 24px);
+}
+
+.reward-tier-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 16px);
+  padding: var(--space-m, 16px);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-m, 8px);
+  border-left: 4px solid transparent;
+  transition: all var(--duration-fast, 0.18s) ease;
+}
+
+.reward-tier-item.unlocked {
+  border-left-color: var(--success, #3ddc84);
+  background: rgba(61, 220, 132, 0.05);
+}
+
+.reward-tier-item.current {
+  border-left-color: var(--accent-primary, #ff4d2e);
+  background: rgba(255, 77, 46, 0.05);
+}
+
+.reward-tier-item.locked {
+  opacity: 0.6;
+}
+
+.reward-tier-rank {
+  font-family: var(--font-display, system-ui);
+  font-size: 16px;
+  font-weight: 800;
+  min-width: 48px;
+  color: var(--text-primary, #f5f6fa);
+}
+
+.reward-tier-rewards {
+  flex: 1;
+  display: flex;
+  gap: var(--space-s, 8px);
+  flex-wrap: wrap;
+}
+
+.reward-mini-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--accent-tertiary, #ffd23f);
+}
+
+.reward-status-icon {
+  font-size: 18px;
+}
+
+/* Promotion/Demotion Flash Animations */
+@keyframes promotionFlash {
+  0% { 
+    background: rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+    transform: scale(1.02);
+  }
+  50% { 
+    background: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+  }
+  100% { 
+    background: inherit;
+    box-shadow: inherit;
+    transform: scale(1);
+  }
+}
+
+.promotion-flash {
+  animation: promotionFlash 1s ease-out !important;
+}
+
+@keyframes demotionFlash {
+  0% { 
+    background: rgba(255, 61, 90, 0.4);
+    box-shadow: 0 0 40px rgba(255, 61, 90, 0.6);
+  }
+  50% { 
+    background: rgba(255, 61, 90, 0.6);
+    box-shadow: 0 0 60px rgba(255, 61, 90, 0.8);
+  }
+  100% { 
+    background: inherit;
+    box-shadow: inherit;
+  }
+}
+
+.demotion-flash {
+  animation: demotionFlash 0.8s ease-out !important;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+@media (max-width: 1024px) {
+  .tournaments-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .tournament-system {
+    padding: var(--space-m, 16px);
+  }
+  
+  .season-banner {
+    padding: var(--space-l, 24px) var(--space-m, 16px);
+  }
+  
+  .season-countdown-row {
+    gap: var(--space-m, 16px);
+  }
+  
+  .countdown-value {
+    font-size: 24px;
+    padding: 6px 12px;
+    min-width: 44px;
+  }
+  
+  .ranked-section,
+  .leaderboard-section,
+  .reward-ladder {
+    padding: var(--space-m, 16px);
+    border-radius: var(--radius-l, 16px);
+  }
+  
+  .current-tier-display {
+    padding: var(--space-m, 16px);
+    flex-direction: column;
+  }
+  
+  .tier-badge {
+    width: 110px;
+    height: 110px;
+  }
+  
+  .tier-badge-inner {
+    width: 94px;
+    height: 94px;
+  }
+  
+  .tier-icon {
+    font-size: 36px;
+  }
+  
+  .tournaments-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .leaderboard-tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .leaderboard-tab {
+    flex: 1;
+    white-space: nowrap;
+  }
+  
+  .tier-ladder {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .season-name {
+    font-size: 28px;
+  }
+  
+  .season-countdown-row {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .tier-badge {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .tier-badge-inner {
+    width: 78px;
+    height: 78px;
+  }
+  
+  .tier-icon {
+    font-size: 28px;
+  }
+  
+  .tier-name {
+    font-size: 11px;
+  }
+  
+  .rp-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section-header-with-action {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .season-banner {
+    padding: var(--space-m, 16px);
+  }
+  
+  .season-name {
+    font-size: 24px;
+  }
+  
+  .current-tier-display {
+    flex-direction: row;
+    padding: 12px;
+  }
+  
+  .tier-badge {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .tier-badge-inner {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .tier-icon {
+    font-size: 24px;
+  }
+}
+
+/* ==================== REDUCED MOTION SUPPORT ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .season-particle {
+    animation: none;
+  }
+  
+  .tier-badge-inner {
+    animation: none;
+  }
+  
+  .tier-badge::before {
+    animation: none;
+  }
+  
+  .season-progress-fill::after,
+  .rp-bar-fill {
+    animation: none;
+  }
+  
+  .tournament-card,
+  .ladder-tier,
+  .leaderboard-entry,
+  .entry-btn {
+    transition: none;
+  }
+  
+  .tournament-card:hover {
+    transform: none;
+  }
+  
+  .promotion-flash,
+  .demotion-flash {
+    animation: none;
+  }
+}

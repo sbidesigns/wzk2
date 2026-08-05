@@ -1,0 +1,33 @@
+{
+  "$schema": "../../config/schemas/mode.schema.json",
+  "category": "modes",
+  "entries": [
+    {
+      "id": "circuit",
+      "displayName": "Circuit Race",
+      "description": "Classic multi-lap race. First across the line after the lap count wins. Items enabled. Up to 12 racers.",
+      "category": "race",
+      "icon": "circuit",
+      "matchConfig": { "laps": 3, "maxPlayers": 12, "allowItems": true, "allowCombat": true, "timeLimitSec": 0 },
+      "module": "./mode.circuit.js"
+    },
+    {
+      "id": "sprint",
+      "displayName": "Sprint",
+      "description": "Single-lap point-to-point. No items. Pure driving skill. Top speed matters more than combat.",
+      "category": "race",
+      "icon": "sprint",
+      "matchConfig": { "laps": 1, "maxPlayers": 8, "allowItems": false, "allowCombat": false, "timeLimitSec": 0 },
+      "module": "./mode.sprint.js"
+    },
+    {
+      "id": "drift",
+      "displayName": "Drift Trial",
+      "description": "Score-based. Chain drifts for combos. Highest score at the timer end wins. Items disabled.",
+      "category": "score",
+      "icon": "drift",
+      "matchConfig": { "laps": 0, "maxPlayers": 1, "allowItems": false, "allowCombat": false, "timeLimitSec": 180 },
+      "module": "./mode.drift.js"
+    }
+  ]
+}

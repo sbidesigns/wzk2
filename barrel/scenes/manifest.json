@@ -1,0 +1,18 @@
+{
+  "$schema": "../../config/schemas/scene.schema.json",
+  "category": "scenes",
+  "entries": [
+    {
+      "id": "race",
+      "type": "3d",
+      "persistent": false,
+      "module": "./scene.race.js"
+    },
+    {
+      "id": "cutscene",
+      "type": "cutscene",
+      "persistent": false,
+      "module": "./scene.cutscene.js"
+    }
+  ]
+}

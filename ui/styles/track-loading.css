@@ -1,0 +1,672 @@
+/* ui/styles/track-loading.css — Track Loading Transition Screen Styling */
+
+/* ============================================
+   LOADING OVERLAY
+   ============================================ */
+.track-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.track-loading-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease;
+}
+
+.track-loading-overlay.removing {
+  opacity: 0 !important;
+  transition: opacity 0.25s ease;
+}
+
+.tl-bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.tl-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 6, 10, 0.75) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.tl-main-content {
+  position: relative;
+  z-index: 10;
+  width: 92%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(165deg, rgba(18, 20, 30, 0.97), rgba(10, 12, 18, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(255, 107, 53, 0.04) inset;
+  animation: mainContentFloat 4s ease-in-out infinite;
+}
+
+@keyframes mainContentFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.tl-main-content.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+.tl-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tl-track-preview {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.tl-track-image {
+  height: 90px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.tl-terrain-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  animation: terrainPulse 2s ease-in-out infinite;
+}
+
+@keyframes terrainPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.tl-track-info {
+  min-width: 0;
+}
+
+.tl-track-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ff6b35;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.tl-track-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+}
+
+.diff-easy { color: #4ade80; border-color: rgba(74, 222, 128, 0.25); }
+.diff-normal { color: #fbbf24; border-color: rgba(251, 191, 36, 0.25); }
+.diff-hard { color: #f97316; border-color: rgba(249, 115, 22, 0.25); }
+.diff-extreme { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
+/* Progress Section */
+.tl-progress-section {
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.tl-phase-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tl-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00e5ff;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+  animation: statusPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.tl-phase-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tl-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tl-progress-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tl-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff6b35, #f7931e, #ffcc02);
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.tl-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    transparent 60%
+  );
+  animation: progressShine 1.2s linear infinite;
+}
+
+@keyframes progressShine {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+.tl-progress-glow {
+  width: 80px;
+  height: 8px;
+  background: radial-gradient(circle at center, #ff6b35, transparent);
+  filter: blur(8px);
+  opacity: 0.7;
+  margin-left: -70px;
+}
+
+.tl-progress-text {
+  font-size: 13px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: #ff6b35;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ============================================
+   BODY GRID
+   ============================================ */
+.tl-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 20px;
+}
+
+.tl-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tip-title .tip-icon {
+  font-size: 14px;
+}
+
+/* Left Column */
+.tl-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Vehicle Card */
+.tl-vehicle-card {
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.tl-vehicle-display {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tl-vehicle-shape {
+  position: relative;
+  width: 80px;
+  height: 40px;
+  animation: vehicleIdle 2.5s ease-in-out infinite;
+}
+
+@keyframes vehicleIdle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-2px) rotate(1deg); }
+  75% { transform: translateY(1px) rotate(-1deg); }
+}
+
+.tl-vehicle-body {
+  position: absolute;
+  inset: 6px 12px;
+  background: var(--v-color, #888);
+  border-radius: 8px 8px 6px 6px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tl-wheel {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  background: #222;
+  border-radius: 50%;
+  border: 2px solid #444;
+}
+
+.tl-wheel.front { right: 6px; }
+.tl-wheel.rear { left: 6px; }
+
+.tl-vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tl-vehicle-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tl-vehicle-class {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v-color, #888);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tip Card */
+.tl-tip-card {
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), transparent);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+  border-radius: 10px;
+}
+
+.tl-tip-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 191, 36, 0.8);
+  min-height: 38px;
+  transition: opacity 0.2s ease;
+}
+
+.tl-tip-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.tl-tip-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tl-tip-dots span.active {
+  background: #fbbf24;
+  transform: scale(1.25);
+}
+
+/* Right Column - Opponents */
+.tl-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.tl-opponent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tl-opponent-row {
+  display: grid;
+  grid-template-columns: 26px 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  animation: opponentSlideIn 0.35s ease-out backwards both;
+  animation-delay: var(--opp-delay, 0ms);
+  transition: all 0.2s ease;
+}
+
+@keyframes opponentSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tl-opponent-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.opp-position {
+  font-weight: 700;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.opp-avatar {
+  font-size: 18px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--opp-color, 136, 136, 136), 0.15);
+  border-radius: 50%;
+}
+
+.opp-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.opp-vehicle {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: right;
+}
+
+.tl-more-opponents {
+  text-align: center;
+  padding: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  margin-top: 4px;
+}
+
+/* ============================================
+   READY SCREEN
+   ============================================ */
+.tl-ready-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 6, 10, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+}
+
+.tl-ready-screen.hidden {
+  display: none !important;
+}
+
+.tl-ready-screen.visible {
+  opacity: 1;
+  visibility: visible;
+  animation: readyScreenIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes readyScreenIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.ready-content {
+  text-align: center;
+  padding: 48px;
+}
+
+.ready-icon {
+  font-size: 72px;
+  animation: readyBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes readyBounce {
+  from { transform: scale(0) rotate(-180deg); }
+  to { transform: scale(1) rotate(0deg); }
+}
+
+.ready-title {
+  font-size: 32px;
+  font-weight: 900;
+  color: #22c55e;
+  text-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+  margin: 16px 0 8px;
+}
+
+.ready-subtitle {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ready-countdown {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ready-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.ready-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.4);
+  animation: readyDotPulse 1s ease-in-out infinite;
+}
+
+.ready-dots span:nth-child(2) { animation-delay: 0.15s; }
+.ready-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes readyDotPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ============================================
+   FOOTER / CANCEL BUTTON
+   ============================================ */
+.tl-footer {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: center;
+}
+
+.tl-cancel-btn {
+  padding: 10px 24px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  color: rgba(239, 68, 68, 0.6);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tl-cancel-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .tl-main-content {
+    width: 96%;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .tl-track-preview {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .tl-track-image {
+    height: 70px;
+  }
+
+  .tl-track-name {
+    font-size: 17px;
+  }
+
+  .tl-body-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tl-right-col {
+    max-height: 160px;
+  }
+
+  .ready-icon {
+    font-size: 56px;
+  }
+
+  .ready-title {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tl-main-content {
+    width: 98%;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .tl-track-preview {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tl-track-image {
+    height: 60px;
+  }
+
+  .tl-vehicle-shape {
+    width: 65px;
+    height: 32px;
+  }
+
+  .tl-section-title {
+    font-size: 10px;
+  }
+
+  .opponent-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+  }
+
+  .ready-content {
+    padding: 32px;
+  }
+
+  .ready-icon {
+    font-size: 48px;
+  }
+
+  .ready-title {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$id": "scene.schema.json",
+  "type": "object",
+  "required": ["id", "type", "module"],
+  "properties": {
+    "id":    { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "type":  { "type": "string", "enum": ["3d", "2d", "cutscene", "boot"] },
+    "persistent": { "type": "boolean" },
+    "module": { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["mount", "unmount"],
+  "additionalProperties": false
+}

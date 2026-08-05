@@ -1,0 +1,15 @@
+{
+  "$id": "screen.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-\\.]+$" },
+    "displayName": { "type": "string" },
+    "category":    { "type": "string", "enum": ["primary", "secondary", "overlay", "settings"] },
+    "music":       { "type": ["string", "null"] },
+    "module":      { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["mount", "unmount"],
+  "recommendedInterface": ["update", "onNavigateIn", "onNavigateOut", "onInput"],
+  "additionalProperties": false
+}

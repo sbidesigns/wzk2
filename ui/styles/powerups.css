@@ -1,0 +1,774 @@
+/* ui/styles/powerups.css — Power-Ups System Styling for Warzone Kart: Neon Underground
+ * Features: Item slot, timer ring, rarity glow effects, active power-up display, mobile support
+ */
+
+/* ==================== RARITY COLOR VARIABLES (same as achievements) ==================== */
+:root {
+  --powerup-common: #8a8a8a;
+  --powerup-uncommon: #00ffa8;
+  --powerup-rare: #00e5ff;
+  --powerup-epic: #aa00ff;
+  --powerup-legendary: #ffd23f;
+  
+  /* Type-specific colors */
+  --powerup-speed-color: #ff6b35;
+  --powerup-defensive-color: #00e5ff;
+  --powerup-offensive-color: #ff4444;
+  --powerup-tactical-color: #ffd23f;
+  --powerup-utility-color: #aa00ff;
+}
+
+/* ==================== ITEM SLOT (HUD INTEGRATION) ==================== */
+.powerup-item-slot {
+  position: fixed;
+  bottom: var(--space-xl, 24px);
+  right: var(--space-xl, 24px);
+  z-index: calc(var(--z-hud, 1000) + 10);
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+}
+
+/* Inner slot container */
+.item-slot-inner {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  
+  background: rgba(10, 12, 20, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  
+  /* Subtle inner gradient */
+}
+.item-slot-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Empty state */
+.item-slot-inner.empty {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.item-slot-inner.empty .item-icon {
+  font-size: 28px;
+  opacity: 0.4;
+}
+
+.item-slot-inner.empty .item-name {
+  display: none;
+}
+
+/* Has item state - glowing border */
+.item-slot-inner.has-item {
+  border-color: var(--item-color, var(--powerup-common));
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--item-color, transparent) 30%, transparent),
+    0 0 40px color-mix(in srgb, var(--item-color, transparent) 15%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--item-color, transparent) 10%, transparent);
+  
+  animation: itemSlotPulse 2s ease-in-out infinite;
+}
+
+@keyframes itemSlotPulse {
+  0%, 100% { 
+    box-shadow:
+      0 0 20px color-mix(in srgb, var(--item-color, transparent) 25%, transparent),
+      0 0 40px color-mix(in srgb, var(--item-color, transparent) 12%, transparent);
+  }
+  50% { 
+    box-shadow:
+      0 0 25px color-mix(in srgb, var(--item-color, transparent) 35%, transparent),
+      0 0 50px color-mix(in srgb, var(--item-color, transparent) 18%, transparent),
+      inset 0 0 25px color-mix(in srgb, var(--item-color, transparent) 12%, transparent);
+  }
+}
+
+/* Rarity-specific item slot styles */
+.item-slot-inner.rarity-common {
+  --item-color: var(--powerup-common);
+}
+.item-slot-inner.rarity-uncommon {
+  --item-color: var(--powerup-uncommon);
+}
+.item-slot-inner.rarity-rare {
+  --item-color: var(--powerup-rare);
+}
+.item-slot-inner.rarity-epic {
+  --item-color: var(--powerup-epic);
+}
+.item-slot-inner.rarity-legendary {
+  --item-color: var(--powerup-legendary);
+  
+  animation: legendaryItemPulse 2s ease-in-out infinite;
+}
+
+@keyframes legendaryItemPulse {
+  0%, 100% { 
+    box-shadow:
+      0 0 25px rgba(255, 210, 63, 0.4),
+      0 0 50px rgba(255, 210, 63, 0.2),
+      inset 0 0 25px rgba(255, 210, 63, 0.15);
+  }
+  50% { 
+    box-shadow:
+      0 0 35px rgba(255, 210, 63, 0.55),
+      0 0 65px rgba(255, 210, 63, 0.3),
+      inset 0 0 35px rgba(255, 210, 63, 0.22);
+    
+    /* Golden shimmer */
+    transform: scale(1.02);
+  }
+}
+
+/* Item Icon */
+.item-icon {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.has-item:hover .item-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+/* Item Name (shown on hover/focus) */
+.item-name {
+  font-family: var(--font-display, system-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-primary, #fff);
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+}
+
+.has-item:hover .item-name,
+.has-item:focus-within .item-name {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Item Count (when holding multiple) */
+.item-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: linear-gradient(135deg, var(--powerup-legendary), #ff9500);
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  box-shadow: 0 2px 8px rgba(255, 149, 0, 0.5);
+  z-index: 2;
+}
+
+/* Use Prompt Animation */
+.use-prompt {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--item-color, var(--powerup-rare));
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  
+  animation: promptBounce 2s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.has-item .use-prompt {
+  opacity: 1;
+}
+
+@keyframes promptBounce {
+  0%, 100% { 
+    transform: translateX(-50%) translateY(0); 
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateX(-50%) translateY(-3px); 
+    opacity: 1;
+  }
+}
+
+/* Interactive button behavior */
+.item-slot-inner.has-item {
+  cursor: pointer;
+}
+
+.item-slot-inner.has-item:hover {
+  transform: scale(1.08);
+}
+
+.item-slot-inner.has-item:active {
+  transform: scale(0.95);
+}
+
+/* ==================== ACTIVE POWER-UP DISPLAY ==================== */
+.powerup-active-display {
+  position: fixed;
+  bottom: 120px;
+  right: var(--space-xl, 24px);
+  width: 100px;
+  z-index: calc(var(--z-hud, 1000) + 15);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.powerup-active-display.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.active-powerup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(10, 12, 20, 0.92);
+  border-radius: 14px;
+  border: 2px solid var(--active-color, var(--powerup-rare));
+  box-shadow:
+    0 0 25px color-mix(in srgb, var(--active-color, transparent) 35%, transparent),
+    0 0 50px color-mix(in srgb, var(--active-color, transparent) 18%, transparent);
+  
+  animation: activeGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes activeGlow {
+  from {
+    box-shadow:
+      0 0 25px color-mix(in srgb, var(--active-color, transparent) 30%, transparent),
+      0 0 45px color-mix(in srgb, var(--active-color, transparent) 15%, transparent);
+  }
+  to {
+    box-shadow:
+      0 0 32px color-mix(in srgb, var(--active-color, transparent) 45%, transparent),
+      0 0 60px color-mix(in srgb, var(--active-color, transparent) 25%, transparent);
+  }
+}
+
+/* Active icon and name */
+.active-icon {
+  font-size: 32px;
+  line-height: 1;
+  animation: iconFloat 2s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.active-name {
+  font-family: var(--font-display, system-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--active-color, #fff);
+  white-space: nowrap;
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Circular Timer Ring */
+.timer-ring {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 36px;
+  height: 36px;
+}
+
+.circular-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 3;
+}
+
+.circle {
+  fill: none;
+  stroke: var(--active-color, var(--powerup-rare));
+  stroke-width: 3;
+  stroke-linecap: round;
+  
+  /* Initial state (full) - will be animated via JS */
+  stroke-dasharray: 100, 100;
+  stroke-dashoffset: 0;
+  
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 0.1s linear;
+  
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Timer low warning (< 30%) */
+.timer-ring.warning .circle {
+  stroke: var(--danger, #ff3d5a);
+  animation: timerWarning 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes timerWarning {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
+}
+
+/* ==================== POWERUP INFO PANEL (for screens) ==================== */
+.powerups-info-panel {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 14, 24, 0.98) 0%,
+    rgba(18, 21, 35, 0.97) 100%
+  );
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.powerups-info-header {
+  margin-bottom: 24px;
+}
+
+.powerups-info-header h3 {
+  font-family: var(--font-display, system-ui);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary, #fff);
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary, #999);
+}
+
+.powerups-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.powerup-category + .powerup-category {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 28px;
+}
+
+.category-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.powerup-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+/* Individual power-up info card */
+.powerup-info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.powerup-info-card:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+
+/* Rarity borders for info cards */
+.powerup-info-card.rarity-common {
+  border-left: 3px solid var(--powerup-common);
+}
+.powerup-info-card.rarity-uncommon {
+  border-left: 3px solid var(--powerup-uncommon);
+}
+.powerup-info-card.rarity-rare {
+  border-left: 3px solid var(--powerup-rare);
+}
+.powerup-info-card.rarity-epic {
+  border-left: 3px solid var(--powerup-epic);
+}
+.powerup-info-card.rarity-legendary {
+  border-left: 3px solid var(--powerup-legendary);
+  background: linear-gradient(135deg, rgba(255, 210, 63, 0.08), rgba(0, 0, 0, 0.25));
+}
+
+.info-card-icon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.info-card-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-card-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary, #fff);
+  margin-bottom: 2px;
+}
+
+.info-card-desc {
+  font-size: 12px;
+  color: var(--text-secondary, #999);
+  line-height: 1.4;
+}
+
+.info-card-rarity {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.rarity-common .info-card-rarity {
+  background: rgba(138, 138, 138, 0.2);
+  color: var(--powerup-common);
+}
+.rarity-uncommon .info-card-rarity {
+  background: rgba(0, 255, 168, 0.15);
+  color: var(--powerup-uncommon);
+}
+.rarity-rare .info-card-rarity {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--powerup-rare);
+}
+.rarity-epic .info-card-rarity {
+  background: rgba(170, 0, 255, 0.15);
+  color: var(--powerup-epic);
+}
+.rarity-legendary .info-card-rarity {
+  background: rgba(255, 210, 63, 0.2);
+  color: var(--powerup-legendary);
+}
+
+/* ==================== TYPE-SPECIFIC COLOR THEMES ==================== */
+
+/* Speed items - orange/red flame theme */
+[data-type="speed"] .item-slot-inner,
+.powerup-item-slot:has([data-category="speed"]) .has-item {
+  --item-color: var(--powerup-speed-color);
+}
+
+/* Defensive items - cyan/ice blue theme */
+[data-type="defensive"] .item-slot-inner,
+.powerup-item-slot:has([data-category="defensive"]) .has-item {
+  --item-color: var(--powerup-defensive-color);
+}
+
+/* Offensive items - red danger theme */
+[data-type="offensive"] .item-slot-inner,
+.powerup-item-slot:has([data-category="offensive"]) .has-item {
+  --item-color: var(--powerup-offensive-color);
+}
+
+/* Tactical items - gold/yellow theme */
+[data-type="tactical"] .item-slot-inner,
+.powerup-item-slot:has([data-category="tactical"]) .has-item {
+  --item-color: var(--powerup-tactical-color);
+}
+
+/* Utility items - purple theme */
+[data-type="utility"] .item-slot-inner,
+.powerup-item-slot:has([data-category="utility"]) .has-item {
+  --item-color: var(--powerup-utility-color);
+}
+
+/* ==================== MOBILE RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .powerup-item-slot {
+    bottom: var(--space-m, 16px);
+    right: var(--space-m, 16px);
+  }
+  
+  .item-slot-inner {
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+  }
+  
+  .item-icon {
+    font-size: 30px;
+  }
+  
+  .use-prompt {
+    bottom: -18px;
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+  
+  .powerup-active-display {
+    bottom: 100px;
+    right: var(--space-m, 16px);
+    width: 88px;
+  }
+  
+  .active-powerup {
+    padding: 10px;
+    border-radius: 12px;
+  }
+  
+  .active-icon {
+    font-size: 28px;
+  }
+  
+  .timer-ring {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Info panel mobile */
+  .powerups-info-panel {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .powerup-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .powerup-item-slot {
+    bottom: calc(var(--space-m, 16px) + 60px); /* Above touch controls if present */
+  }
+  
+  .item-slot-inner {
+    width: 62px;
+    height: 62px;
+  }
+  
+  .item-icon {
+    font-size: 26px;
+  }
+  
+  .item-count {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+  
+  .use-prompt {
+    display: none; /* Hide on small screens to save space */
+  }
+  
+  .powerup-active-display {
+    bottom: calc(var(--space-m, 16px) + 140px);
+    width: 80px;
+  }
+  
+  .active-name {
+    font-size: 9px;
+  }
+}
+
+/* Landscape adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .powerup-item-slot {
+    bottom: var(--space-s, 8px);
+    right: var(--space-s, 8px);
+  }
+  
+  .item-slot-inner {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+  }
+  
+  .item-icon {
+    font-size: 24px;
+  }
+  
+  .powerup-active-display {
+    bottom: 75px;
+    right: var(--space-s, 8px);
+    width: 72px;
+  }
+  
+  .active-powerup {
+    padding: 8px;
+  }
+  
+  .active-icon {
+    font-size: 24px;
+  }
+  
+  .active-name {
+    display: none;
+  }
+}
+
+/* ==================== REDUCED MOTION SUPPORT ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .item-slot-inner.has-item,
+  .item-slot-inner.rarity-legendary,
+  .active-powerup {
+    animation: none !important;
+  }
+  
+  .item-icon,
+  .active-icon {
+    animation: none !important;
+  }
+  
+  .use-prompt {
+    animation: none !important;
+    opacity: 1;
+  }
+  
+  .circle {
+    transition: stroke-dasharray 0.01s linear;
+  }
+  
+  .timer-ring.warning .circle {
+    animation: none;
+  }
+  
+  .powerup-info-card,
+  .item-slot-inner {
+    transition: none;
+  }
+  
+  .item-slot-inner:hover,
+  .powerup-info-card:hover {
+    transform: none;
+  }
+}
+
+/* ==================== HIGH CONTRAST MODE ==================== */
+@media (prefers-contrast: high) {
+  .item-slot-inner {
+    border-width: 3px;
+  }
+  
+  .item-slot-inner.has-item {
+    border-width: 3px;
+  }
+  
+  .active-powerup {
+    border-width: 3px;
+  }
+  
+  .powerup-info-card {
+    border-width: 2px;
+    border-left-width: 4px;
+  }
+}
+
+/* ==================== DARK MODE (already default, but explicit) ==================== */
+@media (prefers-color-scheme: light) {
+  .powerups-info-panel {
+    background: linear-gradient(
+      180deg,
+      rgba(245, 247, 250, 0.98) 0%,
+      rgba(240, 242, 248, 0.97) 100%
+    );
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .category-title {
+    color: #111;
+  }
+  
+  .powerup-info-card {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  
+  .info-card-name {
+    color: #111;
+  }
+  
+  .info-card-desc {
+    color: #555;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  .powerup-item-slot,
+  .powerup-active-display {
+    display: none !important;
+  }
+  
+  .powerups-info-panel {
+    break-inside: avoid;
+    border: 1px solid #333;
+  }
+}

@@ -1,0 +1,390 @@
+/* Root styles for Warzone Kart - Neon Underground */
+/* This file is intentionally minimal - main styles are in ui/styles/ */
+
+/* Critical base reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05060a;
+  color: #f5f6fa;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium body background with subtle gradient */
+body {
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(255, 77, 46, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0, 229, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(180deg, #05060a 0%, #0a0c14 50%, #12141f 100%);
+  background-attachment: fixed;
+}
+
+/* Prevent text selection during gameplay */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Canvas styling */
+canvas {
+  display: block;
+}
+
+/* Button resets */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid #00e5ff;
+  outline-offset: 2px;
+  box-shadow: 0 0 16px -4px rgba(0, 229, 255, 0.6);
+}
+
+/* Image defaults */
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Loading state - Premium styling */
+.loading-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    radial-gradient(circle at center, #0a0c14 0%, #05060a 70%);
+  z-index: 99999;
+}
+
+/* Error state - Enhanced cyberpunk style */
+.error-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(135deg, rgba(255, 61, 90, 0.05) 0%, transparent 30%),
+    radial-gradient(circle at center, #05060a 0%, #0a0c14 100%);
+  z-index: 99999;
+  padding: 24px;
+}
+
+.error-content {
+  max-width: 560px;
+  text-align: center;
+  padding: var(--space-xl);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 61, 90, 0.08) 0%,
+    rgba(18, 20, 31, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 61, 90, 0.2);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(20px);
+  animation: errorGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes errorGlowPulse {
+  0%, 100% { box-shadow: 0 24px 48px -12px rgba(255, 61, 90, 0.15); }
+  50% { box-shadow: 0 32px 64px -8px rgba(255, 61, 90, 0.25); }
+}
+
+.error-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff3d5a;
+  margin-bottom: 12px;
+  text-shadow: 0 0 20px rgba(255, 61, 90, 0.4);
+}
+
+.error-message {
+  font-size: 14px;
+  color: #a0a4b0;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.error-stack {
+  font-size: 12px;
+  color: #5a5e6a;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 200px;
+  border: 1px solid rgba(255, 61, 90, 0.1);
+}
+
+/* Fallback for no WebGL - Warning style instead of error */
+.nowebgl .error-title {
+  color: #ffb13d;
+  text-shadow: 0 0 20px rgba(255, 177, 61, 0.4);
+}
+
+.nowebgl .error-message {
+  color: #f5f6fa;
+}
+
+.nowebgl .error-content {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 177, 61, 0.08) 0%,
+    rgba(18, 20, 31, 0.95) 100%
+  );
+  border-color: rgba(255, 177, 61, 0.2);
+}
+
+/* === PREMIUM SCROLLBAR STYLING === */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 77, 46, 0.4) 0%,
+    rgba(255, 140, 0, 0.3) 100%
+  );
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: all var(--duration-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 77, 46, 0.7) 0%,
+    rgba(255, 140, 0, 0.5) 100%
+  );
+  background-clip: content-box;
+  border-color: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox scrollbar support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 77, 46, 0.4) transparent;
+}
+
+*:hover {
+  scrollbar-color: rgba(255, 77, 46, 0.6) transparent;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  * {
+    border-color: CanvasText !important;
+  }
+  
+  button:focus-visible {
+    outline: 3px solid Highlight !important;
+  }
+}
+
+/* ============================================ */
+/* GLOBAL UTILITY CLASSES                       */
+/* ============================================ */
+
+/**
+ * .text-gradient - Apply gradient to text
+ * Uses currentColor variations for cyberpunk aesthetic
+ */
+.text-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary, #ff4d2e) 0%,
+    var(--accent-secondary, #00e5ff) 50%,
+    var(--accent-tertiary, #ffd23f) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-orange-cyan {
+  background: linear-gradient(
+    90deg,
+    #ff4d2e 0%,
+    #ff8c00 35%,
+    #ffd23f 65%,
+    #00e5ff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/**
+ * .bg-mesh - Mesh gradient background
+ * Creates organic, flowing gradient mesh effect
+ */
+.bg-mesh {
+  background:
+    radial-gradient(at 40% 20%, rgba(255, 77, 46, 0.12) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(0, 229, 255, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(255, 210, 63, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(168, 85, 247, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(0, 229, 255, 0.06) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(255, 77, 46, 0.08) 0px, transparent 50%);
+  background-color: #0a0c14;
+}
+
+/**
+ * .overlay-darken / .overlay-lighten - Quick overlays
+ * Semi-transparent overlay utilities for darkening/lightening content
+ */
+.overlay-darken {
+  position: relative;
+}
+
+.overlay-darken::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 6, 10, 0.6);
+  pointer-events: none;
+}
+
+.overlay-lighten {
+  position: relative;
+}
+
+.overlay-lighten::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/**
+ * .hide-scroll - Hide scrollbar but keep scrolling
+ * Custom scrollbar hiding that maintains scroll functionality
+ */
+.hide-scroll {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/**
+ * .no-select - Prevent text selection
+ * Prevents user from selecting text within element
+ */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/**
+ * .font-display - Display font stack
+ * For headings and prominent typography
+ */
+.font-display {
+  font-family: 'Bebas Neue', 'Impact', 'Arial Black', sans-serif;
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+
+/**
+ * .font-body - Body font stack
+ * For general body text and UI elements
+ */
+.font-body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+/**
+ * .font-mono - Monospace font stack
+ * For code, numbers, and technical displays
+ */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  letter-spacing: -0.02em;
+}
+
+
+/* ============================================ */
+/* ADDITIONAL UTILITY CLASSES                  */
+/* ============================================ */
+
+/* Text alignment utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Display utilities */
+.hidden { display: none !important; }
+.visible { visibility: visible !important; }
+.invisible { visibility: hidden !important; }
+
+/* Position utilities */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+/* Overflow utilities */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+
+/* Cursor utilities */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Opacity utilities */
+.opacity-25 { opacity: 0.25; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-100 { opacity: 1; }
+
+/* Border radius utilities */
+.rounded-sm { border-radius: var(--radius-sm, 4px); }
+.rounded-md { border-radius: var(--radius-md, 8px); }
+.rounded-lg { border-radius: var(--radius-lg, 16px); }
+.rounded-xl { border-radius: var(--radius-xl, 24px); }
+.rounded-full { border-radius: 9999px; }

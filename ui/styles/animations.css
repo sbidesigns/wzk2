@@ -1,0 +1,1878 @@
+/* ui/styles/animations.css — reusable keyframes + transition utilities. GSAP handles complex tweens. */
+
+/* ============================================ */
+/* FOUNDATION ANIMATIONS                       */
+/* ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes irisOpen {
+  from { clip-path: circle(0% at 50% 50%); }
+  to { clip-path: circle(150% at 50% 50%); }
+}
+
+@keyframes parallaxRise {
+  from { opacity: 0; transform: translateY(80px) scale(0.98); filter: blur(8px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes riseBlur {
+  from { opacity: 0; transform: translateY(60px) scale(1.02); filter: blur(12px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.97); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 46, 0); }
+  50% { box-shadow: 0 0 24px 4px rgba(255, 77, 46, 0.4); }
+}
+
+@keyframes gridScroll {
+  from { background-position: 0 0; }
+  to { background-position: 80px 80px; }
+}
+
+/* ============================================ */
+/* AAA QUALITY ENHANCED ANIMATIONS             */
+/* ============================================ */
+
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 
+      0 0 4px #fff,
+      0 0 11px #fff,
+      0 0 19px #fff,
+      0 0 40px #ff4d2e,
+      0 0 80px #ff4d2e;
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.7;
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% { 
+    border-color: rgba(255, 77, 46, 0.5);
+    box-shadow: 
+      0 0 5px rgba(255, 77, 46, 0.2),
+      inset 0 0 10px rgba(255, 77, 46, 0.1);
+  }
+  50% { 
+    border-color: rgba(255, 77, 46, 1);
+    box-shadow: 
+      0 0 15px rgba(255, 77, 46, 0.5),
+      0 0 30px rgba(255, 77, 46, 0.3),
+      inset 0 0 20px rgba(255, 77, 46, 0.2);
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% { 
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+  50% { 
+    text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+  }
+}
+
+@keyframes rotate3d {
+  0% { transform: perspective(1000px) rotateY(0deg); }
+  100% { transform: perspective(1000px) rotateY(360deg); }
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% { 
+    transform: scale(0.9);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes scanline {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  70% { transform: scale(1); }
+}
+
+/* ============================================ */
+/* NEW AAA ANIMATIONS                          */
+/* ============================================ */
+
+/* Neon Border Pulse - Cycles through neon colors on borders */
+@keyframes neonBorderPulse {
+  0%, 100% { 
+    border-color: var(--accent-primary, #ff4d2e);
+    box-shadow: 
+      0 0 10px rgba(255, 77, 46, 0.4),
+      inset 0 0 10px rgba(255, 77, 46, 0.1);
+  }
+  33% { 
+    border-color: var(--accent-secondary, #00e5ff);
+    box-shadow: 
+      0 0 10px rgba(0, 229, 255, 0.4),
+      inset 0 0 10px rgba(0, 229, 255, 0.1);
+  }
+  66% { 
+    border-color: var(--accent-tertiary, #ffd23f);
+    box-shadow: 
+      0 0 10px rgba(255, 210, 63, 0.4),
+      inset 0 0 10px rgba(255, 210, 63, 0.1);
+  }
+}
+
+/* Glitch Effect - Cyberpunk glitch for error/attention states */
+@keyframes glitchEffect {
+  0%, 100% { 
+    transform: translate(0);
+    filter: none;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  20% { 
+    transform: translate(-3px, 2px);
+    clip-path: polygon(0 12%, 100% 0, 100% 88%, 0 100%);
+    filter: hue-rotate(90deg);
+  }
+  40% { 
+    transform: translate(3px, -2px);
+    clip-path: polygon(0 0, 100% 15%, 100% 100%, 0 85%);
+    filter: hue-rotate(-90deg);
+  }
+  60% { 
+    transform: translate(-2px, -1px);
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    filter: saturate(2);
+  }
+  80% { 
+    transform: translate(2px, 1px);
+    clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);
+    filter: brightness(1.3);
+  }
+}
+
+/* Glitch with color split effect (more intense) */
+@keyframes glitchEffectIntense {
+  0%, 92%, 96%, 100% { 
+    transform: translate(0);
+    text-shadow: none;
+  }
+  94% { 
+    transform: translate(-4px, 1px);
+    text-shadow: 
+      3px 0 #ff00aa,
+      -3px 0 #00e5ff;
+  }
+  98% { 
+    transform: translate(4px, -1px);
+    text-shadow: 
+      -3px 0 #ff4d2e,
+      3px 0 #ffd23f;
+  }
+}
+
+/* Float Up - Gentle upward floating animation */
+@keyframes floatUp {
+  0%, 100% { 
+    transform: translateY(0) translateX(0);
+    opacity: 0.9;
+  }
+  25% { 
+    transform: translateY(-15px) translateX(5px);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateY(-25px) translateX(-3px);
+    opacity: 0.95;
+  }
+  75% { 
+    transform: translateY(-18px) translateX(8px);
+    opacity: 1;
+  }
+}
+
+/* Speed Lines - Racing speed lines animation */
+@keyframes speedLines {
+  0% { 
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  10% { 
+    opacity: 1;
+  }
+  90% { 
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(300%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+/* Energy Ripple - Expanding energy wave from center */
+@keyframes energyRipple {
+  0% { 
+    transform: scale(0);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(var(--accent-primary-rgb, 255, 77, 46), 0.8);
+  }
+  70% { 
+    opacity: 0.5;
+    box-shadow: 0 0 40px 20px rgba(var(--accent-primary-rgb, 255, 77, 46), 0);
+  }
+  100% { 
+    transform: scale(2.5);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(var(--accent-primary-rgb, 255, 77, 46), 0);
+  }
+}
+
+/* Text Reveal - Character-by-character reveal with glow */
+@keyframes textReveal {
+  0% { 
+    letter-spacing: 0.5em;
+    opacity: 0;
+    filter: blur(8px);
+    text-shadow: 0 0 30px currentColor;
+  }
+  50% {
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+    filter: blur(2px);
+    text-shadow: 0 0 20px currentColor;
+  }
+  100% { 
+    letter-spacing: normal;
+    opacity: 1;
+    filter: blur(0);
+    text-shadow: 0 0 10px currentColor;
+  }
+}
+
+/* Card Flip - 3D card flip effect */
+@keyframes cardFlipFront {
+  0% { transform: perspective(1200deg) rotateY(0deg); }
+  100% { transform: perspective(1200deg) rotateY(-180deg); }
+}
+
+@keyframes cardFlipBack {
+  0% { transform: perspective(1200deg) rotateY(180deg); }
+  100% { transform: perspective(1200deg) rotateY(0deg); }
+}
+
+/* Shake X - Horizontal shake for errors/warnings */
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+/* Shake Y - Vertical shake variant */
+@keyframes shakeY {
+  0%, 100% { transform: translateY(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateY(-6px); }
+  20%, 40%, 60%, 80% { transform: translateY(6px); }
+}
+
+/* Morph Shape - Smooth shape morphing (circle to rounded square and back) */
+@keyframes morphShape {
+  0%, 100% { border-radius: 50%; }
+  25% { border-radius: 40% 60% 55% 45%; }
+  50% { border-radius: 16px; }
+  75% { border-radius: 60% 40% 45% 55%; }
+}
+
+/* Gradient Shift - Animated gradient background cycling colors */
+@keyframes gradientShift {
+  0% { 
+    background-position: 0% 50%;
+    background-color: #ff4d2e;
+  }
+  25% { 
+    background-position: 50% 100%;
+    background-color: #ff8c00;
+  }
+  50% { 
+    background-position: 100% 50%;
+    background-color: #ffd23f;
+  }
+  75% { 
+    background-position: 50% 0%;
+    background-color: #00e5ff;
+  }
+  100% { 
+    background-position: 0% 50%;
+    background-color: #ff4d2e;
+  }
+}
+
+/* Electric Arc - Lightning-like arc animation */
+@keyframes electricArc {
+  0%, 100% { 
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  5% { 
+    opacity: 1;
+    transform: scaleY(1) scaleX(0.95);
+  }
+  10% { 
+    opacity: 1;
+    transform: scaleY(1) scaleX(1.05);
+  }
+  15% { 
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  50% { opacity: 0; }
+}
+
+/* Radar Sweep - For minimap or scanning effects */
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pulse Ring - Expanding ring pulse */
+@keyframes pulseRing {
+  0% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Data Stream - Binary/data flowing effect */
+@keyframes dataStream {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+
+/* Cyber Rotate - Subtle rotation with depth change */
+@keyframes cyberRotate {
+  0%, 100% { 
+    transform: perspective(800px) rotateX(0deg) rotateY(0deg);
+  }
+  25% { 
+    transform: perspective(800px) rotateX(2deg) rotateY(2deg);
+  }
+  50% { 
+    transform: perspective(800px) rotateX(0deg) rotateY(4deg);
+  }
+  75% { 
+    transform: perspective(800px) rotateX(-2deg) rotateY(2deg);
+  }
+}
+
+/* Hologram Flicker - Holographic display effect */
+@keyframes hologramFlicker {
+  0%, 96%, 98%, 100% { 
+    opacity: 1;
+    transform: scaleY(1) scaleX(1);
+  }
+  97% { 
+    opacity: 0.8;
+    transform: scaleY(1.02) scaleX(0.99);
+  }
+  99% { 
+    opacity: 0.9;
+    transform: scaleY(0.99) scaleX(1.01);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes bounceIn {
+  0% { 
+    opacity: 0;
+    transform: scale(0.3) translateY(-20px);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05) translateY(5px);
+  }
+  70% { 
+    transform: scale(0.95);
+  }
+  100% { 
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Reusable utility classes */
+.anim-fade-in    { animation: fadeIn var(--duration-base) var(--ease-out-expo) both; }
+.anim-slide-up   { animation: slideUp var(--duration-screen) var(--ease-out-expo) both; }
+.anim-slide-down { animation: slideDown var(--duration-screen) var(--ease-out-expo) both; }
+.anim-slide-left { animation: slideLeft var(--duration-screen) var(--ease-out-expo) both; }
+.anim-scale-in   { animation: scaleIn var(--duration-base) var(--ease-back-out) both; }
+.anim-parallax-rise { animation: parallaxRise var(--duration-screen) var(--ease-out-expo) both; }
+.anim-rise-blur  { animation: riseBlur var(--duration-screen) var(--ease-out-expo) both; }
+.anim-iris       { animation: irisOpen var(--duration-screen) var(--ease-in-out-circ) both; }
+.anim-float      { animation: floatY 4s ease-in-out infinite; }
+.anim-glow       { animation: glow 2.4s ease-in-out infinite; }
+
+/* Enhanced animation utilities */
+.anim-neon-flicker  { animation: neonFlicker 3s linear infinite; }
+.anim-border-glow   { animation: borderGlow 2s ease-in-out infinite; }
+.anim-text-glow     { animation: textGlow 2s ease-in-out infinite; }
+.anim-rotate-3d     { animation: rotate3d 20s linear infinite; }
+.anim-bounce-in     { animation: bounceIn 0.8s cubic-bezier(0.215, 0.61, 0.355, 1) both; }
+.anim-shake         { animation: shake 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) both; }
+.anim-heartbeat     { animation: heartbeat 1.5s ease-in-out infinite; }
+
+/* ============================================ */
+/* NEW AAA ANIMATION UTILITY CLASSES            */
+/* ============================================ */
+
+/* Neon Border Pulse - cycles through accent colors */
+.anim-neon-border-pulse {
+  animation: neonBorderPulse 4.5s ease-in-out infinite;
+}
+
+/* Glitch Effect - cyberpunk error state */
+.anim-glitch {
+  animation: glitchEffect 2s ease-in-out infinite;
+}
+.anim-glitch-intense {
+  animation: glitchEffectIntense 4s steps(1) infinite;
+}
+
+/* Float Up - gentle upward floating */
+.anim-float-up {
+  animation: floatUp 6s ease-in-out infinite;
+}
+
+/* Speed Lines - racing effect (use on pseudo-elements or children) */
+.anim-speed-lines {
+  animation: speedLines 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+/* Energy Ripple - expanding wave from center */
+.anim-energy-ripple {
+  animation: energyRipple 2s ease-out infinite;
+}
+
+/* Text Reveal - dramatic entrance with blur and glow */
+.anim-text-reveal {
+  animation: textReveal 1.2s var(--ease-out-expo) both;
+}
+
+/* Card Flip - 3D flip effect */
+.anim-card-flip-front {
+  transform-style: preserve-3d;
+  animation: cardFlipFront 0.8s var(--ease-out-expo) both;
+}
+.anim-card-flip-back {
+  transform-style: preserve-3d;
+  animation: cardFlipBack 0.8s var(--ease-out-expo) both;
+}
+
+/* Shake variants for errors/warnings */
+.anim-shake-x {
+  animation: shakeX 0.7s cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+}
+.anim-shake-y {
+  animation: shakeY 0.7s cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+}
+
+/* Morph Shape - organic shape morphing */
+.anim-morph {
+  animation: morphShape 8s ease-in-out infinite;
+}
+
+/* Gradient Shift - animated background gradient */
+.anim-gradient-shift {
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease-in-out infinite;
+}
+
+/* Electric Arc - lightning/electric effect */
+.anim-electric {
+  animation: electricArc 3s ease-out infinite;
+}
+
+/* Radar Sweep - scanning/minimap rotation */
+.anim-radar-sweep {
+  animation: radarSweep 3s linear infinite;
+}
+
+/* Pulse Ring - expanding ring pulse */
+.anim-pulse-ring {
+  animation: pulseRing 2s ease-out infinite;
+}
+
+/* Cyber Rotate - subtle 3D depth rotation */
+.anim-cyber-rotate {
+  animation: cyberRotate 10s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Hologram Flicker - holographic display effect */
+.anim-hologram {
+  animation: hologramFlicker 4s steps(1) infinite;
+}
+
+/* Staggered children helper */
+.stagger > * { opacity: 0; animation: slideUp var(--duration-base) var(--ease-out-expo) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.30s; }
+.stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger > *:nth-child(8) { animation-delay: 0.40s; }
+.stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger > *:nth-child(10) { animation-delay: 0.50s; }
+
+/* Stagger with bounce effect */
+.stagger-bounce > * { 
+  opacity: 0; 
+  animation: bounceIn 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) both; 
+}
+.stagger-bounce > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-bounce > *:nth-child(2) { animation-delay: 0.12s; }
+.stagger-bounce > *:nth-child(3) { animation-delay: 0.19s; }
+.stagger-bounce > *:nth-child(4) { animation-delay: 0.26s; }
+.stagger-bounce > *:nth-child(5) { animation-delay: 0.33s; }
+
+/* Shimmer for loading */
+.shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* Parallax background grid */
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,77,46,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,77,46,0.06) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: gridScroll 8s linear infinite;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+}
+
+.bg-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+}
+
+.bg-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  pointer-events: none;
+  animation: floatY 6s ease-in-out infinite;
+}
+
+/* Scanline effect overlay */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  z-index: 9999;
+}
+
+/* Noise texture overlay */
+.noise::before {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 9998;
+  animation: noiseMove 0.3s steps(10) infinite;
+}
+
+@keyframes noiseMove {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -5%); }
+  20% { transform: translate(5%, 5%); }
+  30% { transform: translate(-5%, 5%); }
+  40% { transform: translate(5%, -5%); }
+  50% { transform: translate(-5%, 0); }
+  60% { transform: translate(5%, 0); }
+  70% { transform: translate(0, 5%); }
+  80% { transform: translate(0, -5%); }
+  90% { transform: translate(-5%, 0); }
+  100% { transform: translate(5%, 0); }
+}
+
+/* ============================================ */
+/* ADVANCED ANIMATIONS - Cycle 5 Additions     */
+/* ============================================ */
+
+/**
+ * equalizerBar - Audio visualizer bar height variation
+ * Use for music-reactive UI elements
+ * Usage: animation: equalizerBar 0.8s ease-in-out infinite alternate;
+ */
+@keyframes equalizerBar {
+  0% { 
+    height: 20%; 
+    opacity: 0.4; 
+  }
+  25% { 
+    height: 85%; 
+    opacity: 1; 
+  }
+  50% { 
+    height: 45%; 
+    opacity: 0.7; 
+  }
+  75% { 
+    height: 95%; 
+    opacity: 1; 
+  }
+  100% { 
+    height: 30%; 
+    opacity: 0.5; 
+  }
+}
+
+/**
+ * scanlineMove - CRT scanline moving down
+ * Classic CRT monitor effect
+ * Usage: animation: scanlineMove 8s linear infinite;
+ */
+@keyframes scanlineMove {
+  0% { 
+    top: -100%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% { 
+    top: 200%; 
+    opacity: 0;
+  }
+}
+
+/**
+ * borderDraw - Stroke dashoffset animation
+ * Border that draws itself around element
+ * Usage: animation: borderDraw 2s ease-in-out forwards;
+ */
+@keyframes borderDraw {
+  0% { 
+    stroke-dashoffset: 1000;
+    stroke-dasharray: 1000;
+  }
+  100% { 
+    stroke-dashoffset: 0;
+    stroke-dasharray: 1000;
+  }
+}
+
+/**
+ * shimmerSweep - Light sweep across surface
+ * Shimmer effect that sweeps across horizontally
+ * Usage: animation: shimmerSweep 2.5s ease-in-out infinite;
+ */
+@keyframes shimmerSweep {
+  0% { 
+    background-position: -200% center;
+  }
+  100% { 
+    background-position: 200% center;
+  }
+}
+
+/**
+ * morphBlob - Organic blob shape shifting
+ * Creates organic, fluid shape morphing effect
+ * Usage: animation: morphBlob 8s ease-in-out infinite;
+ */
+@keyframes morphBlob {
+  0%, 100% { 
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; 
+    transform: scale(1) rotate(0deg);
+  }
+  12.5% { 
+    border-radius: 40% 60% 70% 30% / 50% 60% 40% 50%; 
+    transform: scale(1.02) rotate(2deg);
+  }
+  25% { 
+    border-radius: 50% 50% 35% 65% / 45% 55% 45% 55%; 
+    transform: scale(0.98) rotate(-1deg);
+  }
+  37.5% { 
+    border-radius: 65% 35% 55% 45% / 35% 65% 35% 65%; 
+    transform: scale(1.03) rotate(1deg);
+  }
+  50% { 
+    border-radius: 45% 55% 40% 60% / 65% 35% 65% 35%; 
+    transform: scale(1) rotate(0deg);
+  }
+  62.5% { 
+    border-radius: 35% 65% 60% 40% / 55% 45% 55% 45%; 
+    transform: scale(0.97) rotate(-2deg);
+  }
+  75% { 
+    border-radius: 55% 45% 45% 55% / 40% 60% 40% 60%; 
+    transform: scale(1.01) rotate(1deg);
+  }
+  87.5% { 
+    border-radius: 42% 58% 38% 62% / 52% 48% 52% 48%; 
+    transform: scale(0.99) rotate(-1deg);
+  }
+}
+
+/**
+ * typewriterBlink - Cursor blink for text
+ * Blinking cursor at end of typewriter text
+ * Usage: animation: typewriterBlink 1s step-end infinite;
+ */
+@keyframes typewriterBlink {
+  0%, 100% { 
+    opacity: 1;
+  }
+  50% { 
+    opacity: 0;
+  }
+}
+
+/**
+ * counterPulse - Number counter pulse on change
+ * Pulse effect when numeric values change
+ * Usage: animation: counterPulse 0.4s ease-out;
+ */
+@keyframes counterPulse {
+  0% { 
+    transform: scale(1);
+    color: inherit;
+  }
+  25% { 
+    transform: scale(1.15);
+    color: var(--accent-secondary, #00e5ff);
+    text-shadow: 0 0 12px currentColor;
+  }
+  50% { 
+    transform: scale(0.95);
+  }
+  75% { 
+    transform: scale(1.05);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
+/**
+ * rippleOutward - Click/expansion ripple
+ * Material design style ripple expansion
+ * Usage: animation: rippleOutward 0.6s ease-out forwards;
+ */
+@keyframes rippleOutward {
+  0% { 
+    transform: scale(0);
+    opacity: 0.6;
+    box-shadow: 0 0 0 0 rgba(var(--accent-primary-rgb, 255, 77, 46), 0.7);
+  }
+  70% { 
+    transform: scale(2.5);
+    opacity: 0.3;
+    box-shadow: 0 0 0 20px transparent;
+  }
+  100% { 
+    transform: scale(3.5);
+    opacity: 0;
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/**
+ * floatRotate - Float + gentle rotation
+ * Combines floating motion with subtle rotation
+ * Usage: animation: floatRotate 6s ease-in-out infinite;
+ */
+@keyframes floatRotate {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  25% { 
+    transform: translateY(-12px) rotate(3deg);
+  }
+  50% { 
+    transform: translateY(-22px) rotate(0deg);
+  }
+  75% { 
+    transform: translateY(-12px) rotate(-3deg);
+  }
+}
+
+/**
+ * glitchSplit - RGB split glitch effect
+ * Cyberpunk-style RGB channel separation glitch
+ * Usage: animation: glitchSplit 3s steps(1) infinite;
+ */
+@keyframes glitchSplit {
+  0%, 92%, 96%, 98%, 100% { 
+    transform: translate(0) skew(0);
+    filter: none;
+    text-shadow: none;
+  }
+  93% { 
+    transform: translate(-4px, 2px) skewX(2deg);
+    text-shadow: 
+      3px 0 #ff00aa,
+      -3px 0 #00e5ff;
+    filter: hue-rotate(30deg);
+  }
+  94% { 
+    transform: translate(4px, -2px) skewX(-1deg);
+    text-shadow: 
+      -4px 0 #ff4d2e,
+      4px 0 #ffd23f;
+    filter: hue-rotate(-20deg);
+  }
+  97% { 
+    transform: translate(-2px, 1px) skewX(1deg);
+    text-shadow: 
+      2px 0 #00ffa8,
+      -2px 0 #ff4d2e;
+    filter: saturate(1.5);
+  }
+}
+
+/**
+ * neonFlickerIntense - Stronger neon flicker
+ * More dramatic version of neonFlicker with longer duration
+ * Usage: animation: neonFlickerIntense 4s linear infinite;
+ */
+@keyframes neonFlickerIntense {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 4px #fff,
+      0 0 11px #fff,
+      0 0 19px #fff,
+      0 0 40px var(--accent-primary, #ff4d2e),
+      0 0 80px var(--accent-primary, #ff4d2e),
+      0 0 120px var(--accent-primary, #ff4d2e);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.6;
+    filter: brightness(0.7);
+  }
+}
+
+/**
+ * dataFlow - Data stream flowing upward
+ * Binary/data stream moving upward (matrix-like)
+ * Usage: animation: dataFlow 4s linear infinite;
+ */
+@keyframes dataFlow {
+  0% { 
+    background-position: 0% 100%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% { 
+    background-position: 0% 0%;
+    opacity: 0;
+  }
+}
+
+/**
+ * chargeUp - Power charging effect
+ * Energy building up from bottom to top
+ * Usage: animation: chargeUp 1.5s ease-out infinite;
+ */
+@keyframes chargeUp {
+  0% { 
+    height: 10%;
+    opacity: 0.4;
+    background-position: bottom;
+  }
+  50% { 
+    height: 80%;
+    opacity: 1;
+    box-shadow: 0 0 30px currentColor;
+  }
+  100% { 
+    height: 100%;
+    opacity: 0;
+    filter: brightness(2);
+    transform: scaleY(1.2);
+  }
+}
+
+/**
+ * explodeOutward - Explosion particle spread
+ * Particles exploding outward from center
+ * Usage: animation: explodeOutward 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+ */
+@keyframes explodeOutward {
+  0% { 
+    transform: translate(0, 0) scale(0);
+    opacity: 1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(var(--explode-x, 100px), var(--explode-y, -100px)) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/**
+ * collapseInward - Implosion/collapse effect
+ * Elements collapsing toward center point
+ * Usage: animation: collapseInward 0.6s ease-in forwards;
+ */
+@keyframes collapseInward {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% { 
+    transform: scale(0.7) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+
+/* ============================================ */
+/* NEW UTILITY CLASSES FOR CYCLE 5 ANIMATIONS   */
+/* ============================================ */
+
+.anim-equalizer {
+  animation: equalizerBar 0.8s ease-in-out infinite alternate;
+}
+
+.anim-scanline-move {
+  animation: scanlineMove 8s linear infinite;
+}
+
+.anim-border-draw-anim {
+  /* Requires SVG stroke setup or use with pseudo-elements */
+  animation: borderDraw 2s ease-in-out forwards;
+}
+
+.anim-shimmer-sweep {
+  background-size: 400% 100%;
+  animation: shimmerSweep 2.5s ease-in-out infinite;
+}
+
+.anim-morph-blob {
+  animation: morphBlob 8s ease-in-out infinite;
+}
+
+.anim-typewriter-blink {
+  animation: typewriterBlink 1s step-end infinite;
+}
+
+.anim-counter-pulse {
+  animation: counterPulse 0.4s ease-out;
+}
+
+.anim-ripple {
+  animation: rippleOutward 0.6s ease-out forwards;
+}
+
+.anim-float-rotate {
+  animation: floatRotate 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.anim-glitch-split {
+  animation: glitchSplit 3s steps(1) infinite;
+}
+
+.anim-neon-flicker-intense {
+  animation: neonFlickerIntense 4s linear infinite;
+}
+
+.anim-data-flow {
+  background-size: 100% 200%;
+  animation: dataFlow 4s linear infinite;
+}
+
+.anim-charge-up {
+  animation: chargeUp 1.5s ease-out infinite;
+  overflow: hidden;
+}
+
+.anim-explode {
+  animation: explodeOutward 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.anim-collapse {
+  animation: collapseInward 0.6s ease-in forwards;
+}
+
+
+/* ============================================ */
+/* CYCLE 9: MODE-SELECT & ENHANCEMENT ANIMATIONS */
+/* ============================================ */
+
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes stepGlowPulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 5px rgba(255, 107, 53, 0.3),
+      inset 0 0 10px rgba(255, 107, 53, 0.05);
+  }
+  50% { 
+    box-shadow: 
+      0 0 20px rgba(255, 107, 53, 0.5),
+      inset 0 0 20px rgba(255, 107, 53, 0.15);
+  }
+}
+
+@keyframes cardSelectRing {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+}
+
+@keyframes vehicleHover3D {
+  0%, 100% { 
+    transform: translateY(0) perspective(500px) rotateX(2deg) rotateY(0deg); 
+  }
+  25% { 
+    transform: translateY(-6px) perspective(500px) rotateX(-2deg) rotateY(3deg); 
+  }
+  50% { 
+    transform: translateY(-2px) perspective(500px) rotateX(1deg) rotateY(0deg); 
+  }
+  75% { 
+    transform: translateY(-8px) perspective(500px) rotateX(-1deg) rotateY(-3deg); 
+  }
+}
+
+@keyframes statBarFill {
+  from { width: 0; }
+}
+
+@keyframes difficultyGlow {
+  0%, 100% { box-shadow: inset 0 0 15px transparent; border-color: var(--diff-color, inherit); }
+  50% { box-shadow: inset 0 0 25px var(--diff-color-rgb, rgba(255, 107, 53, 0.3)); }
+}
+
+@keyframes trackCardShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes lockBounce3D {
+  0%, 100% { transform: translateY(0) rotateZ(-8deg) scale(1); }
+  25% { transform: translateY(-12px) rotateZ(8deg) scale(1.1); }
+  50% { transform: translateY(0) rotateZ(-4deg) scale(1.05); }
+  75% { transform: translateY(-6px) rotateZ(4deg) scale(1.08); }
+}
+
+@keyframes weatherIconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sliderTrackFill {
+  0%, 100% { background-size: 100% 100%; }
+  50% { background-size: 200% 100%; }
+}
+
+@keyframes summaryItemPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes toastSlideUp {
+  from {
+    transform: translateX(-50%) translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    opacity: var(--p-opacity, 0.5);
+  }
+  33% { 
+    transform: translate(var(--p-x, 20px), calc(var(--p-y, -30px) * -1)) scale(1.1);
+  }
+  66% { 
+    transform: translate(calc(var(--p-x, 20px) * -1), var(--p-y, -15px)) scale(0.95);
+  }
+}
+
+@keyframes neonBorderFlow {
+  0% { --border-angle: 0deg; }
+  100% { --border-angle: 360deg; }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 50% 0%; }
+  50% { background-position: 100% 50%; }
+  75% { background-position: 50% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes buttonPress {
+  0% { transform: scale(1); box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3); }
+  50% { transform: scale(0.96); box-shadow: 0 2px 10px rgba(255, 107, 53, 0.2); }
+  100% { transform: scale(1); box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3); }
+}
+
+@keyframes starEarned {
+  0% { transform: scale(0) rotate(-180deg); color: #fff; text-shadow: none; }
+  50% { transform: scale(1.4) rotate(10deg); color: #fbbf24; }
+  100% { transform: scale(1) rotate(0deg); color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
+}
+
+@keyframes progressBarGlow {
+  0%, 100% { box-shadow: 0 0 5px currentColor; }
+  50% { box-shadow: 0 0 15px currentColor, 0 0 25px currentColor; }
+}
+
+/* ============================================ */
+/* CYCLE 9 ANIMATION UTILITY CLASSES             */
+/* ============================================ */
+
+.anim-panel-slide-in {
+  animation: panelSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-step-glow {
+  animation: stepGlowPulse 2s ease-in-out infinite;
+}
+
+.anim-card-select-ring {
+  animation: cardSelectRing 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.anim-vehicle-hover-3d {
+  animation: vehicleHover3D 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+.anim-stat-bar-fill {
+  animation: statBarFill 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.anim-difficulty-glow {
+  animation: difficultyGlow 2.5s ease-in-out infinite;
+}
+
+.anim-track-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 60%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: trackCardShimmer 3s linear infinite;
+}
+
+.anim-lock-bounce-3d {
+  animation: lockBounce3D 2s ease-in-out infinite;
+}
+
+.anim-icon-spin-slow {
+  animation: weatherIconSpin 8s linear infinite;
+}
+
+.anim-slider-track-fill {
+  animation: sliderTrackFill 1.5s ease-in-out infinite;
+}
+
+.anim-summary-pop {
+  animation: summaryItemPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.anim-toast-slide {
+  animation: toastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-particle-float {
+  animation: particleFloat 8s ease-in-out infinite;
+}
+
+.anim-neon-border-flow {
+  position: relative;
+  overflow: hidden;
+}
+
+.anim-neon-border-flow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    var(--neon-color, #ff6b35),
+    transparent,
+    var(--neon-color, #ff6b35)
+  );
+  z-index: -1;
+  animation: neonBorderFlow 4s linear infinite;
+  border-radius: inherit;
+}
+
+.anim-gradient-shift {
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.anim-button-press:active {
+  animation: buttonPress 0.2s ease;
+}
+
+.anim-star-earned {
+  animation: starEarned 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.anim-progress-bar-glow {
+  animation: progressBarGlow 1.5s ease-in-out infinite;
+}
+
+/* Stagger delay utilities for lists */
+.stagger-delay-1 { animation-delay: 0.05s; }
+.stagger-delay-2 { animation-delay: 0.1s; }
+.stagger-delay-3 { animation-delay: 0.15s; }
+.stagger-delay-4 { animation-delay: 0.2s; }
+.stagger-delay-5 { animation-delay: 0.25s; }
+.stagger-delay-6 { animation-delay: 0.3s; }
+.stagger-delay-7 { animation-delay: 0.35s; }
+.stagger-delay-8 { animation-delay: 0.4s; }
+
+/* ============================================ */
+/* RACE ENVIRONMENT ANIMATIONS (C12)             */
+/* ============================================ */
+
+@keyframes trackSegmentGlow {
+  0%, 100% { 
+    filter: brightness(1) drop-shadow(0 0 2px currentColor);
+  }
+  50% { 
+    filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+  }
+}
+
+@keyframes sceneryPulse {
+  0%, 100% { 
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { 
+    opacity: 0.7;
+    filter: hue-rotate(0deg);
+  }
+  10% { opacity: 0.9; }
+  20% { opacity: 0.6; }
+  30% { opacity: 0.85; }
+  40% { opacity: 0.75; }
+  50% { 
+    opacity: 0.95;
+    filter: hue-rotate(10deg);
+  }
+  60% { opacity: 0.65; }
+  70% { opacity: 0.88; }
+  80% { opacity: 0.72; }
+  90% { 
+    opacity: 0.9;
+    filter: hue-rotate(-5deg);
+  }
+}
+
+@keyframes auroraWave {
+  0% { 
+    background-position: 0% 50%;
+    transform: translateX(0) skewX(0deg);
+  }
+  25% { 
+    background-position: 25% 50%;
+    transform: translateX(2%) skewX(1deg);
+  }
+  50% { 
+    background-position: 100% 50%;
+    transform: translateX(0) skewX(0deg);
+  }
+  75% { 
+    background-position: 75% 50%;
+    transform: translateX(-2%) skewX(-1deg);
+  }
+  100% { 
+    background-position: 0% 50%;
+    transform: translateX(0) skewX(0deg);
+  }
+}
+
+@keyframes lavaBubble {
+  0% { 
+    transform: translateY(0) scale(1);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: translateY(-15px) scale(1.2);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-30px) scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes iceCrystalShimmer {
+  0%, 100% { 
+    background: linear-gradient(135deg, rgba(165, 243, 252, 0.3), rgba(0, 255, 255, 0.1));
+  }
+  33% { 
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(165, 243, 252, 0.2));
+  }
+  66% { 
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(0, 255, 255, 0.15));
+  }
+}
+
+@keyframes toxicPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.3),
+                inset 0 0 15px rgba(57, 255, 20, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(57, 255, 20, 0.6),
+                inset 0 0 25px rgba(57, 255, 20, 0.2);
+  }
+}
+
+@keyframes cloudFloat {
+  0%, 100% { 
+    transform: translateX(0) translateY(0);
+  }
+  25% { 
+    transform: translateX(10px) translateY(-5px);
+  }
+  50% { 
+    transform: translateX(20px) translateY(0);
+  }
+  75% { 
+    transform: translateX(10px) translateY(5px);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes nebulaDrift {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1);
+    opacity: 0.04;
+  }
+  50% { 
+    transform: rotate(5deg) scale(1.05);
+    opacity: 0.07;
+  }
+}
+
+@keyframes lightPoleFlicker {
+  0%, 90%, 92%, 94%, 96%, 100% { 
+    opacity: 1;
+    box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+  }
+  91%, 93%, 95% { 
+    opacity: 0.6;
+    box-shadow: 0 0 5px currentColor;
+  }
+}
+
+/* ============================================ */
+/* VEHICLE CONTROLLER ANIMATIONS (C12)          */
+/* ============================================ */
+
+@keyframes speedRipple {
+  0% { 
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% { 
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes gearShiftFlash {
+  0% { 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+    filter: blur(0);
+  }
+  100% { 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    filter: blur(10px);
+  }
+}
+
+@keyframes nitroCharge {
+  0% { 
+    background-position: 0% 50%;
+  }
+  100% { 
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes nitroDeplete {
+  0% { 
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 25px rgba(233, 69, 96, 0.8);
+  }
+  100% { 
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 5px rgba(233, 69, 96, 0.3);
+  }
+}
+
+@keyframes driftScoreCount {
+  0%, 100% { 
+    transform: scale(1);
+  }
+  50% { 
+    transform: scale(1.15);
+    color: #fff;
+  }
+}
+
+@keyframes driftAngleSweep {
+  0% { 
+    transform: rotate(-45deg);
+  }
+  50% { 
+    transform: rotate(45deg);
+  }
+  100% { 
+    transform: rotate(-45deg);
+  }
+}
+
+@keyframes tireMarkFade {
+  0% { 
+    opacity: 0.8;
+    width: 8px;
+  }
+  100% { 
+    opacity: 0;
+    width: 4px;
+  }
+}
+
+@keyframes boostFlameCore {
+  0% { 
+    transform: translateX(-50%) scaleY(1);
+    background: linear-gradient(to top, #e94560, #ff6b35, transparent);
+  }
+  25% { 
+    transform: translateX(-52%) scaleY(1.2);
+    background: linear-gradient(to top, #ff4444, #ff8800, transparent);
+  }
+  50% { 
+    transform: translateX(-48%) scaleY(0.95);
+    background: linear-gradient(to top, #ff6b35, #ffaa00, transparent);
+  }
+  75% { 
+    transform: translateX(-51%) scaleY(1.1);
+    background: linear-gradient(to top, #e94560, #ff6b35, transparent);
+  }
+  100% { 
+    transform: translateX(-50%) scaleY(1);
+    background: linear-gradient(to top, #e94560, #ff6b35, transparent);
+  }
+}
+
+@keyframes exhaustPuff {
+  0% { 
+    transform: translate(-50%, 0) scale(0.5);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translate(-50%, -20px) scale(1);
+    opacity: 0.5;
+  }
+  100% { 
+    transform: translate(-50%, -40px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes collisionShake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5px, -3px); }
+  20% { transform: translate(5px, 3px); }
+  30% { transform: translate(-3px, 5px); }
+  40% { transform: translate(3px, -3px); }
+  50% { transform: translate(-2px, 2px); }
+  60% { transform: translate(2px, -2px); }
+  70% { transform: translate(-1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  90% { transform: translate(0, 0); }
+}
+
+@keyframes healthCritical {
+  0%, 100% { 
+    border-color: rgba(255, 68, 68, 0.5);
+    background: rgba(255, 68, 68, 0.1);
+  }
+  50% { 
+    border-color: rgba(255, 68, 68, 1);
+    background: rgba(255, 68, 68, 0.2);
+  }
+}
+
+@keyframes positionChangeUp {
+  0% { 
+    transform: translateY(20px);
+    opacity: 0;
+    color: #00ff88;
+  }
+  50% { 
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+    color: inherit;
+  }
+}
+
+@keyframes positionChangeDown {
+  0% { 
+    transform: translateY(-20px);
+    opacity: 0;
+    color: #ff4444;
+  }
+  50% { 
+    transform: translateY(5px);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+    color: inherit;
+  }
+}
+
+@keyframes lapCompleteCelebration {
+  0% { 
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% { 
+    transform: scale(1.2);
+    filter: brightness(1.5);
+  }
+  50% { 
+    transform: scale(1);
+    filter: brightness(1.2);
+  }
+  75% { 
+    transform: scale(1.1);
+    filter: brightness(1.3);
+  }
+  100% { 
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes checkpointPassed {
+  0% { 
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  50% { 
+    transform: scaleX(1.05);
+    opacity: 1;
+  }
+  100% { 
+    transform: scaleX(1);
+    opacity: 0.8;
+  }
+}
+
+/* Animation utility classes for new animations */
+.anim-track-glow { animation: trackSegmentGlow 2s ease-in-out infinite; }
+.anim-scenery-pulse { animation: sceneryPulse 4s ease-in-out infinite; }
+.anim-hologram-flicker { animation: hologramFlicker 3s ease-in-out infinite; }
+.anim-aurora-wave { animation: auroraWave 8s ease-in-out infinite; }
+.anim-lava-bubble { animation: lavaBubble 2s ease-in-out infinite; }
+.anim-ice-shimmer { animation: iceCrystalShimmer 3s ease-in-out infinite; }
+.anim-toxic-pulse { animation: toxicPulse 2s ease-in-out infinite; }
+.anim-cloud-float { animation: cloudFloat 20s ease-in-out infinite; }
+.anim-star-twinkle { animation: starTwinkle var(--twinkle-duration, 3s) ease-in-out infinite; }
+.anim-nebula-drift { animation: nebulaDrift 30s ease-in-out infinite; }
+.anim-light-pole-flicker { animation: lightPoleFlicker 4s ease-in-out infinite; }
+
+.anim-speed-ripple { animation: speedRipple 0.6s ease-out forwards; }
+.anim-gear-shift-flash { animation: gearShiftFlash 0.5s ease-out forwards; }
+.anim-nitro-charge { animation: nitroCharge 2s linear infinite; background-size: 200% 200%; }
+.anim-nitro-deplete { animation: nitroDeplete 0.5s ease-out forwards; }
+.anim-drift-score-count { animation: driftScoreCount 0.3s ease-in-out infinite; }
+.anim-drift-angle-sweep { animation: driftAngleSweep 1s ease-in-out infinite; }
+.anim-tire-mark-fade { animation: tireMarkFade 3s ease-out forwards; }
+.anim-boost-flame-core { animation: boostFlameCore 0.08s ease-in-out infinite; }
+.anim-exhaust-puff { animation: exhaustPuff 0.5s ease-out forwards; }
+.anim-collision-shake { animation: collisionShake 0.4s ease-out; }
+.anim-health-critical { animation: healthCritical 0.5s ease-in-out infinite; }
+.anim-position-up { animation: positionChangeUp 0.4s ease-out forwards; }
+.anim-position-down { animation: positionChangeDown 0.4s ease-out forwards; }
+.anim-lap-celebration { animation: lapCompleteCelebration 1s ease-out; }
+.anim-checkpoint-passed { animation: checkpointPassed 0.4s ease-out forwards; }
+
+/* Stagger delays for new animations */
+.stagger-delay-9 { animation-delay: 1.8s; }
+.stagger-delay-10 { animation-delay: 2s; }
+.stagger-delay-11 { animation-delay: 2.2s; }
+.stagger-delay-12 { animation-delay: 2.4s; }
+
+/* ============================================ */
+/* REDUCED MOTION SUPPORT - UPDATED (C12)       */
+/* ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Original animations */
+  .anim-equalizer,
+  .anim-scanline-move,
+  .anim-shimmer-sweep,
+  .anim-morph-blob,
+  .anim-typewriter-blink,
+  .anim-float-rotate,
+  .anim-glitch-split,
+  .anim-neon-flicker-intense,
+  .anim-data-flow,
+  .anim-charge-up,
+  .anim-explode,
+  .anim-collapse,
+  /* C9 new animations */
+  .anim-panel-slide-in,
+  .anim-step-glow,
+  .anim-vehicle-hover-3d,
+  .anim-difficulty-glow,
+  .anim-track-shimmer,
+  .anim-lock-bounce-3d,
+  .anim-icon-spin-slow,
+  .anim-slider-track-fill,
+  .anim-particle-float,
+  .anim-neon-border-flow,
+  .anim-gradient-shift,
+  .anim-progress-bar-glow,
+  /* C12 new animations */
+  .anim-track-glow,
+  .anim-scenery-pulse,
+  .anim-hologram-flicker,
+  .anim-aurora-wave,
+  .anim-lava-bubble,
+  .anim-ice-shimmer,
+  .anim-toxic-pulse,
+  .anim-cloud-float,
+  .anim-star-twinkle,
+  .anim-nebula-drift,
+  .anim-light-pole-flicker,
+  .anim-speed-ripple,
+  .anim-gear-shift-flash,
+  .anim-nitro-charge,
+  .anim-nitro-deplete,
+  .anim-drift-score-count,
+  .anim-drift-angle-sweep,
+  .anim-tire-mark-fade,
+  .anim-boost-flame-core,
+  .anim-exhaust-puff,
+  .anim-collision-shake,
+  .anim-health-critical,
+  .anim-position-up,
+  .anim-position-down,
+  .anim-lap-celebration,
+  .anim-checkpoint-passed {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  
+  .anim-counter-pulse,
+  .anim-ripple,
+  .anim-border-draw-anim,
+  .anim-card-select-ring,
+  .anim-stat-bar-fill,
+  .anim-summary-pop,
+  .anim-toast-slide,
+  .anim-button-press,
+  .anim-star-earned {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

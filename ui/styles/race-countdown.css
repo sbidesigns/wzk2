@@ -1,0 +1,607 @@
+/* ui/styles/race-countdown.css — Race Countdown Styling */
+
+/* ============================================
+   COUNTDOWN OVERLAY
+   ============================================ */
+.race-countdown-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+.race-countdown-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s ease, visibility 0s;
+}
+
+.race-countdown-overlay.hiding {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.countdown-bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.countdown-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 6, 10, 0.7) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ============================================
+   TRACK PREVIEW SECTION
+   ============================================ */
+.track-preview-section {
+  position: relative;
+  z-index: 10;
+  width: 90%;
+  max-width: 800px;
+  padding: 32px;
+  background: rgba(15, 17, 25, 0.9);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s ease;
+}
+
+.track-preview-section.hidden {
+  opacity: 0;
+  transform: translateY(-30px) scale(0.95);
+  pointer-events: none;
+  position: absolute;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.preview-track-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ff6b35;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
+}
+
+.preview-lap-info {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+}
+
+.preview-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+}
+
+/* Position Preview */
+.position-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), transparent);
+  border: 1px solid rgba(255, 107, 53, 0.25);
+  border-radius: 16px;
+}
+
+.position-number {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #fff, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: positionPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes positionPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.position-label {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Mini Track Map */
+.mini-track-map {
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.track-svg {
+  width: 100%;
+  height: auto;
+}
+
+.track-path {
+  stroke-dasharray: 4 4;
+  animation: pathScroll 8s linear infinite;
+}
+
+@keyframes pathScroll {
+  to { stroke-dashoffset: -100; }
+}
+
+.player-marker {
+  animation: playerPulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+@keyframes playerPulse {
+  0%, 100% { r: 4; opacity: 1; }
+  50% { r: 6; opacity: 0.8; }
+}
+
+.opponent-marker {
+  opacity: 0.7;
+}
+
+/* Player List */
+.racer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.racer-item {
+  display: grid;
+  grid-template-columns: 30px 1fr 120px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.racer-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.racer-item.player-row {
+  background: rgba(255, 107, 53, 0.1);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+.racer-pos {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.racer-name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.racer-item.player-row .racer-name {
+  color: #ff6b35;
+}
+
+.racer-vehicle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: right;
+}
+
+/* Skip Button */
+.skip-btn {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 14px;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.skip-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 107, 53, 0.4);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================
+   MAIN COUNTDOWN DISPLAY
+   ============================================ */
+.countdown-display {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.countdown-display.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.countdown-display.hidden {
+  opacity: 0 !important;
+  transform: scale(1.2);
+}
+
+.countdown-number-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-number {
+  font-size: 160px;
+  font-weight: 900;
+  line-height: 1;
+  font-family: 'Bebas Neue', 'Oswald', Impact, sans-serif;
+  /* Default style (classic) */
+  color: #fff;
+  text-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(255, 255, 255, 0.2);
+}
+
+/* Neon Style Override */
+.neon .countdown-number {
+  color: #ff6b35;
+  text-shadow:
+    0 0 10px rgba(255, 107, 53, 0.8),
+    0 0 30px rgba(255, 107, 53, 0.6),
+    0 0 60px rgba(255, 107, 53, 0.4),
+    0 0 100px rgba(255, 107, 53, 0.2);
+}
+
+.neon .countdown-number-container::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border: 3px solid rgba(255, 107, 53, 0.3);
+  border-radius: 50%;
+  animation: countdownRing 1s ease-out infinite paused;
+}
+
+.neon .countdown-number-container.animate-in::before {
+  animation-play-state: running;
+}
+
+@keyframes countdownRing {
+  from {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Minimal Style Override */
+.minimal .countdown-number {
+  font-size: 140px;
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: -8px;
+  text-shadow: none;
+}
+
+/* Cinematic Style Override */
+.cinematic .countdown-number {
+  font-size: 180px;
+  color: #fff;
+  text-shadow:
+    0 0 20px #fff,
+    0 0 40px #fff,
+    0 0 80px rgba(255, 107, 53, 0.5);
+}
+
+.cinematic .countdown-number-container::after {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(circle, transparent 40%, rgba(255, 107, 53, 0.05) 70%);
+  animation: cinematicGlow 0.5s ease-out infinite alternate;
+}
+
+@keyframes cinematicGlow {
+  from { transform: scale(0.95); opacity: 0.5; }
+  to { transform: scale(1.1); opacity: 1; }
+}
+
+/* Number Animation */
+.countdown-number-container.animate-in {
+  animation: numberPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes numberPopIn {
+  from {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.countdown-label {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+/* ============================================
+   GO! FLASH EFFECT
+   ============================================ */
+.go-flash {
+  position: absolute;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.go-flash.visible {
+  opacity: 1;
+  animation: goFlashPulse 0.3s ease-out;
+}
+
+@keyframes goFlashPulse {
+  from { transform: scale(1.5); }
+  to { transform: scale(1); }
+}
+
+.go-text {
+  font-size: 140px;
+  font-weight: 900;
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  color: #22c55e;
+  text-shadow:
+    0 0 20px rgba(34, 197, 94, 0.8),
+    0 0 60px rgba(34, 197, 94, 0.6),
+    0 0 100px rgba(34, 197, 94, 0.3);
+  animation: goTextGlow 0.5s ease-out alternate infinite;
+}
+
+@keyframes goTextGlow {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.3); }
+}
+
+.go-particles {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  pointer-events: none;
+}
+
+.go-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--size, 8px);
+  height: var(--size, 8px);
+  border-radius: 50%;
+  background: hsl(var(--hue, 25), 100%, 60%);
+  box-shadow: 0 0 10px currentColor;
+  animation: goParticleBurst 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes goParticleBurst {
+  from {
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) translate(var(--burst-x, 100px), var(--burst-y, -100px)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   INFO BAR
+   ============================================ */
+.countdown-info-bar {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  max-width: 600px;
+  padding: 14px 24px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+.countdown-info-bar.fade-out {
+  opacity: 0;
+}
+
+.info-left,
+.info-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mode-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ff6b35;
+  padding: 4px 10px;
+  background: rgba(255, 107, 53, 0.15);
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.difficulty-indicator {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.difficulty-indicator.easy { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+.difficulty-indicator.normal { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+.difficulty-indicator.hard { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+.difficulty-indicator.extreme { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.difficulty-indicator.nightmare { background: rgba(220, 38, 38, 0.3); color: #dc2626; }
+
+.weather-icon {
+  font-size: 18px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .preview-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .position-preview {
+    flex-direction: row;
+    gap: 16px;
+    padding: 16px 24px;
+  }
+
+  .position-number {
+    font-size: 48px;
+  }
+
+  .position-label {
+    writing-mode: horizontal-tb;
+  }
+
+  .mini-track-map {
+    display: none;
+  }
+
+  .countdown-number-container {
+    width: 200px;
+    height: 200px;
+  }
+
+  .countdown-number {
+    font-size: 110px;
+  }
+
+  .cinematic .countdown-number {
+    font-size: 130px;
+  }
+
+  .go-text {
+    font-size: 90px;
+  }
+
+  .countdown-info-bar {
+    bottom: 20px;
+    width: 95%;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .track-preview-section {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .preview-track-name {
+    font-size: 16px;
+  }
+
+  .racer-item {
+    grid-template-columns: 24px 1fr 80px;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .countdown-number-container {
+    width: 160px;
+    height: 160px;
+  }
+
+  .countdown-number {
+    font-size: 85px;
+  }
+
+  .go-text {
+    font-size: 70px;
+  }
+}

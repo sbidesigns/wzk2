@@ -1,0 +1,30 @@
+{
+  "$schema": "../../config/schemas/controller.schema.json",
+  "category": "controllers",
+  "entries": [
+    {
+      "id": "keyboard",
+      "displayName": "Keyboard & Mouse",
+      "platform": "keyboard",
+      "priority": 10,
+      "autoActivate": true,
+      "module": "./controller.keyboard.js"
+    },
+    {
+      "id": "gamepad",
+      "displayName": "Gamepad (XInput)",
+      "platform": "gamepad",
+      "priority": 20,
+      "autoActivate": true,
+      "module": "./controller.gamepad.js"
+    },
+    {
+      "id": "touch",
+      "displayName": "Touch Controls",
+      "platform": "touch",
+      "priority": 30,
+      "autoActivate": false,
+      "module": "./controller.touch.js"
+    }
+  ]
+}

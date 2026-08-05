@@ -1,0 +1,896 @@
+/* ui/styles/challenges.css — Daily Challenges Styling for Warzone Kart: Neon Underground
+ * Features: Challenge cards, progress rings, difficulty badges, reward previews,
+ *           countdown timer, streak indicators, celebration animations, claimed states
+ */
+
+/* ==================== DESIGN TOKENS ==================== */
+:root {
+  /* Difficulty colors (matching challenge definitions) */
+  --dc-easy: #3ddc84;
+  --dc-medium: #ffb13d;
+  --dc-hard: #ff8c42;
+  --dc-extreme: #ff3d5a;
+
+  /* Type colors */
+  --dc-racing: #ff4d2e;
+  --dc-skill: #00e5ff;
+  --dc-items: #aa00ff;
+  --dc-special: #ffd23f;
+
+  /* Card dimensions */
+  --dc-ring-size: 52px;
+  --dc-ring-stroke: 4px;
+}
+
+/* ==================== MAIN CONTAINER ==================== */
+.dc-container {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 14, 24, 0.98) 0%,
+    rgba(18, 21, 35, 0.97) 100%
+  );
+  border-radius: var(--radius-xl, 20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  font-family: var(--font-body, system-ui);
+  color: var(--text-primary, #f5f6fa);
+  max-width: 600px;
+}
+
+.dc-animate-in {
+  animation: dcFadeIn 0.35s ease-out both;
+}
+
+@keyframes dcFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== HEADER ==================== */
+.dc-header {
+  padding: var(--space-l, 24px) var(--space-l, 24px) var(--space-m, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dc-title {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-l, 28px);
+  font-weight: 800;
+  margin: 0 0 var(--space-s, 8px);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-tertiary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dc-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-s, 8px);
+  margin-bottom: var(--space-s, 8px);
+}
+
+.dc-progress-text {
+  font-size: var(--text-body, 15px);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.dc-countdown {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-caption, 11px);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dc-countdown-time {
+  color: var(--accent-secondary);
+  font-weight: 700;
+}
+
+/* Progress bar in header */
+.dc-progress-bar-wrapper {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill, 999px);
+  overflow: hidden;
+}
+
+.dc-progress-bar {
+  height: 100%;
+  width: 100%;
+}
+
+.dc-progress-fill {
+  height: 100%;
+  width: var(--fill-percent, 0%);
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary) 0%,
+    var(--accent-tertiary) 50%,
+    var(--success) 100%
+  );
+  border-radius: var(--radius-pill, 999px);
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 0 10px rgba(61, 220, 132, 0.3);
+}
+
+/* ==================== STREAK BANNER ==================== */
+.dc-streak-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-m, 16px);
+  padding: var(--space-m, 16px) var(--space-l, 24px);
+  margin: 0 var(--space-l, 24px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 140, 66, 0.12) 0%,
+    rgba(255, 210, 63, 0.08) 100%
+  );
+  border-radius: var(--radius-l, 16px);
+  border: 1px solid rgba(255, 177, 61, 0.2);
+}
+
+.dc-streak-fire {
+  font-size: 24px;
+  line-height: 1;
+  animation: dcFireFlicker 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes dcFireFlicker {
+  0% { transform: scale(1) rotate(-3deg); }
+  100% { transform: scale(1.1) rotate(3deg); }
+}
+
+.dc-streak-text {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-s, 18px);
+  font-weight: 800;
+  color: var(--dc-medium);
+}
+
+.dc-streak-best {
+  font-size: var(--text-body-s, 13px);
+  color: var(--text-tertiary);
+}
+
+/* ==================== CHALLENGES LIST ==================== */
+.dc-challenges-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m, 16px);
+  padding: var(--space-l, 24px);
+  max-height: 60vh;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.dc-challenges-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dc-challenges-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dc-challenges-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill, 999px);
+}
+
+.dc-challenges-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== CHALLENGE CARD ==================== */
+.dc-card {
+  position: relative;
+  background: linear-gradient(
+    145deg,
+    rgba(22, 25, 40, 0.95) 0%,
+    rgba(16, 18, 30, 0.98) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-l, 16px);
+  padding: var(--space-l, 20px);
+  transition: all 0.35s ease;
+  opacity: 0;
+  transform: translateY(15px);
+  animation: dcCardAppear 0.45s ease-out forwards;
+  animation-delay: var(--card-delay, 0ms);
+  overflow: hidden;
+}
+
+@keyframes dcCardAppear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Left accent line based on difficulty */
+.dc-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--difficulty-color, var(--dc-easy));
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.dc-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px color-mix(in srgb, var(--difficulty-color) 10%, transparent);
+}
+
+.dc-card:hover::before {
+  opacity: 1;
+  width: 5px;
+}
+
+/* Completed state */
+.dc-card-completed {
+  background: linear-gradient(
+    145deg,
+    rgba(25, 35, 25, 0.9) 0%,
+    rgba(18, 26, 20, 0.95) 100%
+  );
+  border-color: rgba(61, 220, 132, 0.15);
+}
+
+.dc-card-completed::before {
+  background: var(--dc-easy);
+  opacity: 0.8;
+}
+
+/* Claimed state - greyed out */
+.dc-card-claimed {
+  opacity: 0.7;
+}
+
+.dc-card-claimed .dc-card-title {
+  color: var(--text-tertiary);
+}
+
+/* ==================== CARD HEADER ==================== */
+.dc-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-m, 14px);
+  margin-bottom: var(--space-m, 14px);
+}
+
+.dc-card-type-icon {
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-m, 12px);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.dc-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dc-card-title {
+  font-family: var(--font-heading, system-ui);
+  font-size: var(--text-heading-s, 17px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.dc-card-desc {
+  font-size: var(--text-body-s, 13px);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Difficulty badge */
+.dc-card-difficulty {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill, 999px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dc-diff-easy {
+  background: rgba(61, 220, 132, 0.15);
+  color: var(--dc-easy);
+  border: 1px solid rgba(61, 220, 132, 0.25);
+}
+
+.dc-diff-medium {
+  background: rgba(255, 177, 61, 0.15);
+  color: var(--dc-medium);
+  border: 1px solid rgba(255, 177, 61, 0.25);
+}
+
+.dc-diff-hard {
+  background: rgba(255, 140, 66, 0.15);
+  color: var(--dc-hard);
+  border: 1px solid rgba(255, 140, 66, 0.25);
+}
+
+.dc-diff-extreme {
+  background: rgba(255, 61, 90, 0.15);
+  color: var(--dc-extreme);
+  border: 1px solid rgba(255, 61, 90, 0.25);
+  animation: dcExtremePulse 2s ease-in-out infinite;
+}
+
+@keyframes dcExtremePulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 12px rgba(255, 61, 90, 0.3); }
+}
+
+/* ==================== PROGRESS SECTION ==================== */
+.dc-card-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 16px);
+  margin-bottom: var(--space-m, 14px);
+  padding: var(--space-s, 8px) 0;
+}
+
+/* Circular progress ring */
+.dc-progress-ring-container {
+  position: relative;
+  width: var(--dc-ring-size);
+  height: var(--dc-ring-size);
+  flex-shrink: 0;
+}
+
+.dc-progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.dc-progress-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: var(--dc-ring-stroke);
+}
+
+.dc-progress-ring-fill {
+  fill: none;
+  stroke: var(--ring-color, var(--dc-easy));
+  stroke-width: var(--dc-ring-stroke);
+  stroke-linecap: round;
+  stroke-dasharray: calc(2 * 19 * 3.14159);
+  stroke-dashoffset: calc(var(--ring-percent, 0%) * 119.38 / 100);
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              stroke 0.3s ease;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Ring completion glow */
+.dc-card-completed .dc-progress-ring-fill {
+  filter: drop-shadow(0 0 8px var(--dc-easy));
+}
+
+.dc-progress-ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-body-s, 13px);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Progress numbers */
+.dc-progress-details {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono, monospace);
+}
+
+.dc-current-value {
+  font-size: var(--text-heading-s, 20px);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.dc-separator {
+  font-size: var(--text-body-s, 14px);
+  color: var(--text-tertiary);
+}
+
+.dc-target-value {
+  font-size: var(--text-body-s, 14px);
+  color: var(--text-tertiary);
+}
+
+/* ==================== REWARDS SECTION ==================== */
+.dc-card-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m, 16px);
+  padding-top: var(--space-s, 8px);
+  border-top: 1px dashed rgba(255, 255, 255, 0.06);
+}
+
+.dc-reward-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs, 4px);
+}
+
+.dc-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-pill, 999px);
+  font-size: var(--text-caption, 11px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dc-reward-credits {
+  color: var(--dc-medium);
+  border: 1px solid rgba(255, 177, 61, 0.2);
+}
+
+.dc-reward-xp {
+  color: var(--dc-special);
+  border: 1px solid rgba(255, 210, 63, 0.2);
+}
+
+.dc-reward-special {
+  color: var(--dc-special);
+  border: 1px solid rgba(170, 0, 255, 0.3);
+  background: linear-gradient(135deg, rgba(170, 0, 255, 0.1), rgba(255, 210, 63, 0.05));
+  animation: dcSpecialGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes dcSpecialGlow {
+  from { box-shadow: 0 0 4px rgba(170, 0, 255, 0.2); }
+  to { box-shadow: 0 0 12px rgba(255, 210, 63, 0.3); }
+}
+
+/* Claim button */
+.dc-btn-claim {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--dc-easy), #2db86a);
+  border: none;
+  border-radius: var(--radius-pill, 999px);
+  color: white;
+  font-family: var(--font-heading, system-ui);
+  font-size: var(--text-body-s, 13px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dc-btn-claim:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(61, 220, 132, 0.35);
+}
+
+.dc-btn-claim:active {
+  transform: scale(0.98);
+}
+
+/* Claimed badge */
+.dc-claimed-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-tertiary);
+  font-size: var(--text-body-s, 13px);
+  font-weight: 600;
+}
+
+.dc-checkmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--dc-easy);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* Time-gated indicator */
+.dc-time-gated {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(138, 138, 138, 0.1);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-tertiary);
+  font-size: var(--text-caption, 11px);
+  font-style: italic;
+}
+
+/* ==================== CELEBRATION FRAME ==================== */
+.dc-celebration-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.dc-card-completed:not(.dc-card-claimed) .dc-celebration-frame::before,
+.dc-card-completed:not(.dc-card-claimed) .dc-celebration-frame::after {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: -100px;
+  right: -50px;
+  background: radial-gradient(circle, rgba(61, 220, 132, 0.2) 0%, transparent 70%);
+  animation: dcCelebrationPulse 2s ease-in-out infinite alternate;
+}
+
+.dc-card-completed:not(.dc-card-claimed) .dc-celebration-frame::after {
+  top: auto;
+  bottom: -80px;
+  right: auto;
+  left: -40px;
+  background: radial-gradient(circle, rgba(255, 210, 63, 0.15) 0%, transparent 70%);
+  animation-delay: 1s;
+}
+
+@keyframes dcCelebrationPulse {
+  from { transform: scale(0.8); opacity: 0.5; }
+  to { transform: scale(1.2); opacity: 0; }
+}
+
+/* Confetti particles for completed challenges */
+.dc-card-completed:not(.dc-card-claimed) {
+  animation: dcConfettiBurst 0.6s ease-out;
+}
+
+@keyframes dcConfettiBurst {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* ==================== FOOTER ==================== */
+.dc-footer {
+  padding: var(--space-m, 16px) var(--space-l, 24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dc-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-m, 16px);
+}
+
+.dc-stat {
+  text-align: center;
+  padding: var(--space-s, 8px);
+}
+
+.dc-stat-value {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-l, 24px);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.dc-stat-label {
+  font-size: var(--text-caption, 11px);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== DAILY RESET NOTIFICATION BANNER ==================== */
+.dc-reset-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-s, 8px) var(--space-m, 16px);
+  margin: 0 var(--space-l, 24px);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 229, 255, 0.1) 0%,
+    rgba(0, 255, 168, 0.05) 100%
+  );
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: var(--radius-m, 12px);
+  font-size: var(--text-body-s, 13px);
+  color: var(--accent-secondary);
+}
+
+.dc-reset-banner-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.dc-reset-banner-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* ==================== LOADING SKELETON ==================== */
+.dc-skeleton-card {
+  height: 180px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: dcSkeletonShimmer 1.5s infinite;
+  border-radius: var(--radius-l, 16px);
+  margin-bottom: var(--space-m, 16px);
+}
+
+@keyframes dcSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .dc-container {
+    border-radius: var(--radius-l, 16px);
+    max-width: 100%;
+  }
+
+  .dc-header {
+    padding: var(--space-m, 16px);
+  }
+
+  .dc-title {
+    font-size: 22px;
+  }
+
+  .dc-challenges-list {
+    padding: var(--space-m, 16px);
+    max-height: 55vh;
+  }
+
+  .dc-card {
+    padding: var(--space-m, 16px);
+  }
+
+  .dc-card-type-icon {
+    font-size: 24px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .dc-card-title {
+    font-size: 15px;
+  }
+
+  .dc-card-desc {
+    font-size: 12px;
+  }
+
+  .dc-progress-ring-container {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dc-current-value {
+    font-size: 18px;
+  }
+
+  .dc-footer {
+    padding: 12px 16px;
+  }
+
+  .dc-stat-value {
+    font-size: 20px;
+  }
+
+  .dc-streak-banner {
+    margin: 0 var(--space-m, 16px);
+    padding: 12px 16px;
+  }
+
+  .dc-streak-fire {
+    font-size: 20px;
+  }
+
+  .dc-streak-text {
+    font-size: 16px;
+  }
+}
+
+/* Mobile small */
+@media (max-width: 480px) {
+  .dc-container {
+    border-radius: var(--radius-m, 12px);
+  }
+
+  .dc-title {
+    font-size: 20px;
+  }
+
+  .dc-header-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .dc-countdown {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .dc-challenges-list {
+    padding: 12px;
+    gap: 12px;
+    max-height: 48vh;
+  }
+
+  .dc-card {
+    padding: 14px;
+  }
+
+  .dc-card-header {
+    gap: 10px;
+  }
+
+  .dc-card-difficulty {
+    font-size: 8px;
+    padding: 3px 6px;
+  }
+
+  .dc-card-progress {
+    gap: 12px;
+  }
+
+  .dc-card-rewards {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .dc-reward-items {
+    justify-content: center;
+  }
+
+  .dc-btn-claim,
+  .dc-claimed-badge {
+    justify-content: center;
+  }
+
+  .dc-summary-stats {
+    gap: 8px;
+  }
+
+  .dc-stat-value {
+    font-size: 18px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-height: 550px) and (orientation: landscape) {
+  .dc-container {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .dc-challenges-list {
+    max-height: 280px;
+  }
+
+  .dc-streak-banner {
+    padding: 8px 12px;
+    margin: 8px 16px;
+  }
+
+  .dc-streak-fire {
+    font-size: 18px;
+  }
+}
+
+/* ==================== REDUCED MOTION SUPPORT ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .dc-animate-in,
+  .dc-card,
+  .dc-skeleton-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .dc-btn-claim:hover,
+  .dc-card:hover {
+    transform: none !important;
+  }
+
+  .dc-streak-fire {
+    animation: none !important;
+  }
+
+  .dc-diff-extreme {
+    animation: none !important;
+  }
+
+  .dc-progress-ring-fill {
+    transition: stroke-dashoffset 0.01s linear;
+  }
+
+  .dc-progress-fill {
+    transition: none;
+  }
+}
+
+/* ==================== HIGH CONTRAST / ACCESSIBILITY ==================== */
+@media (prefers-contrast: high) {
+  .dc-card {
+    border-width: 2px;
+  }
+
+  .dc-card::before {
+    width: 5px !important;
+  }
+
+  .dc-btn-claim {
+    border: 2px solid currentColor;
+  }
+
+  .dc-reward {
+    border-width: 1px;
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$id": "track.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "biome", "difficulty", "laps", "spline", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string" },
+    "biome":       { "type": "string", "enum": ["city-night", "desert", "alpine", "coastal", "industrial", "neon-grid"] },
+    "difficulty":  { "type": "integer", "minimum": 1, "maximum": 5 },
+    "laps":        { "type": "integer", "minimum": 1, "maximum": 10 },
+    "spline": {
+      "type": "object",
+      "required": ["points"],
+      "properties": {
+        "points":     { "type": "array", "minItems": 8, "items": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 } },
+        "width":      { "type": "number", "minimum": 6, "maximum": 40 },
+        "bankingFactor": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "lighting": {
+      "type": "object",
+      "properties": {
+        "ambientColor": { "type": "string" },
+        "sunColor":     { "type": "string" },
+        "sunIntensity": { "type": "number" },
+        "fogColor":     { "type": "string" },
+        "fogDensity":   { "type": "number" }
+      }
+    },
+    "props": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "module": { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["build", "getStartPosition", "getCheckpoints"],
+  "additionalProperties": false
+}

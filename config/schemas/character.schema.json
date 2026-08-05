@@ -1,0 +1,41 @@
+{
+  "$id": "character.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "archetype", "signatureAbility", "unlock", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string", "minLength": 2 },
+    "archetype":   { "type": "string", "enum": ["racer", "trickster", "bruiser", "technician", "showman"] },
+    "signatureAbility": {
+      "type": "object",
+      "required": ["id", "displayName", "cooldownMs", "durationMs"],
+      "properties": {
+        "id":          { "type": "string" },
+        "displayName": { "type": "string" },
+        "cooldownMs":  { "type": "integer", "minimum": 0 },
+        "durationMs":  { "type": "integer", "minimum": 0 },
+        "description": { "type": "string" }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "aggression": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "focus":      { "type": "integer", "minimum": 1, "maximum": 10 },
+        "luck":       { "type": "integer", "minimum": 1, "maximum": 10 }
+      }
+    },
+    "unlock": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["default", "level", "currency", "season", "achievement"] },
+        "value": { "type": ["number", "string"] }
+      }
+    },
+    "cosmetic": { "type": "object" },
+    "module":   { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["onAbilityActivate", "onAbilityEnd", "applyPassive"],
+  "additionalProperties": false
+}

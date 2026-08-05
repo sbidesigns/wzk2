@@ -1,0 +1,688 @@
+/* ui/styles/effects.css — Advanced CSS Effects Library for Warzone Kart: Neon Underground */
+/* 
+ * This file contains reusable visual effects organized by category.
+ * All effects use CSS custom properties from tokens.css where applicable.
+ * Designed for cyberpunk/neon aesthetic: #ff4d2e (orange), #00e5ff (cyan), #ffd23f (gold)
+ */
+
+/* ============================================ */
+/* LIGHTING EFFECTS                             */
+/* ============================================ */
+
+/**
+ * .light-glow - Soft glow shadow for subtle emphasis
+ * Usage: <div class="light-glow">Glowing content</div>
+ */
+.light-glow {
+  box-shadow: 
+    0 4px 12px rgba(255, 77, 46, 0.15),
+    0 8px 24px rgba(255, 77, 46, 0.08);
+  transition: box-shadow var(--duration-base) ease;
+}
+
+.light-glow:hover {
+  box-shadow: 
+    0 6px 20px rgba(255, 77, 46, 0.25),
+    0 12px 40px rgba(255, 77, 46, 0.12);
+}
+
+/**
+ * .light-neon-strong - Intense neon glow with multiple box-shadows
+ * Creates dramatic neon sign effect
+ */
+.light-neon-strong {
+  box-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 40px rgba(var(--accent-primary-rgb, 255, 77, 46), 0.5),
+    0 0 80px rgba(var(--accent-primary-rgb, 255, 77, 46), 0.25);
+  text-shadow:
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+}
+
+/**
+ * .light-inner-glow - Inner shadow glow effect
+ * Creates inset luminous appearance
+ */
+.light-inner-glow {
+  box-shadow:
+    inset 0 2px 10px rgba(255, 77, 46, 0.3),
+    inset 0 -1px 5px rgba(0, 229, 255, 0.15);
+}
+
+/**
+ * .light-spotlight - Radial gradient spotlight overlay
+ * Use as pseudo-element or on overlay div
+ */
+.light-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+/* ============================================ */
+/* TEXTURE OVERLAYS                            */
+/* ============================================ */
+
+/**
+ * .texture-grid - Grid pattern overlay
+ * Cyberpunk-style grid lines
+ */
+.texture-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 77, 46, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 77, 46, 0.08) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/**
+ * .texture-dots - Dot matrix pattern
+ * Subtle dotted texture overlay
+ */
+.texture-dots::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(0, 229, 255, 0.15) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/**
+ * .texture-stripes - Diagonal stripe overlay
+ * Dynamic diagonal stripe pattern
+ */
+.texture-stripes::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 210, 63, 0.04) 10px,
+    rgba(255, 210, 63, 0.04) 20px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/**
+ * .texture-noise - Noise/grain texture
+ * Film grain / noise overlay for grit
+ */
+.texture-noise::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 9998;
+  animation: noiseShift 8s steps(10) infinite;
+}
+
+
+/* ============================================ */
+/* EDGE EFFECTS                                */
+/* ============================================ */
+
+/**
+ * .edge-underline-neon - Animated underline that draws itself
+ * Neon underline that animates in on hover/focus
+ */
+.edge-underline-neon {
+  position: relative;
+  display: inline-block;
+}
+
+.edge-underline-neon::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-primary, #ff4d2e),
+    transparent
+  );
+  transform: scaleX(0);
+  transition: transform var(--duration-base) ease-out;
+  box-shadow: 
+    0 0 8px rgba(255, 77, 46, 0.6),
+    0 0 16px rgba(255, 77, 46, 0.3);
+}
+
+.edge-underline-neon:hover::after,
+.edge-underline-neon:focus::after {
+  transform: scaleX(1);
+}
+
+/**
+ * .edge-border-draw - Border that animates drawing
+ * Animated border draw-in effect using clip-path
+ */
+.edge-border-draw {
+  position: relative;
+  overflow: hidden;
+}
+
+.edge-border-draw::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--accent-primary, #ff4d2e);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--border-progress, 0%)) 0,
+    100% var(--border-progress-y, 0%),
+    100% 100%,
+    var(--border-progress-x, 0%) 100%,
+    0 calc(100% - var(--border-progress-y, 0%))
+  );
+  transition: clip-path var(--duration-screen) ease-out;
+  pointer-events: none;
+}
+
+.edge-border-draw:hover::before {
+  --border-progress: 100%;
+  --border-progress-y: 100%;
+  --border-progress-x: 100%;
+}
+
+/**
+ * .edge-corner-decorations - Fancy corner brackets
+ * Adds decorative corner elements
+ */
+.edge-corner-decorations {
+  position: relative;
+}
+
+.edge-corner-decorations::before,
+.edge-corner-decorations::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--accent-secondary, #00e5ff);
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: all var(--duration-base) ease;
+}
+
+.edge-corner-decorations::before {
+  top: -2px;
+  left: -2px;
+  border-width: 2px 0 0 2px;
+}
+
+.edge-corner-decorations::after {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Additional corners using pseudo-element trick */
+.edge-corner-decorations .corner-tl,
+.edge-corner-decorations .corner-tr,
+.edge-corner-decorations .corner-bl,
+.edge-corner-decorations .corner-br {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--accent-secondary, #00e5ff);
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.edge-corner-decorations .corner-tr {
+  top: -2px; right: -2px;
+  border-width: 2px 2px 0 0;
+}
+.edge-corner-decorations .corner-bl {
+  bottom: -2px; left: -2px;
+  border-width: 0 0 2px 2px;
+}
+
+
+/* ============================================ */
+/* STATE INDICATORS                            */
+/* ============================================ */
+
+/**
+ * .status-online - Pulsing green dot indicator
+ */
+.status-online {
+  position: relative;
+  padding-left: 18px;
+}
+
+.status-online::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #00ffa8;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 255, 168, 0.7);
+  animation: statusPulseGreen 2s ease-in-out infinite;
+}
+
+@keyframes statusPulseGreen {
+  0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+  50% { opacity: 0.6; transform: translateY(-50%) scale(1.2); }
+}
+
+/**
+ * .status-loading - Spinning loader indicator
+ */
+.status-loading {
+  position: relative;
+  padding-left: 22px;
+}
+
+.status-loading::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid transparent;
+  border-top-color: var(--accent-secondary, #00e5ff);
+  border-radius: 50%;
+  animation: statusSpin 0.8s linear infinite;
+}
+
+@keyframes statusSpin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/**
+ * .status-warning - Amber pulse indicator
+ */
+.status-warning {
+  position: relative;
+  padding-left: 18px;
+}
+
+.status-warning::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #ffd23f;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 210, 63, 0.7);
+  animation: statusPulseAmber 1s ease-in-out infinite;
+}
+
+@keyframes statusPulseAmber {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(255, 210, 63, 0.7); }
+  50% { opacity: 0.5; box-shadow: 0 0 16px rgba(255, 210, 63, 0.9); }
+}
+
+/**
+ * .status-error - Red flash indicator
+ */
+.status-error {
+  position: relative;
+  padding-left: 18px;
+}
+
+.status-error::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #ff3d5a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 61, 90, 0.7);
+  animation: statusFlashRed 0.8s ease-in-out infinite;
+}
+
+@keyframes statusFlashRed {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; box-shadow: 0 0 20px rgba(255, 61, 90, 0.9); }
+}
+
+
+/* ============================================ */
+/* GLASS EFFECTS (Glassmorphism)               */
+/* ============================================ */
+
+/**
+ * .glass-dark - Dark glassmorphism effect
+ * Translucent dark background with blur
+ */
+.glass-dark {
+  background: rgba(5, 6, 10, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/**
+ * .glass-light - Light glassmorphism effect
+ * Translucent light background with blur
+ */
+.glass-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/**
+ * .glass-colored - Tinted glass effect
+ * Uses CSS variable --glass-color for tint
+ */
+.glass-colored {
+  background: var(--glass-color, rgba(0, 229, 255, 0.1));
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid color-mix(in srgb, var(--glass-color, #00e5ff) 30%, transparent);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 color-mix(in srgb, var(--glass-color, #00e5ff) 20%, white);
+}
+
+/**
+ * .glass-blur-heavy - Extra strong blur glass
+ * Maximum blur for intense frosted glass look
+ */
+.glass-blur-heavy {
+  background: rgba(5, 6, 10, 0.85);
+  backdrop-filter: blur(32px) brightness(1.1) contrast(1.1);
+  -webkit-backdrop-filter: blur(32px) brightness(1.1) contrast(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 16px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+
+/* ============================================ */
+/* ANIMATION MODIFIERS                         */
+/* ============================================ */
+
+/**
+ * .anim-slow - 2x slower animation speed
+ */
+.anim-slow,
+.anim-slow *,
+.anim-slow::before,
+.anim-slow::after {
+  animation-duration: calc(var(--animation-duration, 1s) * 2) !important;
+  transition-duration: calc(var(--transition-duration, 0.3s) * 2) !important;
+}
+
+/**
+ * .anim-fast - 2x faster animation speed
+ */
+.anim-fast,
+.anim-fast *,
+.anim-fast::before,
+.anim-fast::after {
+  animation-duration: calc(var(--animation-duration, 1s) * 0.5) !important;
+  transition-duration: calc(var(--transition-duration, 0.3s) * 0.5) !important;
+}
+
+/**
+ * .anim-pause - Paused animation, hover to resume
+ */
+.anim-pause {
+  animation-play-state: paused !important;
+}
+
+.anim-pause:hover {
+  animation-play-state: running !important;
+}
+
+/**
+ * .anim-infinite-loop - Ensure infinite loop
+ */
+.anim-infinite-loop {
+  animation-iteration-count: infinite !important;
+}
+
+
+/* ============================================ */
+/* TRANSFORM UTILITIES                         */
+/* ============================================ */
+
+/**
+ * .transform-3d - Enable 3D transforms context
+ * Required parent element for children with 3D transforms
+ */
+.transform-3d {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/**
+ * .perspective-distant - Distant perspective (subtle 3D)
+ * For less dramatic depth effects
+ */
+.perspective-distant {
+  perspective: 2500px;
+}
+
+/**
+ * .perspective-close - Close perspective (dramatic)
+ * For exaggerated depth and parallax effects
+ */
+.perspective-close {
+  perspective: 500px;
+}
+
+/**
+ * .preserve-3d - Preserve 3D for children
+ * Ensures child elements maintain 3D positioning
+ */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+
+/* ============================================ */
+/* COMBINATION EFFECTS                         */
+/* ============================================ */
+
+/**
+ * .effect-cyber-card - Full cyberpunk card styling
+ * Combines multiple effects for premium card look
+ */
+.effect-cyber-card {
+  @extend .glass-dark;
+  @extend .texture-grid;
+  @extend .edge-corner-decorations;
+  
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-lg, 24px);
+}
+
+.effect-cyber-card:hover {
+  @extend .light-glow;
+  border-color: rgba(255, 77, 46, 0.3);
+}
+
+/**
+ * .effect-neon-text - Full neon text treatment
+ */
+.effect-neon-text {
+  @extend .light-neon-strong;
+  
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-primary, #ff4d2e);
+}
+
+/**
+ * .effect-holographic - Holographic shimmer effect
+ * Rainbow-like color shift on interaction
+ */
+.effect-holographic {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary, #ff4d2e) 0%,
+    var(--accent-secondary, #00e5ff) 33%,
+    var(--accent-tertiary, #ffd23f) 66%,
+    var(--accent-primary, #ff4d2e) 100%
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holographicShift 6s ease-in-out infinite;
+}
+
+@keyframes holographicShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* ============================================ */
+/* REDUCED MOTION SUPPORT                      */
+/* ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .light-neon-strong,
+  .light-glow,
+  .edge-underline-neon::after,
+  .edge-border-draw::before,
+  .status-online::before,
+  .status-loading::before,
+  .status-warning::before,
+  .status-error::before,
+  .effect-holographic {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .anim-pause {
+    animation-play-state: running !important;
+  }
+  
+  .texture-noise::after {
+    animation: none !important;
+    opacity: 0.03;
+  }
+}
+
+
+/* ============================================ */
+/* UTILITY VARIANTS WITH COLORS                */
+/* ============================================ */
+
+/* Orange neon (default accent) */
+.light-neon-orange {
+  --neon-color: #ff4d2e;
+  color: #ff4d2e;
+  box-shadow:
+    0 0 5px #ff4d2e,
+    0 0 10px #ff4d2e,
+    0 0 20px #ff4d2e,
+    0 0 40px rgba(255, 77, 46, 0.5);
+  text-shadow: 0 0 10px #ff4d2e;
+}
+
+/* Cyan neon */
+.light-neon-cyan {
+  --neon-color: #00e5ff;
+  color: #00e5ff;
+  box-shadow:
+    0 0 5px #00e5ff,
+    0 0 10px #00e5ff,
+    0 0 20px #00e5ff,
+    0 0 40px rgba(0, 229, 255, 0.5);
+  text-shadow: 0 0 10px #00e5ff;
+}
+
+/* Gold neon */
+.light-neon-gold {
+  --neon-color: #ffd23f;
+  color: #ffd23f;
+  box-shadow:
+    0 0 5px #ffd23f,
+    0 0 10px #ffd23f,
+    0 0 20px #ffd23f,
+    0 0 40px rgba(255, 210, 63, 0.5);
+  text-shadow: 0 0 10px #ffd23f;
+}
+
+/* Green neon (success) */
+.light-neon-green {
+  --neon-color: #00ffa8;
+  color: #00ffa8;
+  box-shadow:
+    0 0 5px #00ffa8,
+    0 0 10px #00ffa8,
+    0 0 20px #00ffa8,
+    0 0 40px rgba(0, 255, 168, 0.5);
+  text-shadow: 0 0 10px #00ffa8;
+}
+
+/* Purple neon */
+.light-neon-purple {
+  --neon-color: #a855f7;
+  color: #a855f7;
+  box-shadow:
+    0 0 5px #a855f7,
+    0 0 10px #a855f7,
+    0 0 20px #a855f7,
+    0 0 40px rgba(168, 85, 247, 0.5);
+  text-shadow: 0 0 10px #a855f7;
+}

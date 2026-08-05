@@ -1,0 +1,46 @@
+{
+  "_comment": "Game-level configuration. Modes, progression, battle pass, season. All data-driven.",
+  "version": "0.1.0",
+  "season": {
+    "id": "S01_NEON_UNDERGROUND",
+    "displayName": "Season 1 — Neon Underground",
+    "startDate": "2026-08-01T00:00:00-08:00",
+    "endDate": "2026-11-01T00:00:00-07:00",
+    "battlePass": {
+      "tiers": 100,
+      "freeTiers": [1, 5, 10, 15, 25, 40, 60, 80, 100],
+      "xpPerTier": 1000,
+      "xpPerRace": { "base": 200, "perLap": 50, "winBonus": 300, "objectiveBonus": 100 }
+    }
+  },
+  "modes": {
+    "_comment": "Mode IDs are resolved through barrel/modes/manifest.json. Order here defines menu order.",
+    "available": ["circuit", "sprint", "drift"],
+    "default": "circuit"
+  },
+  "progression": {
+    "playerLevelXpCurve": "linear:1000",
+    "currency": {
+      "credits":  { "starting": 25000, "softCurrency": true },
+      "gold":     { "starting": 500,    "hardCurrency": true }
+    },
+    "unlocks": {
+      "_comment": "Each unlock is checked against the player's save data. Format: { type, id, condition }"
+    }
+  },
+  "matchmaking": {
+    "_comment": "Online mode stub. Real impl needs a backend; the architecture supports offline + online symmetrically.",
+    "maxPlayersPerRace": 12,
+    "lobbyTimeoutSeconds": 30,
+    "aiFillThreshold": 4
+  },
+  "ai": {
+    "rubberBand": {
+      "enabled": true,
+      "catchupFactor": 1.15,
+      "runawayFactor": 0.92
+    },
+    "difficultyLevels": ["relaxed", "normal", "aggressive", "brutal"],
+    "defaultDifficulty": "normal"
+  }
+}

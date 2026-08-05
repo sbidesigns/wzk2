@@ -1,0 +1,1431 @@
+/* ui/styles/particles.css — Advanced Particle System for Warzone Kart: Neon Underground
+ * 
+ * This file contains reusable particle effects organized by category.
+ * All effects use CSS custom properties from tokens.css where applicable.
+ * Designed for cyberpunk/neon aesthetic: #ff4d2e (orange), #00e5ff (cyan), #ffd23f (gold)
+ * Performance-conscious: uses transform/opacity only for GPU-accelerated animations
+ */
+
+/* ============================================ */
+/* PARTICLE BASE STYLES                         */
+/* ============================================ */
+
+/**
+ * Base particle container - required wrapper
+ * Usage: <div class="particle-container"><div class="particles-explosion-small"></div></div>
+ */
+.particle-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: var(--z-overlay, 80);
+}
+
+.particle-container.fixed {
+  position: fixed;
+}
+
+/**
+ * Individual particle base style
+ */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+
+/* ============================================ */
+/* EXPLOSION PARTICLES                         */
+/* ============================================ */
+
+/**
+ * .particles-explosion-small - Small burst (item pickup)
+ * Quick small explosion for collecting items
+ */
+.particles-explosion-small {
+  --explosion-color: var(--accent-primary, #ff4d2e);
+  --explosion-size: 4px;
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+}
+
+.particles-explosion-small::before,
+.particles-explosion-small::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: var(--explosion-color);
+  box-shadow: 0 0 6px var(--explosion-color), 0 0 12px rgba(255, 77, 46, 0.5);
+}
+
+.particles-explosion-small::before {
+  width: var(--explosion-size);
+  height: var(--explosion-size);
+  top: 50%;
+  left: 50%;
+  animation: explodeSmall1 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particles-explosion-small::after {
+  width: calc(var(--explosion-size) * 0.75);
+  height: calc(var(--explosion-size) * 0.75);
+  top: 50%;
+  left: 50%;
+  animation: explodeSmall2 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.05s;
+}
+
+/* Additional particles using nth-child when inner elements exist */
+.particles-explosion-small .p {
+  position: absolute;
+  width: var(--explosion-size);
+  height: var(--explosion-size);
+  background: var(--explosion-color);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  box-shadow: 0 0 4px var(--explosion-color);
+}
+
+@keyframes explodeSmall1 {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + 25px), calc(-50% - 20px)) scale(0); opacity: 0; }
+}
+
+@keyframes explodeSmall2 {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% - 22px), calc(-50% + 18px)) scale(0); opacity: 0; }
+}
+
+/**
+ * .particles-explosion-medium - Medium burst (power-up use)
+ * Larger explosion with more particles for power-ups
+ */
+.particles-explosion-medium {
+  --explosion-color-1: var(--accent-primary, #ff4d2e);
+  --explosion-color-2: var(--accent-secondary, #00e5ff);
+  --explosion-color-3: var(--accent-tertiary, #ffd23f);
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+}
+
+.particles-explosion-medium .ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--explosion-color-1);
+  border-right-color: var(--explosion-color-2);
+  animation: explodeRing 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particles-explosion-medium .core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  background: radial-gradient(circle, #fff 0%, var(--explosion-color-3) 50%, var(--explosion-color-1) 100%);
+  border-radius: 50%;
+  animation: explodeCore 0.5s ease-out forwards;
+  box-shadow: 0 0 15px var(--explosion-color-1), 0 0 30px rgba(255, 77, 46, 0.4);
+}
+
+.particles-explosion-medium .spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--spark-color, var(--explosion-color-1));
+  border-radius: 50%;
+  animation: explodeSpark 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particles-explosion-medium .spark:nth-child(1) { --spark-x: -40px; --spark-y: -35px; --spark-delay: 0s; --spark-color: var(--explosion-color-1); }
+.particles-explosion-medium .spark:nth-child(2) { --spark-x: 45px; --spark-y: -25px; --spark-delay: 0.05s; --spark-color: var(--explosion-color-2); }
+.particles-explosion-medium .spark:nth-child(3) { --spark-x: -30px; --spark-y: 40px; --spark-delay: 0.1s; --spark-color: var(--explosion-color-3); }
+.particles-explosion-medium .spark:nth-child(4) { --spark-x: 38px; --spark-y: 32px; --spark-delay: 0.08s; --spark-color: var(--explosion-color-1); }
+.particles-explosion-medium .spark:nth-child(5) { --spark-x: -48px; --spark-y: 5px; --spark-delay: 0.12s; --spark-color: var(--explosion-color-2); }
+.particles-explosion-medium .spark:nth-child(6) { --spark-x: 42px; --spark-y: -5px; --spark-delay: 0.03s; --spark-color: var(--explosion-color-3); }
+
+@keyframes explodeRing {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes explodeCore {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.8); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+@keyframes explodeSpark {
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(
+      calc(-50% + var(--spark-x, 30px)), 
+      calc(-50% + var(--spark-y, 30px))
+    ) scale(0); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .particles-explosion-large - Large burst (race finish/winner)
+ * Epic celebration explosion with many particles
+ */
+.particles-explosion-large {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  margin-top: -100px;
+}
+
+.particles-explosion-large .wave {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 210, 63, 0.6);
+  animation: explodeWave 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.particles-explosion-large .wave:nth-child(2) {
+  animation-delay: 0.15s;
+  border-color: rgba(255, 77, 46, 0.5);
+}
+
+.particles-explosion-large .wave:nth-child(3) {
+  animation-delay: 0.3s;
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+.particles-explosion-large .burst-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 2px;
+  animation: largeBurstParticle 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Generate varied burst directions using CSS custom properties */
+.particles-explosion-large .burst-particle:nth-child(4n+1) { 
+  background: #ff4d2e; 
+  box-shadow: 0 0 8px #ff4d2e; 
+  --burst-dist: 90px; --burst-angle: 0deg;
+}
+.particles-explosion-large .burst-particle:nth-child(4n+2) { 
+  background: #00e5ff; 
+  box-shadow: 0 0 8px #00e5ff; 
+  --burst-dist: 85px; --burst-angle: 45deg;
+}
+.particles-explosion-large .burst-particle:nth-child(4n+3) { 
+  background: #ffd23f; 
+  box-shadow: 0 0 8px #ffd23f; 
+  --burst-dist: 95px; --burst-angle: 90deg;
+}
+.particles-explosion-large .burst-particle:nth-child(4n+4) { 
+  background: #a855f7; 
+  box-shadow: 0 0 8px #a855f7; 
+  --burst-dist: 88px; --burst-angle: 135deg;
+}
+
+/* Staggered delays and distances */
+.particles-explosion-large .burst-particle:nth-child(5) { --burst-dist: 70px; --burst-angle: 180deg; animation-delay: 0.05s; }
+.particles-explosion-large .burst-particle:nth-child(6) { --burst-dist: 92px; --burst-angle: 225deg; animation-delay: 0.08s; }
+.particles-explosion-large .burst-particle:nth-child(7) { --burst-dist: 78px; --burst-angle: 270deg; animation-delay: 0.12s; }
+.particles-explosion-large .burst-particle:nth-child(8) { --burst-dist: 86px; --burst-angle: 315deg; animation-delay: 0.03s; }
+.particles-explosion-large .burst-particle:nth-child(9) { --burst-dist: 82px; --burst-angle: 20deg; animation-delay: 0.1s; }
+.particles-explosion-large .burst-particle:nth-child(10) { --burst-dist: 94px; --burst-angle: 110deg; animation-delay: 0.06s; }
+.particles-explosion-large .burst-particle:nth-child(11) { --burst-dist: 76px; --burst-angle: 200deg; animation-delay: 0.14s; }
+.particles-explosion-large .burst-particle:nth-child(12) { --burst-dist: 89px; --burst-angle: 290deg; animation-delay: 0.04s; }
+
+@keyframes explodeWave {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes largeBurstParticle {
+  0% { 
+    transform: translate(-50%, -50%) rotate(var(--burst-angle, 0deg)) translateY(0) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) rotate(var(--burst-angle, 0deg)) 
+               translateY(calc(var(--burst-dist, 80px) * -1)) scale(0) rotate(180deg); 
+    opacity: 0; 
+  }
+}
+
+
+/* ============================================ */
+/* TRAIL EFFECTS                               */
+/* ============================================ */
+
+/**
+ * .trail-speed-lines - Motion lines behind fast objects
+ * Speed lines indicating fast movement
+ */
+.trail-speed-lines {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.trail-speed-line {
+  position: absolute;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.9) 100%);
+  border-radius: 2px;
+  animation: speedLineMove 0.4s linear infinite;
+  opacity: 0;
+}
+
+.trail-speed-lines.active .trail-speed-line {
+  opacity: 1;
+}
+
+.trail-speed-line:nth-child(1) { top: 15%; width: 40px; animation-delay: 0s; }
+.trail-speed-line:nth-child(2) { top: 35%; width: 55px; animation-delay: 0.1s; }
+.trail-speed-line:nth-child(3) { top: 55%; width: 35px; animation-delay: 0.05s; }
+.trail-speed-line:nth-child(4) { top: 72%; width: 50px; animation-delay: 0.15s; }
+.trail-speed-line:nth-child(5) { top: 88%; width: 42px; animation-delay: 0.08s; }
+
+@keyframes speedLineMove {
+  0% { transform: translateX(20px); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 0.8; }
+  100% { transform: translateX(-60px); opacity: 0; }
+}
+
+/**
+ * .trail-fire - Flame trail (nitro boost)
+ * Fiery trail effect for boost/ nitro
+ */
+.trail-fire {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.trail-fire.active {
+  opacity: 1;
+}
+
+.trail-fire::before,
+.trail-fire::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  filter: blur(3px);
+}
+
+.trail-fire::before {
+  width: 24px;
+  height: 45px;
+  margin-left: -12px;
+  background: linear-gradient(180deg, 
+    transparent 0%,
+    rgba(255, 200, 50, 0.8) 30%,
+    rgba(255, 120, 20, 0.9) 60%,
+    rgba(255, 77, 46, 1) 100%
+  );
+  animation: fireFlicker1 0.15s ease-in-out infinite alternate;
+}
+
+.trail-fire::after {
+  width: 14px;
+  height: 35px;
+  margin-left: -7px;
+  background: linear-gradient(180deg, 
+    transparent 0%,
+    rgba(255, 255, 200, 0.9) 40%,
+    rgba(255, 220, 100, 1) 70%,
+    rgba(255, 180, 50, 1) 100%
+  );
+  animation: fireFlicker2 0.12s ease-in-out infinite alternate;
+}
+
+/* Inner core flame */
+.trail-fire .fire-core {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 8px;
+  height: 25px;
+  margin-left: -4px;
+  background: linear-gradient(180deg, 
+    transparent 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 240, 200, 1) 100%
+  );
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  filter: blur(1px);
+  animation: fireFlickerCore 0.08s ease-in-out infinite alternate;
+}
+
+@keyframes fireFlicker1 {
+  0% { transform: scaleX(1) scaleY(1) translateX(0); }
+  100% { transform: scaleX(0.9) scaleY(1.1) translateX(2px); }
+}
+
+@keyframes fireFlicker2 {
+  0% { transform: scaleX(1) scaleY(1); }
+  100% { transform: scaleX(1.1) scaleY(0.9) translateX(-2px); }
+}
+
+@keyframes fireFlickerCore {
+  0% { transform: scaleX(1) scaleY(1); opacity: 1; }
+  100% { transform: scaleX(0.8) scaleY(1.2); opacity: 0.9; }
+}
+
+/**
+ * .trail-sparkle - Sparkle trail (shield active)
+ * Sparkling effect for shield/ protection state
+ */
+.trail-sparkle {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.trail-sparkle.active {
+  opacity: 1;
+}
+
+.trail-sparkle .sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #fff 0%, var(--accent-secondary, #00e5ff) 60%, transparent 100%);
+  border-radius: 50%;
+  animation: sparkleFloat 1s ease-in-out infinite;
+}
+
+.trail-sparkle .sparkle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+.trail-sparkle .sparkle:nth-child(2) { top: 30%; left: 80%; animation-delay: 0.2s; }
+.trail-sparkle .sparkle:nth-child(3) { top: 60%; left: 15%; animation-delay: 0.4s; }
+.trail-sparkle .sparkle:nth-child(4) { top: 80%; left: 75%; animation-delay: 0.6s; }
+.trail-sparkle .sparkle:nth-child(5) { top: 45%; left: 50%; animation-delay: 0.8s; }
+.trail-sparkle .sparkle:nth-child(6) { top: 20%; left: 55%; animation-delay: 0.3s; }
+.trail-sparkle .sparkle:nth-child(7) { top: 70%; left: 35%; animation-delay: 0.7s; }
+.trail-sparkle .sparkle:nth-child(8) { top: 50%; left: 10%; animation-delay: 0.5s; }
+
+@keyframes sparkleFloat {
+  0%, 100% { 
+    transform: scale(0.5) translateY(0); 
+    opacity: 0.4; 
+  }
+  50% { 
+    transform: scale(1.2) translateY(-8px); 
+    opacity: 1; 
+  }
+}
+
+/**
+ * .trail-smoke - Smoke trail (brake/drift)
+ * Dark smoke effect for braking/ drifting
+ */
+.trail-smoke {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 50px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.trail-smoke.active {
+  opacity: 1;
+}
+
+.trail-smoke .smoke-puff {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  background: radial-gradient(circle, 
+    rgba(100, 100, 110, 0.5) 0%, 
+    rgba(60, 60, 70, 0.3) 50%, 
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: smokeRise 0.8s ease-out forwards;
+}
+
+.trail-smoke .smoke-puff:nth-child(1) { animation-delay: 0s; --smoke-x: -5px; }
+.trail-smoke .smoke-puff:nth-child(2) { animation-delay: 0.15s; --smoke-x: 8px; }
+.trail-smoke .smoke-puff:nth-child(3) { animation-delay: 0.3s; --smoke-x: -10px; }
+.trail-smoke .smoke-puff:nth-child(4) { animation-delay: 0.1s; --smoke-x: 12px; }
+
+@keyframes smokeRise {
+  0% { 
+    transform: translateX(var(--smoke-x, 0)) translateY(0) scale(0.5); 
+    opacity: 0.7; 
+  }
+  100% { 
+    transform: translateX(calc(var(--smoke_x, 0) * 2)) translateY(-40px) scale(2); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .trail-rainbow - Rainbow trail (special item)
+ * Colorful rainbow trail for special power-up states
+ */
+.trail-rainbow {
+  position: absolute;
+  inset: -15px;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.trail-rainbow.active {
+  opacity: 1;
+}
+
+.trail-rainbow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #ff4d2e 0%,
+    #ff8c00 17%,
+    #ffd23f 33%,
+    #00ffa8 50%,
+    #00e5ff 67%,
+    #a855f7 83%,
+    #ff4d2e 100%
+  );
+  background-size: 200% 100%;
+  animation: rainbowShift 1s linear infinite;
+  mask-image: linear-gradient(90deg, transparent 30%, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 30%, black 70%, transparent 100%);
+  filter: blur(4px);
+  opacity: 0.6;
+}
+
+.trail-rainbow::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  background: linear-gradient(
+    90deg,
+    #ff4d2e 0%,
+    #ff8c00 17%,
+    #ffd23f 33%,
+    #00ffa8 50%,
+    #00e5ff 67%,
+    #a855f7 83%,
+    #ff4d2e 100%
+  );
+  background-size: 200% 100%;
+  animation: rainbowShift 0.8s linear infinite reverse;
+  mask-image: linear-gradient(90deg, transparent 50%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 50%, black 80%, transparent 100%);
+  filter: blur(2px);
+  opacity: 0.8;
+}
+
+@keyframes rainbowShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+
+/* ============================================ */
+/* AMBIENT PARTICLES                           */
+/* ============================================ */
+
+/**
+ * .ambient-dust - Floating dust motes
+ * Subtle floating dust particles in environment
+ */
+.ambient-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-dust .dust-mote {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  filter: blur(1px);
+  animation: dustFloat 15s ease-in-out infinite;
+}
+
+.ambient-dust .dust-mote:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; animation-duration: 18s; }
+.ambient-dust .dust-mote:nth-child(2) { top: 40%; left: 30%; animation-delay: -3s; animation-duration: 14s; }
+.ambient-dust .dust-mote:nth-child(3) { top: 60%; left: 20%; animation-delay: -7s; animation-duration: 16s; }
+.ambient-dust .dust-mote:nth-child(4) { top: 30%; left: 60%; animation-delay: -5s; animation-duration: 19s; }
+.ambient-dust .dust-mote:nth-child(5) { top: 70%; left: 50%; animation-delay: -9s; animation-duration: 13s; }
+.ambient-dust .dust-mote:nth-child(6) { top: 15%; left: 80%; animation-delay: -2s; animation-duration: 17s; }
+.ambient-dust .dust-mote:nth-child(7) { top: 85%; left: 70%; animation-delay: -11s; animation-duration: 15s; }
+.ambient-dust .dust-mote:nth-child(8) { top: 50%; left: 90%; animation-delay: -6s; animation-duration: 20s; }
+
+@keyframes dustFloat {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0.3; 
+  }
+  25% { 
+    transform: translate(20px, -15px) scale(1.2); 
+    opacity: 0.5; 
+  }
+  50% { 
+    transform: translate(-10px, -25px) scale(0.8); 
+    opacity: 0.4; 
+  }
+  75% { 
+    transform: translate(15px, -10px) scale(1.1); 
+    opacity: 0.35; 
+  }
+}
+
+/**
+ * .ambient-sparks - Random electrical sparks
+ * Electrical spark effect for high-energy areas
+ */
+.ambient-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-sparks .spark {
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: linear-gradient(180deg, 
+    rgba(0, 229, 255, 0.9) 0%, 
+    rgba(255, 255, 255, 1) 50%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  opacity: 0;
+  animation: sparkFlash 3s ease-in-out infinite;
+  filter: blur(0.5px);
+}
+
+.ambient-sparks .spark:nth-child(1) { top: 25%; left: 15%; animation-delay: 0s; transform: rotate(-15deg); }
+.ambient-sparks .spark:nth-child(2) { top: 45%; left: 70%; animation-delay: 1.2s; transform: rotate(20deg); }
+.ambient-sparks .spark:nth-child(3) { top: 65%; left: 35%; animation-delay: 2.1s; transform: rotate(-8deg); }
+.ambient-sparks .spark:nth-child(4) { top: 20%; left: 85%; animation-delay: 0.8s; transform: rotate(25deg); }
+.ambient-sparks .spark:nth-child(5) { top: 80%; left: 55%; animation-delay: 1.8s; transform: rotate(-20deg); }
+
+@keyframes sparkFlash {
+  0%, 90%, 100% { 
+    opacity: 0; 
+    transform: rotate(var(--spark-rotate, 0deg)) scaleY(0.5); 
+  }
+  92%, 96% { 
+    opacity: 1; 
+    transform: rotate(var(--spark-rotate, 0deg)) scaleY(1); 
+  }
+  94% { 
+    opacity: 0.6; 
+    transform: rotate(var(--spark-rotate, 0deg)) scaleY(0.8); 
+  }
+}
+
+/**
+ * .ambient-bubbles - Rising bubbles (underwater?)
+ * Bubble rising effect for underwater or special tracks
+ */
+.ambient-bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-bubbles .bubble {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  background: radial-gradient(circle at 30% 30%, 
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(0, 229, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: bubbleRise 6s ease-in-out infinite;
+}
+
+.ambient-bubbles .bubble:nth-child(1) { 
+  left: 15%; width: 8px; height: 8px; 
+  animation-delay: 0s; animation-duration: 5s; 
+}
+.ambient-bubbles .bubble:nth-child(2) { 
+  left: 35%; width: 12px; height: 12px; 
+  animation-delay: 1.5s; animation-duration: 7s; 
+}
+.ambient-bubbles .bubble:nth-child(3) { 
+  left: 55%; width: 6px; height: 6px; 
+  animation-delay: 0.8s; animation-duration: 4.5s; 
+}
+.ambient-bubbles .bubble:nth-child(4) { 
+  left: 75%; width: 10px; height: 10px; 
+  animation-delay: 2.2s; animation-duration: 6.5s; 
+}
+.ambient-bubbles .bubble:nth-child(5) { 
+  left: 25%; width: 14px; height: 14px; 
+  animation-delay: 3s; animation-duration: 8s; 
+}
+.ambient-bubbles .bubble:nth-child(6) { 
+  left: 65%; width: 7px; height: 7px; 
+  animation-delay: 1.2s; animation-duration: 5.5s; 
+}
+
+@keyframes bubbleRise {
+  0% { 
+    transform: translateY(0) translateX(0) scale(1); 
+    opacity: 0; 
+  }
+  10% { 
+    opacity: 0.8; 
+  }
+  90% { 
+    opacity: 0.6; 
+  }
+  100% { 
+    transform: translateY(-110vh) translateX(20px) scale(1.1); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .ambient-leaves - Floating leaves (outdoor tracks)
+ * Gentle falling leaves for outdoor environments
+ */
+.ambient-leaves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-leaves .leaf {
+  position: absolute;
+  top: -20px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, 
+    rgba(76, 140, 60, 0.7) 0%, 
+    rgba(100, 160, 70, 0.6) 100%
+  );
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: leafFall 12s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.ambient-leaves .leaf:nth-child(1) { 
+  left: 10%; animation-delay: 0s; 
+  --leaf-sway: 30px; --leaf-fall: 105vh;
+}
+.ambient-leaves .leaf:nth-child(2) { 
+  left: 30%; animation-delay: 2.5s; 
+  --leaf-sway: -25px; --leaf-fall: 108vh;
+  background: linear-gradient(135deg, rgba(180, 130, 50, 0.7), rgba(200, 150, 60, 0.6));
+}
+.ambient-leaves .leaf:nth-child(3) { 
+  left: 50%; animation-delay: 5s; 
+  --leaf-sway: 35px; --leaf-fall: 102vh;
+}
+.ambient-leaves .leaf:nth-child(4) { 
+  left: 70%; animation-delay: 1.8s; 
+  --leaf-sway: -28px; --leaf-fall: 110vh;
+  background: linear-gradient(135deg, rgba(160, 80, 40, 0.7), rgba(180, 100, 50, 0.6));
+}
+.ambient-leaves .leaf:nth-child(5) { 
+  left: 85%; animation-delay: 4.2s; 
+  --leaf-sway: 22px; --leaf-fall: 106vh;
+}
+.ambient-leaves .leaf:nth-child(6) { 
+  left: 20%; animation-delay: 7s; 
+  --leaf-sway: -32px; --leaf-fall: 104vh;
+}
+
+@keyframes leafFall {
+  0% { 
+    transform: translateY(0) translateX(0) rotate(0deg); 
+    opacity: 0; 
+  }
+  5% { 
+    opacity: 0.7; 
+  }
+  50% { 
+    transform: translateY(calc(var(--leaf-fall, 100vh) * 0.5)) 
+               translateX(var(--leaf-sway, 20px)) rotate(180deg); 
+  }
+  100% { 
+    transform: translateY(var(--leaf-fall, 100vh)) 
+               translateX(calc(var(--leaf-sway, 20px) * -0.5)) rotate(360deg); 
+    opacity: 0; 
+  }
+}
+
+
+/* ============================================ */
+/* CELEBRATION PARTICLES                       */
+/* ============================================ */
+
+/**
+ * .celebration-confetti - Colorful confetti shower
+ * Full confetti celebration effect
+ */
+.celebration-confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.celebration-confetti .confetti {
+  position: absolute;
+  top: -10%;
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  animation: confettiFall 3s ease-in forwards;
+}
+
+.celebration-confetti .confetti::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--confetti-color, #ff4d2e);
+  clip-path: var(--confetti-shape, polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%));
+}
+
+/* Varied colors, positions, delays, shapes */
+.celebration-confetti .confetti:nth-child(1) { left: 5%; animation-delay: 0s; --confetti-color: #ff4d2e; --confetti-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --confetti-drift: 40px; }
+.celebration-confetti .confetti:nth-child(2) { left: 12%; animation-delay: 0.15s; --confetti-color: #00e5ff; --confetti-shape: polygon(0% 0%, 100% 0%, 50% 100%); --confetti-drift: -30px; }
+.celebration-confetti .confetti:nth-child(3) { left: 20%; animation-delay: 0.3s; --confetti-color: #ffd23f; --confetti-shape: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); --confetti-drift: 50px; }
+.celebration-confetti .confetti:nth-child(4) { left: 28%; animation-delay: 0.08s; --confetti-color: #00ffa8; --confetti-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --confetti-drift: -45px; }
+.celebration-confetti .confetti:nth-child(5) { left: 35%; animation-delay: 0.22s; --confetti-color: #a855f7; --confetti-shape: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); --confetti-drift: 35px; }
+.celebration-confetti .confetti:nth-child(6) { left: 43%; animation-delay: 0.35s; --confetti-color: #ff4d2e; --confetti-shape: polygon(0% 0%, 100% 0%, 50% 100%); --confetti-drift: -25px; }
+.celebration-confetti .confetti:nth-child(7) { left: 52%; animation-delay: 0.12s; --confetti-color: #00e5ff; --confetti-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --confetti-drift: 48px; }
+.celebration-confetti .confetti:nth-child(8) { left: 60%; animation-delay: 0.28s; --confetti-color: #ffd23f; --confetti-shape: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); --confetti-drift: -38px; }
+.celebration-confetti .confetti:nth-child(9) { left: 68%; animation-delay: 0.18s; --confetti-color: #00ffa8; --confetti-shape: polygon(0% 0%, 100% 0%, 50% 100%); --confetti-drift: 28px; }
+.celebration-confetti .confetti:nth-child(10) { left: 75%; animation-delay: 0.38s; --confetti-color: #a855f7; --confetti-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --confetti-drift: -42px; }
+.celebration-confetti .confetti:nth-child(11) { left: 82%; animation-delay: 0.05s; --confetti-color: #ff4d2e; --confetti-shape: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); --confetti-drift: 32px; }
+.celebration-confetti .confetti:nth-child(12) { left: 90%; animation-delay: 0.25s; --confetti-color: #00e5ff; --confetti-shape: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); --confetti-drift: -35px; }
+
+@keyframes confettiFall {
+  0% { 
+    transform: translateY(0) translateX(0) rotateZ(0deg) rotateX(0deg); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translateY(60vh) translateX(var(--confetti-drift, 30px)) rotateZ(360deg) rotateX(180deg); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateY(110vh) translateX(calc(var(--confetti-drift, 30px) * 1.5)) rotateZ(720deg) rotateX(360deg); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .celebration-stars - Star burst pattern
+ * Radiating star burst celebration
+ */
+.celebration-stars {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  margin: -150px 0 0 -150px;
+  pointer-events: none;
+}
+
+.celebration-stars .star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  opacity: 0;
+  animation: starBurst 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.celebration-stars .star::before,
+.celebration-stars .star::after {
+  content: '';
+  position: absolute;
+  background: var(--star-color, #ffd23f);
+}
+
+.celebration-stars .star::before {
+  width: 100%;
+  height: 3px;
+  top: 50%;
+  left: 0;
+  margin-top: -1.5px;
+  border-radius: 2px;
+}
+
+.celebration-stars .star::after {
+  width: 3px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  margin-left: -1.5px;
+  border-radius: 2px;
+}
+
+/* Star positions and delays */
+.celebration-stars .star:nth-child(1) { --star-dist: 100px; --star-angle: 0deg; --star-delay: 0s; --star-color: #ffd23f; }
+.celebration-stars .star:nth-child(2) { --star-dist: 115px; --star-angle: 45deg; --star-delay: 0.06s; --star-color: #ffffff; }
+.celebration-stars .star:nth-child(3) { --star-dist: 95px; --star-angle: 90deg; --star-delay: 0.12s; --star-color: #ffd23f; }
+.celebration-stars .star:nth-child(4) { --star-dist: 120px; --star-angle: 135deg; --star-delay: 0.04s; --star-color: #ffffff; }
+.celebration-stars .star:nth-child(5) { --star-dist: 105px; --star-angle: 180deg; --star-delay: 0.1s; --star-color: #ffd23f; }
+.celebration-stars .star:nth-child(6) { --star-dist: 110px; --star-angle: 225deg; --star-delay: 0.08s; --star-color: #ffffff; }
+.celebration-stars .star:nth-child(7) { --star-dist: 98px; --star-angle: 270deg; --star-delay: 0.14s; --star-color: #ffd23f; }
+.celebration-stars .star:nth-child(8) { --star-dist: 118px; --star-angle: 315deg; --star-delay: 0.02s; --star-color: #ffffff; }
+
+@keyframes starBurst {
+  0% { 
+    transform: translate(-50%, -50%) rotate(var(--star-angle, 0deg)) 
+               translateY(0) scale(0); 
+    opacity: 0; 
+  }
+  30% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) rotate(var(--star-angle, 0deg)) 
+               translateY(calc(var(--star-dist, 100px) * -1)) scale(1); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .celebration-hearts - Heart shapes (fan appreciation)
+ * Floating heart particles for fan love moments
+ */
+.celebration-hearts {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  right: 0;
+  height: 60%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.celebration-hearts .heart {
+  position: absolute;
+  bottom: -30px;
+  width: 16px;
+  height: 14px;
+  opacity: 0;
+  animation: heartFloat 3s ease-out forwards;
+}
+
+.celebration-hearts .heart::before,
+.celebration-hearts .heart::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  background: var(--heart-color, #ff4d2e);
+  border-radius: 10px 10px 0 0;
+}
+
+.celebration-hearts .heart::before {
+  left: 0;
+  transform: rotate(-45deg);
+  transform-origin: bottom right;
+}
+
+.celebration-hearts .heart::after {
+  left: 6px;
+  transform: rotate(45deg);
+  transform-origin: bottom left;
+}
+
+.celebration-hearts .heart:nth-child(1) { left: 15%; animation-delay: 0s; --heart-color: #ff4d2e; --heart-scale: 1; }
+.celebration-hearts .heart:nth-child(2) { left: 30%; animation-delay: 0.3s; --heart-color: #ff69b4; --heart-scale: 0.8; }
+.celebration-hearts .heart:nth-child(3) { left: 50%; animation-delay: 0.15s; --heart-color: #ff4d2e; --heart-scale: 1.2; }
+.celebration-hearts .heart:nth-child(4) { left: 65%; animation-delay: 0.45s; --heart-color: #ff1493; --heart-scale: 0.9; }
+.celebration-hearts .heart:nth-child(5) { left: 80%; animation-delay: 0.2s; --heart-color: #ff4d2e; --heart-scale: 1.1; }
+
+@keyframes heartFloat {
+  0% { 
+    transform: translateY(0) scale(0) rotate(0deg); 
+    opacity: 0; 
+  }
+  15% { 
+    transform: translateY(-10px) scale(var(--heart-scale, 1)) rotate(-5deg); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: translateY(-50%) scale(var(--heart-scale, 1)) rotate(5deg); 
+    opacity: 0.9; 
+  }
+  100% { 
+    transform: translateY(-100%) scale(0.5) rotate(-10deg); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .celebration-money - Currency/coins flying
+ * Flying coins/currency effect
+ */
+.celebration-money {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
+  pointer-events: none;
+}
+
+.celebration-money .coin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  background: radial-gradient(circle at 30% 30%, 
+    #ffd23f 0%, 
+    #ffb800 60%, 
+    #cc9200 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(255, 210, 63, 0.5);
+  opacity: 0;
+  animation: coinSpray 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.celebration-money .coin::before {
+  content: '$';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  color: #996600;
+}
+
+.celebration-money .coin:nth-child(1) { --coin-x: -70px; --coin-y: -80px; --coin-delay: 0s; }
+.celebration-money .coin:nth-child(2) { --coin-x: 65px; --coin-y: -70px; --coin-delay: 0.06s; }
+.celebration-money .coin:nth-child(3) { --coin-x: -50px; --coin-y: 65px; --coin-delay: 0.12s; }
+.celebration-money .coin:nth-child(4) { --coin-x: 75px; --coin-y: 50px; --coin-delay: 0.03s; }
+.celebration-money .coin:nth-child(5) { --coin-x: -85px; --coin-y: -10px; --coin-delay: 0.09s; }
+.celebration-money .coin:nth-child(6) { --coin-x: 80px; --coin-y: -15px; --coin-delay: 0.15s; }
+.celebration-money .coin:nth-child(7) { --coin-x: -30px; --coin-y: 85px; --coin-delay: 0.05s; }
+.celebration-money .coin:nth-child(8) { --coin-x: 40px; --coin-y: 90px; --coin-delay: 0.11s; }
+
+@keyframes coinSpray {
+  0% { 
+    transform: translate(-50%, -50%) scale(1) rotateY(0deg); 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(
+      calc(-50% + var(--coin-x, 50px)), 
+      calc(-50% + var(--coin-y, 50px))
+    ) scale(0.5) rotateY(720deg); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .celebration-trophy - Trophy particles
+ * Golden trophy/award particle effect
+ */
+.celebration-trophy {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  pointer-events: none;
+}
+
+.celebration-trophy .trophy-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb800 50%, #ff9500 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+  animation: trophyParticle 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.celebration-trophy .trophy-particle:nth-child(odd) {
+  background: linear-gradient(135deg, #fff 0%, #ffd700 50%, #ffcc00 100%);
+}
+
+.celebration-trophy .trophy-particle:nth-child(1) { --trophy-r: 0deg; --trophy-d: 60px; --trophy-del: 0s; }
+.celebration-trophy .trophy-particle:nth-child(2) { --trophy-r: 30deg; --trophy-d: 70px; --trophy-del: 0.05s; }
+.celebration-trophy .trophy-particle:nth-child(3) { --trophy-r: 60deg; --trophy-d: 55px; --trophy-del: 0.1s; }
+.celebration-trophy .trophy-particle:nth-child(4) { --trophy-r: 90deg; --trophy-d: 75px; --trophy-del: 0.03s; }
+.celebration-trophy .trophy-particle:nth-child(5) { --trophy-r: 120deg; --trophy-d: 62px; --trophy-del: 0.08s; }
+.celebration-trophy .trophy-particle:nth-child(6) { --trophy-r: 150deg; --trophy-d: 68px; --trophy-del: 0.13s; }
+.celebration-trophy .trophy-particle:nth-child(7) { --trophy-r: 180deg; --trophy-d: 58px; --trophy-del: 0.02s; }
+.celebration-trophy .trophy-particle:nth-child(8) { --trophy-r: 210deg; --trophy-d: 72px; --trophy-del: 0.07s; }
+.celebration-trophy .trophy-particle:nth-child(9) { --trophy-r: 240deg; --trophy-d: 64px; --trophy-del: 0.12s; }
+.celebration-trophy .trophy-particle:nth-child(10) { --trophy-r: 270deg; --trophy-d: 66px; --trophy-del: 0.04s; }
+.celebration-trophy .trophy-particle:nth-child(11) { --trophy-r: 300deg; --trophy-d: 59px; --trophy-del: 0.09s; }
+.celebration-trophy .trophy-particle:nth-child(12) { --trophy-r: 330deg; --trophy-d: 74px; --trophy-del: 0.14s; }
+
+@keyframes trophyParticle {
+  0% { 
+    transform: translate(-50%, -50%) rotate(var(--trophy-r, 0deg)) 
+               translateY(0) scale(0); 
+    opacity: 0; 
+  }
+  20% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) rotate(var(--trophy-r, 0deg)) 
+               translateY(calc(var(--trophy-d, 60px) * -0.3)) scale(1.2); 
+  }
+  100% { 
+    transform: translate(-50%, -50%) rotate(var(--trophy-r, 0deg)) 
+               translateY(calc(var(--trophy_d, 60px) * -1)) scale(0); 
+    opacity: 0; 
+  }
+}
+
+
+/* ============================================ */
+/* WARNING/DANGER PARTICLES                    */
+/* ============================================ */
+
+/**
+ * .warning-pulse-red - Red pulsing danger zone
+ * Pulsing red danger indicator area
+ */
+.warning-pulse-red {
+  position: relative;
+  border: 2px solid rgba(255, 61, 90, 0.4);
+  animation: warningPulseRed 1.5s ease-in-out infinite;
+}
+
+.warning-pulse-red::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(255, 61, 90, 0.2);
+  border-radius: inherit;
+  animation: warningPulseRed 1.5s ease-in-out infinite reverse;
+}
+
+@keyframes warningPulseRed {
+  0%, 100% { 
+    border-color: rgba(255, 61, 90, 0.4); 
+    box-shadow: 0 0 15px rgba(255, 61, 90, 0.2), inset 0 0 15px rgba(255, 61, 90, 0.1); 
+  }
+  50% { 
+    border-color: rgba(255, 61, 90, 0.8); 
+    box-shadow: 0 0 30px rgba(255, 61, 90, 0.5), inset 0 0 25px rgba(255, 61, 90, 0.2); 
+  }
+}
+
+/**
+ * .warning-shield-hit - Shield impact sparks
+ * Sparks that appear when shield is hit
+ */
+.warning-shield-hit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.warning-shield-hit.active {
+  opacity: 1;
+}
+
+.warning-shield-hit .impact-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent-secondary, #00e5ff), 0 0 12px var(--accent-secondary, #00e5ff);
+  animation: shieldImpact 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.warning-shield-hit .impact-spark:nth-child(1) { top: 20%; left: 30%; --impact-x: -30px; --impact-y: -20px; }
+.warning-shield-hit .impact-spark:nth-child(2) { top: 40%; left: 70%; --impact-x: 25px; --impact-y: -25px; }
+.warning-shield-hit .impact-spark:nth-child(3) { top: 60%; left: 25%; --impact-x: -25px; --impact-y: 20px; }
+.warning-shield-hit .impact-spark:nth-child(4) { top: 75%; left: 65%; --impact-x: 30px; --impact-y: 18px; }
+.warning-shield-hit .impact-spark:nth-child(5) { top: 35%; left: 50%; --impact-x: 0; --impact-y: -35px; }
+.warning-shield-hit .impact-spark:nth-child(6) { top: 55%; left: 45%; --impact-x: 0; --impact-y: 30px; }
+
+@keyframes shieldImpact {
+  0% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translate(var(--impact-x, 20px), var(--impact_y, -20px)) scale(0); 
+    opacity: 0; 
+  }
+}
+
+/**
+ * .warning-low-health - Critical warning pulse
+ * Red pulsing overlay for low health/critical state
+ */
+.warning-low-health {
+  position: relative;
+  animation: lowHealthPulse 0.8s ease-in-out infinite;
+}
+
+.warning-low-health::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  background: 
+    linear-gradient(var(--bg-primary, #05060a), var(--bg-primary, #05060a)) padding-box,
+    linear-gradient(180deg, transparent 0%, rgba(255, 61, 90, 0.6) 50%, transparent 100%) border-box;
+  border-radius: inherit;
+  animation: lowHealthBorder 0.8s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes lowHealthPulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 20px rgba(255, 61, 90, 0.3), 
+      inset 0 0 20px rgba(255, 61, 90, 0.1); 
+  }
+  50% { 
+    box-shadow: 
+      0 0 40px rgba(255, 61, 90, 0.6), 
+      inset 0 0 35px rgba(255, 61, 90, 0.25); 
+  }
+}
+
+@keyframes lowHealthBorder {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/**
+ * .warning-countdown - Countdown circle particles
+ * Circular countdown with particle effects
+ */
+.warning-countdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-countdown .countdown-circle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 77, 46, 0.3);
+}
+
+.warning-countdown .countdown-progress {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--accent-primary, #ff4d2e);
+  animation: countdownSpin 1s linear infinite;
+}
+
+.warning-countdown .countdown-number {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 36px;
+  color: var(--accent-primary, #ff4d2e);
+  text-shadow: 0 0 20px rgba(255, 77, 46, 0.8);
+  z-index: 1;
+}
+
+.warning-countdown .countdown-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--accent-primary, #ff4d2e);
+  border-radius: 50%;
+  animation: countdownParticle 1s linear infinite;
+}
+
+@keyframes countdownSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes countdownParticle {
+  0% { 
+    transform: rotate(0deg) translateX(40px) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: rotate(360deg) translateX(40px) scale(0.5); 
+    opacity: 0; 
+  }
+}
+
+
+/* ============================================ */
+/* REDUCED MOTION SUPPORT                      */
+/* ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .particles-explosion-small::before,
+  .particles-explosion-small::after,
+  .particles-explosion-medium .ring,
+  .particles-explosion-medium .core,
+  .particles-explosion-medium .spark,
+  .particles-explosion-large .wave,
+  .particles-explosion-large .burst-particle,
+  .trail-speed-line,
+  .trail-fire::before,
+  .trail-fire::after,
+  .trail-fire .fire-core,
+  .trail-sparkle .sparkle,
+  .trail-smoke .smoke-puff,
+  .trail-rainbow::before,
+  .trail-rainbow::after,
+  .ambient-dust .dust-mote,
+  .ambient-sparks .spark,
+  .ambient-bubbles .bubble,
+  .ambient-leaves .leaf,
+  .celebration-confetti .confetti,
+  .celebration-stars .star,
+  .celebration-hearts .heart,
+  .celebration-money .coin,
+  .celebration-trophy .trophy-particle,
+  .warning-pulse-red,
+  .warning-pulse-red::before,
+  .warning-shield-hit .impact-spark,
+  .warning-low-health,
+  .warning-low-health::after,
+  .warning-countdown .countdown-progress,
+  .warning-countdown .countdown-particle {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Static fallback visibility */
+  .trail-speed-lines.active .trail-speed-line,
+  .trail-fire.active,
+  .trail-sparkle.active,
+  .trail-smoke.active,
+  .trail-rainbow.active,
+  .warning-shield-hit.active {
+    opacity: 0.5;
+  }
+}
+
+
+/* ============================================ */
+/* MOBILE RESPONSIVENESS                       */
+/* ============================================ */
+
+@media (max-width: 480px) {
+  .particles-explosion-large {
+    width: 150px;
+    height: 150px;
+    margin-left: -75px;
+    margin-top: -75px;
+  }
+
+  .celebration-stars {
+    width: 220px;
+    height: 220px;
+    margin: -110px 0 0 -110px;
+  }
+
+  .celebration-money {
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+  }
+
+  .trail-speed-lines {
+    width: 40px;
+  }
+
+  .trail-fire {
+    width: 20px;
+    height: 40px;
+  }
+}

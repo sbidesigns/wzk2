@@ -1,0 +1,512 @@
+/* ui/styles/race-environment.css */
+/* RACE ENVIRONMENT STYLING — Track visualization, scenery effects, atmosphere UI */
+
+/* ============================================
+   RACE CANVAS CONTAINER
+   ============================================ */
+
+.race-canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: #050510;
+  overflow: hidden;
+}
+
+.race-canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   TRACK MAP / MINIMAP OVERLAY
+   ============================================ */
+
+.track-minimap-overlay {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 180px;
+  height: 180px;
+  background: rgba(5, 6, 16, 0.85);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 8px;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.1),
+    inset 0 0 30px rgba(0, 255, 255, 0.05);
+}
+
+.track-minimap-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.track-minimap-label {
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  color: #00ffff;
+  background: rgba(5, 6, 16, 0.9);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+/* Player position indicator on minimap */
+.minimap-player-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #e94560;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px #e94560;
+  animation: playerDotPulse 1s ease-in-out infinite;
+}
+
+@keyframes playerDotPulse {
+  0%, 100% { box-shadow: 0 0 5px #e94560; }
+  50% { box-shadow: 0 0 15px #e94560, 0 0 25px rgba(233, 69, 96, 0.5); }
+}
+
+/* Opponent dots on minimap */
+.minimap-opponent-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Checkpoint markers on minimap */
+.minimap-checkpoint {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: transparent;
+  border: 1px dashed rgba(0, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============================================
+   BIOME INDICATOR
+   ============================================ */
+
+.biome-indicator {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(5, 6, 16, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.biome-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.biome-icon.neoncity { background: linear-gradient(135deg, #e94560, #0f3460); }
+.biome-icon.volcanic { background: linear-gradient(135deg, #ff6b35, #801336); }
+.biome-icon.arctic { background: linear-gradient(135deg, #00fff5, #0f4c75); }
+.biome-icon.toxic { background: linear-gradient(135deg, #39ff14, #0d260d); }
+.biome-icon.skyway { background: linear-gradient(135deg, #ffd700, #16213e); }
+
+.biome-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.biome-weather {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: auto;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   TIME OF DAY DISPLAY
+   ============================================ */
+
+.time-display {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(5, 6, 16, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.time-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.5s ease;
+}
+
+.time-icon.dawn { 
+  background: linear-gradient(135deg, #ff8844, #ffaa66);
+  box-shadow: 0 0 15px rgba(255, 136, 68, 0.5);
+}
+.time-icon.day { 
+  background: linear-gradient(135deg, #ffffee, #ffeebb);
+  box-shadow: 0 0 15px rgba(255, 255, 238, 0.5);
+}
+.time-icon.dusk { 
+  background: linear-gradient(135deg, #ff6644, #ff4422);
+  box-shadow: 0 0 15px rgba(255, 102, 68, 0.5);
+}
+.time-icon.night { 
+  background: linear-gradient(135deg, #6688cc, #334466);
+  box-shadow: 0 0 15px rgba(102, 136, 204, 0.5);
+}
+
+.time-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   WEATHER EFFECTS OVERLAY
+   ============================================ */
+
+.weather-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* Rain effect */
+.rain-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(150, 200, 255, 0.03) 2px,
+      rgba(150, 200, 255, 0.03) 3px
+    );
+  animation: rainFall 0.3s linear infinite;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.rain-effect.active {
+  opacity: 1;
+}
+
+@keyframes rainFall {
+  from { transform: translateY(-50%); }
+  to { transform: translateY(0); }
+}
+
+/* Snow effect */
+.snow-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.snow-effect.active {
+  opacity: 1;
+}
+
+.snowflake {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), transparent);
+  border-radius: 50%;
+  animation: snowFall var(--fall-duration, 5s) linear infinite,
+             snowSway var(--sway-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes snowFall {
+  to { transform: translateY(100vh) rotate(360deg); }
+}
+
+@keyframes snowSway {
+  0%, 100% { margin-left: 0; }
+  50% { margin-left: 30px; }
+}
+
+/* Fog effect */
+.fog-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(100, 100, 120, 0.3) 100%
+  );
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+}
+
+.fog-effect.active {
+  opacity: 1;
+  animation: fogDrift 20s ease-in-out infinite;
+}
+
+@keyframes fogDrift {
+  0%, 100% { transform: translateX(-5%) scale(1.1); }
+  50% { transform: translateX(5%) scale(1.05); }
+}
+
+/* Neon storm effect */
+.neonstorm-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.neonstorm-effect.active {
+  opacity: 1;
+  animation: neonStormFlash 4s ease-in-out infinite;
+}
+
+@keyframes neonStormFlash {
+  0%, 90%, 100% { background: transparent; }
+  92%, 94%, 96% { 
+    background: radial-gradient(
+      ellipse at var(--lightning-x, 50%) var(--lightning-y, 30%),
+      rgba(233, 69, 96, 0.15) 0%,
+      transparent 50%
+    );
+  }
+  93%, 95% {
+    background: radial-gradient(
+      ellipse at calc(var(--lightning-x, 50%) + 10%) var(--lightning-y, 30%),
+      rgba(0, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+  }
+}
+
+/* ============================================
+   TRACK SEGMENT INFO (DEBUG)
+   ============================================ */
+
+.segment-info-panel {
+  position: absolute;
+  bottom: 220px;
+  right: 20px;
+  width: 200px;
+  padding: 12px;
+  background: rgba(5, 6, 16, 0.9);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  display: none; /* Hidden by default, toggle with debug mode */
+}
+
+.segment-info-panel.visible {
+  display: block;
+}
+
+.segment-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-right: 6px;
+}
+
+.segment-type-badge.straight { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+.segment-type-badge.curve { background: rgba(255, 165, 0, 0.2); color: #ffa500; }
+.segment-type-badge.hill { background: rgba(255, 69, 0, 0.2); color: #ff4500; }
+.segment-type-badge.jump { background: rgba(148, 0, 211, 0.2); color: #9400d3; }
+
+/* ============================================
+   SCENERY LOADING PROGRESS
+   ============================================ */
+
+.scenery-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.scenery-loader-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: #fff;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.scenery-loader-progress {
+  width: 300px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.scenery-loader-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #e94560, #00ffff);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.scenery-loader-status {
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================
+   ENVIRONMENT TRANSITIONS
+   ============================================ */
+
+.environment-transition {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.environment-transition.flash {
+  animation: envFlash 0.8s ease-out forwards;
+}
+
+@keyframes envFlash {
+  0% { 
+    background: rgba(0, 255, 255, 0.3);
+    opacity: 1;
+  }
+  100% { 
+    background: transparent;
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .track-minimap-overlay {
+    width: 120px;
+    height: 120px;
+    bottom: 140px;
+    right: 10px;
+  }
+  
+  .biome-indicator,
+  .time-display {
+    top: 60px;
+    padding: 6px 10px;
+  }
+  
+  .biome-name {
+    font-size: 11px;
+  }
+  
+  .biome-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .track-minimap-overlay {
+    width: 100px;
+    height: 100px;
+    bottom: 120px;
+    right: 8px;
+    padding: 6px;
+  }
+  
+  .biome-indicator {
+    left: 8px;
+  }
+  
+  .time-display {
+    right: 8px;
+  }
+  
+  .segment-info-panel {
+    display: none !important; /* Always hidden on mobile */
+  }
+}

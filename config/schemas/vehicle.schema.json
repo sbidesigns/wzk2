@@ -1,0 +1,55 @@
+{
+  "$id": "vehicle.schema.json",
+  "_comment": "Schema for barrel/vehicles/manifest.json entries. The Resolver rejects any entry that doesn't match.",
+  "type": "object",
+  "required": ["id", "displayName", "class", "stats", "tuning", "unlock", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string", "minLength": 2 },
+    "class":       { "type": "string", "enum": ["sports", "muscle", "agile", "heavy", "atv", "super"] },
+    "stats": {
+      "type": "object",
+      "required": ["topSpeed", "acceleration", "handling", "weight"],
+      "properties": {
+        "topSpeed":     { "type": "integer", "minimum": 1, "maximum": 10 },
+        "acceleration": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "handling":     { "type": "integer", "minimum": 1, "maximum": 10 },
+        "weight":       { "type": "integer", "minimum": 1, "maximum": 10 }
+      }
+    },
+    "tuning": {
+      "type": "object",
+      "required": ["enginePower", "maxSteer", "driftGripMultiplier", "burnoutTorqueBoost"],
+      "properties": {
+        "enginePower":          { "type": "number", "minimum": 100,  "maximum": 5000 },
+        "maxSteer":             { "type": "number", "minimum": 0.1,  "maximum": 1.0 },
+        "driftGripMultiplier":  { "type": "number", "minimum": 0.05, "maximum": 1.0 },
+        "burnoutTorqueBoost":   { "type": "number", "minimum": 0.5,  "maximum": 3.0 },
+        "boostAccelerationCurve": { "type": "string" },
+        "suspensionStiffness":  { "type": "number", "minimum": 5,   "maximum": 100 },
+        "suspensionDamping":    { "type": "number", "minimum": 0.1, "maximum": 20 },
+        "bodyRollFactor":       { "type": "number", "minimum": 0,   "maximum": 1 }
+      }
+    },
+    "unlock": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["default", "level", "currency", "season", "achievement"] },
+        "value": { "type": ["number", "string"] }
+      }
+    },
+    "cosmetic": {
+      "type": "object",
+      "properties": {
+        "bodyColor":  { "type": "string" },
+        "accentColor":{ "type": "string" },
+        "wheelColor": { "type": "string" },
+        "livery":     { "type": "string" }
+      }
+    },
+    "module": { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["spawn", "update", "getSpeedKmh", "applyBoost"],
+  "additionalProperties": false
+}

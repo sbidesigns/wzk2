@@ -1,0 +1,16 @@
+{
+  "$id": "item.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "rarity", "category", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string" },
+    "rarity":      { "type": "string", "enum": ["common", "rare", "epic", "legendary"] },
+    "category":    { "type": "string", "enum": ["offensive", "defensive", "utility", "boost"] },
+    "icon":        { "type": "string" },
+    "dropWeight":  { "type": "number", "minimum": 0 },
+    "module":      { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["activate"],
+  "additionalProperties": false
+}

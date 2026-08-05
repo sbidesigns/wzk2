@@ -1,0 +1,934 @@
+/* ui/styles/hud.css — HUD System Styling for Warzone Kart: Neon Underground
+ * Features: Glassmorphism panels, neon accents, responsive layout, animations
+ */
+
+/* ==================== ROOT HUD CONTAINER ==================== */
+.game-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-hud);
+  font-family: var(--font-mono);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-out, visibility 0.4s;
+}
+
+.game-hud.visible,
+.game-hud.hud-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.game-hud > * {
+  pointer-events: auto;
+}
+
+/* ==================== BASE PANEL STYLES ==================== */
+.hud-panel {
+  position: absolute;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 12, 20, 0.92) 0%,
+    rgba(18, 20, 31, 0.88) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-l);
+  padding: var(--space-m) var(--space-l);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(0, 229, 255, 0.05);
+  
+  /* Neon accent line at top */
+}
+
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-secondary),
+    transparent
+  );
+  border-radius: var(--radius-pill);
+  opacity: 0.6;
+}
+
+/* ==================== SPEED DISPLAY PANEL ==================== */
+.hud-speed-panel {
+  bottom: var(--space-xl);
+  left: var(--space-xl);
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.speed-container {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+}
+
+.speed-value {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: color 0.3s ease;
+  
+  /* Default low speed color */
+  color: var(--success);
+  text-shadow: 
+    0 0 20px rgba(61, 220, 132, 0.4),
+    0 0 40px rgba(61, 220, 132, 0.2);
+}
+
+.speed-value.low {
+  color: var(--success);
+  text-shadow: 0 0 20px rgba(61, 220, 132, 0.4);
+}
+
+.speed-value.medium {
+  color: var(--warning);
+  text-shadow: 
+    0 0 20px rgba(255, 177, 61, 0.4),
+    0 0 40px rgba(255, 177, 61, 0.2);
+}
+
+.speed-value.high {
+  color: #ff8c00;
+  text-shadow: 
+    0 0 20px rgba(255, 140, 0, 0.5),
+    0 0 40px rgba(255, 140, 0, 0.25);
+}
+
+.speed-value.critical {
+  color: var(--danger);
+  text-shadow: 
+    0 0 25px rgba(255, 61, 90, 0.6),
+    0 0 50px rgba(255, 61, 90, 0.3);
+  animation: speedCriticalPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes speedCriticalPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.02); }
+}
+
+.speed-unit {
+  font-size: var(--text-caption);
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-ultra-wide);
+  font-weight: 600;
+}
+
+/* Speed bar */
+.speed-bar-container {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: var(--space-xs);
+}
+
+.speed-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--success) 0%,
+    var(--warning) 50%,
+    #ff8c00 80%,
+    var(--danger) 100%
+  );
+  border-radius: var(--radius-pill);
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Gear indicator */
+.gear-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-s);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-subtle);
+}
+
+.gear-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-ultra-wide);
+}
+
+.gear-value {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+.gear-indicator.gear-6 .gear-value {
+  color: var(--danger);
+  text-shadow: 0 0 10px rgba(255, 61, 90, 0.6);
+  animation: gearMaxPulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes gearMaxPulse {
+  from { opacity: 1; }
+  to { opacity: 0.7; }
+}
+
+/* ==================== POSITION & LAP PANEL ==================== */
+.hud-position-panel {
+  top: var(--space-xl);
+  left: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  min-width: 120px;
+}
+
+.position-display {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.position-number {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 64px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.position-suffix {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2.5vw, 28px);
+  color: var(--text-tertiary);
+  letter-spacing: 0;
+}
+
+/* Podium position colors */
+.position-display.first .position-number {
+  color: var(--accent-tertiary);
+  text-shadow: 
+    0 0 20px rgba(255, 210, 63, 0.5),
+    0 0 40px rgba(255, 210, 63, 0.25);
+}
+
+.position-display.second .position-number {
+  color: #c0c0c0;
+  text-shadow: 0 0 15px rgba(192, 192, 192, 0.4);
+}
+
+.position-display.third .position-number {
+  color: #cd7f32;
+  text-shadow: 0 0 15px rgba(205, 127, 50, 0.4);
+}
+
+/* Position change indicators */
+.position-change {
+  font-size: var(--text-body-s);
+  font-weight: 700;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.position-change.gained {
+  opacity: 1;
+  color: var(--success);
+  animation: positionGained 1.5s ease-out forwards;
+}
+
+.position-change.lost {
+  opacity: 1;
+  color: var(--danger);
+  animation: positionLost 1.5s ease-out forwards;
+}
+
+@keyframes positionGained {
+  0% { 
+    opacity: 0; 
+    transform: translateY(-10px) scale(0.8); 
+  }
+  20% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1.1); 
+  }
+  80% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-5px) scale(0.9); 
+  }
+}
+
+@keyframes positionLost {
+  0% { 
+    opacity: 0; 
+    transform: translateY(10px) scale(0.8); 
+  }
+  20% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1.1); 
+  }
+  80% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(5px) scale(0.9); 
+  }
+}
+
+.racers-count {
+  font-size: var(--text-caption);
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Lap counter section */
+.lap-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.lap-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-family: var(--font-display);
+}
+
+.lap-current {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+
+.lap-separator {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+.lap-total {
+  font-size: 18px;
+  color: var(--text-tertiary);
+}
+
+.lap-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-ultra-wide);
+}
+
+/* Lap progress bar */
+.lap-progress-container {
+  width: 100%;
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.lap-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-secondary), var(--accent-tertiary));
+  border-radius: var(--radius-pill);
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+/* ==================== RACE TIMER PANEL ==================== */
+.hud-timer-panel {
+  top: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  min-width: 140px;
+}
+
+.timer-display {
+  font-family: var(--font-mono);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.timer-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-ultra-wide);
+  margin-top: var(--space-xs);
+}
+
+/* ==================== ITEM BOX PANEL ==================== */
+.hud-item-panel {
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  min-width: 100px;
+}
+
+.item-box {
+  width: 72px;
+  height: 72px;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-m);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(0, 229, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.item-box.has-item {
+  border-color: var(--accent-secondary);
+  box-shadow: 
+    0 0 20px rgba(0, 229, 255, 0.3),
+    inset 0 0 20px rgba(0, 229, 255, 0.1);
+  animation: itemReadyPulse 1.5s ease-in-out infinite;
+}
+
+.item-box.has-item::before {
+  opacity: 1;
+}
+
+@keyframes itemReadyPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); }
+}
+
+.item-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--text-tertiary);
+  transition: all 0.3s ease;
+}
+
+.item-box.has-item .item-icon {
+  color: var(--accent-secondary);
+  filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6));
+}
+
+.item-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.item-prompt {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.item-status {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* ==================== SHIELD / HEALTH STATUS PANEL ==================== */
+.hud-status-panel {
+  bottom: calc(var(--space-xl) + 180px);
+  right: var(--space-xl);
+  width: 160px;
+}
+
+.status-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.shield-bar-container,
+.health-bar-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-s);
+  align-items: center;
+}
+
+.status-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-wide);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.status-icon {
+  font-size: 11px;
+}
+
+.bar-track {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.shield-fill {
+  background: linear-gradient(90deg, var(--accent-secondary), #00b8d4);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+.health-fill {
+  background: linear-gradient(90deg, var(--success), #00e676);
+  box-shadow: 0 0 8px rgba(61, 220, 132, 0.4);
+}
+
+.bar-value {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+  min-width: 32px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Warning states for status bars */
+.hud-status-panel.warning-shield .shield-fill {
+  animation: statusWarning 0.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 12px rgba(255, 177, 61, 0.6);
+}
+
+.hud-status-panel.danger-shield .shield-fill {
+  animation: statusDanger 0.3s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, var(--danger), #ff1744);
+  box-shadow: 0 0 15px rgba(255, 61, 90, 0.7);
+}
+
+.hud-status-panel.warning-health .health-fill {
+  animation: statusWarning 0.5s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, var(--warning), #ffa000);
+  box-shadow: 0 0 12px rgba(255, 177, 61, 0.6);
+}
+
+.hud-status-panel.danger-health .health-fill {
+  animation: statusDanger 0.3s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, var(--danger), #ff1744);
+  box-shadow: 0 0 15px rgba(255, 61, 90, 0.7);
+}
+
+@keyframes statusWarning {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+@keyframes statusDanger {
+  from { opacity: 1; transform: scaleX(1); }
+  to { opacity: 0.7; transform: scaleX(0.98); }
+}
+
+/* Panel flash on danger */
+.hud-status-panel.warning-shield,
+.hud-status-panel.danger-shield,
+.hud-status-panel.warning-health,
+.hud-status-panel.danger-health {
+  animation: panelFlash 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes panelFlash {
+  from { border-color: var(--border-subtle); }
+  to { border-color: var(--danger); }
+}
+
+/* ==================== COUNTDOWN OVERLAY ==================== */
+.hud-countdown {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: calc(var(--z-hud) + 10);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.hud-countdown.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.countdown-number {
+  font-family: var(--font-display);
+  font-size: clamp(120px, 25vw, 200px);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 
+    0 0 40px rgba(255, 77, 46, 0.6),
+    0 0 80px rgba(255, 77, 46, 0.3),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: countdownPulse 1s ease-out;
+  transform: scale(0.5);
+  opacity: 0;
+}
+
+.hud-countdown.active .countdown-number {
+  animation: countdownPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.countdown-number.go {
+  color: var(--success);
+  text-shadow: 
+    0 0 40px rgba(61, 220, 132, 0.6),
+    0 0 80px rgba(61, 220, 132, 0.3);
+  animation: goFlash 0.6s ease-out;
+}
+
+@keyframes countdownPopIn {
+  from {
+    transform: scale(2);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes goFlash {
+  0% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes countdownPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ==================== NOTIFICATIONS AREA ==================== */
+.hud-notifications {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  pointer-events: none;
+  z-index: calc(var(--z-hud) + 5);
+  max-width: 320px;
+}
+
+.hud-notification {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-m) var(--space-l);
+  background: rgba(10, 12, 20, 0.95);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-m);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.hud-notification.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.hud-notification.info {
+  border-left: 3px solid var(--accent-secondary);
+}
+
+.hud-notification.success {
+  border-left: 3px solid var(--success);
+}
+
+.hud-notification.warning {
+  border-left: 3px solid var(--warning);
+}
+
+.hud-notification.danger {
+  border-left: 3px solid var(--danger);
+}
+
+.notif-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.notif-message {
+  font-size: var(--text-body-s);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ==================== LAP TIMES DISPLAY ==================== */
+.hud-lap-times {
+  position: absolute;
+  top: var(--space-xl);
+  right: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-m);
+  background: rgba(10, 12, 20, 0.85);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-m);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.lap-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-m);
+}
+
+.lap-time-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-wide);
+}
+
+.lap-time-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-body-s);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.lap-time-value.best {
+  color: var(--accent-tertiary);
+  text-shadow: 0 0 8px rgba(255, 210, 63, 0.4);
+}
+
+/* ==================== MINIMAP CONTAINER ==================== */
+.hud-minimap-container {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Minimap styles handled by minimap.css */
+}
+
+/* ==================== COMPACT (MOBILE) MODE ==================== */
+.game-hud.compact .hud-speed-panel {
+  bottom: var(--space-m);
+  left: var(--space-m);
+  min-width: auto;
+  padding: var(--space-s) var(--space-m);
+}
+
+.game-hud.compact .speed-value {
+  font-size: 28px;
+}
+
+.game-hud.compact .gear-indicator {
+  display: none;
+}
+
+.game-hud.compact .hud-position-panel {
+  top: var(--space-m);
+  left: var(--space-m);
+  padding: var(--space-s) var(--space-m);
+}
+
+.game-hud.compact .position-number {
+  font-size: 32px;
+}
+
+.game-hud.compact .lap-container {
+  display: none;
+}
+
+.game-hud.compact .hud-timer-panel {
+  top: var(--space-m);
+  min-width: auto;
+  padding: var(--space-s) var(--space-m);
+}
+
+.game-hud.compact .timer-display {
+  font-size: 16px;
+}
+
+.game-hud.compact .hud-item-panel {
+  bottom: var(--space-m);
+  right: var(--space-m);
+  padding: var(--space-s);
+}
+
+.game-hud.compact .item-box {
+  width: 56px;
+  height: 56px;
+}
+
+.game-hud.compact .hud-status-panel {
+  display: none; /* Hide on mobile to save space */
+}
+
+.game-hud.compact .hud-lap-times {
+  display: none; /* Hide on mobile */
+}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .speed-value.critical,
+  .gear-indicator.gear-6 .gear-value,
+  .item-box.has-item,
+  .shield-fill,
+  .health-fill {
+    animation: none !important;
+  }
+  
+  .hud-notification,
+  .position-change,
+  .countdown-number {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+}
+
+/* ==================== RESPONSIVE BREAKPOINTS ==================== */
+
+/* Tablet portrait and below */
+@media (max-width: 768px) {
+  .game-hud:not(.compact) {
+    /* Auto-enable compact mode on small screens */
+  }
+  
+  .hud-status-panel {
+    bottom: calc(var(--space-xl) + 150px);
+    right: var(--space-m);
+    width: 140px;
+  }
+  
+  .hud-lap-times {
+    top: auto;
+    bottom: calc(var(--space-xl) + 85px);
+    right: var(--space-m);
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .game-hud {
+    transform: scale(0.95);
+    transform-origin: bottom left;
+  }
+  
+  .hud-timer-panel {
+    display: none;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hud-position-panel {
+    top: var(--space-s);
+    padding: var(--space-s) var(--space-m);
+  }
+  
+  .position-number {
+    font-size: 28px;
+  }
+  
+  .hud-speed-panel {
+    bottom: var(--space-s);
+    padding: var(--space-s) var(--space-m);
+  }
+  
+  .speed-value {
+    font-size: 28px;
+  }
+  
+  .hud-lap-times {
+    display: none;
+  }
+}
+
+/* High DPI / Retina optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hud-panel {
+    border-width: 0.5px;
+  }
+  
+  .bar-track {
+    height: 4px;
+  }
+}

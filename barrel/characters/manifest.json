@@ -1,0 +1,54 @@
+{
+  "$schema": "../../config/schemas/character.schema.json",
+  "category": "characters",
+  "entries": [
+    {
+      "id": "ace",
+      "displayName": "Ace Rourke",
+      "archetype": "racer",
+      "signatureAbility": {
+        "id": "perfect-start",
+        "displayName": "Perfect Start",
+        "cooldownMs": 0,
+        "durationMs": 1500,
+        "description": "Hit throttle within 0.2s of green light for a 1.5x launch boost."
+      },
+      "stats": { "aggression": 5, "focus": 8, "luck": 5 },
+      "unlock": { "type": "default" },
+      "cosmetic": { "color": "#ff4d2e" },
+      "module": "./character.ace.js"
+    },
+    {
+      "id": "nova",
+      "displayName": "Nova Kade",
+      "archetype": "trickster",
+      "signatureAbility": {
+        "id": "drift-master",
+        "displayName": "Drift Master",
+        "cooldownMs": 8000,
+        "durationMs": 4000,
+        "description": "Next drift fills mini-turbo at 2x rate."
+      },
+      "stats": { "aggression": 4, "focus": 6, "luck": 8 },
+      "unlock": { "type": "default" },
+      "cosmetic": { "color": "#00e5ff" },
+      "module": "./character.nova.js"
+    },
+    {
+      "id": "brick",
+      "displayName": "Brick Stone",
+      "archetype": "bruiser",
+      "signatureAbility": {
+        "id": "ram-charge",
+        "displayName": "Ram Charge",
+        "cooldownMs": 12000,
+        "durationMs": 2000,
+        "description": "Mass x2 for 2s; collisions deal knockback."
+      },
+      "stats": { "aggression": 9, "focus": 4, "luck": 4 },
+      "unlock": { "type": "level", "value": 10 },
+      "cosmetic": { "color": "#ffd23f" },
+      "module": "./character.brick.js"
+    }
+  ]
+}

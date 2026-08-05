@@ -1,0 +1,917 @@
+/* ui/styles/racing.css — Racing-specific visual styles
+ * 
+ * Premium UI/UX Enhancement Package (Cycle 6)
+ * Provides comprehensive racing-themed UI components including:
+ * - Speed lines effects
+ * - Position indicators (1st through last)
+ * - Lap display styles
+ * - Countdown timer
+ * - Race status badges
+ * - Track progress bars (linear & circular)
+ */
+
+/* ============================================
+   SPEED LINES EFFECT - Motion blur simulation
+   ============================================ */
+
+.speed-lines-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--duration-base);
+}
+
+.speed-lines-bg.active {
+  opacity: 1;
+}
+
+.speed-lines-bg::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 40px,
+    rgba(255, 255, 255, 0.03) 41px,
+    transparent 42px,
+    transparent 80px,
+    rgba(255, 77, 46, 0.02) 81px,
+    transparent 82px,
+    transparent 120px,
+    rgba(0, 229, 255, 0.02) 121px,
+    transparent 122px
+  );
+  animation: speedLinesMove 0.4s linear infinite;
+}
+
+@keyframes speedLinesMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(160px); }
+}
+
+.speed-lines-subtle {
+  position: relative;
+  overflow: hidden;
+}
+
+.speed-lines-subtle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transition: transform var(--duration-slow) ease-out;
+}
+
+.speed-lines-subtle.active::after {
+  transform: translateX(200%);
+  transition: transform 0.3s linear infinite;
+}
+
+/* Speed intensity levels */
+.speed-intensity-low { --speed-opacity: 0.3; }
+.speed-intensity-medium { --speed-opacity: 0.55; }
+.speed-intensity-high { --speed-opacity: 0.8; }
+.speed-intensity-max { --speed-opacity: 1; }
+
+
+/* ============================================
+   POSITION INDICATORS - Race placement
+   ============================================ */
+
+.pos-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: var(--text-heading-l);
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-m);
+  min-width: 60px;
+  text-align: center;
+  position: relative;
+}
+
+.pos-1st {
+  background: linear-gradient(135deg, rgba(255, 210, 63, 0.2), rgba(255, 140, 0, 0.15));
+  color: #ffd23f;
+  border: 2px solid rgba(255, 210, 63, 0.5);
+  box-shadow:
+    0 0 24px -4px rgba(255, 210, 63, 0.4),
+    inset 0 0 16px rgba(255, 210, 63, 0.08);
+  text-shadow: 0 0 12px rgba(255, 210, 63, 0.5);
+}
+
+/* Crown icon for 1st place */
+.pos-1st::before {
+  content: '👑';
+  font-size: 14px;
+  margin-right: 4px;
+  animation: crownBounce 2s ease-in-out infinite;
+}
+
+@keyframes crownBounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-3px) rotate(5deg); }
+}
+
+.pos-2nd {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.18), rgba(169, 169, 169, 0.12));
+  color: #c0c0c0;
+  border: 2px solid rgba(192, 192, 192, 0.45);
+  box-shadow: 
+    0 0 20px -4px rgba(192, 192, 192, 0.25),
+    inset 0 0 12px rgba(192, 192, 192, 0.06);
+  text-shadow: 0 0 10px rgba(192, 192, 192, 0.35);
+}
+
+.pos-3rd {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.18), rgba(184, 115, 51, 0.12));
+  color: #cd7f32;
+  border: 2px solid rgba(205, 127, 50, 0.45);
+  box-shadow: 
+    0 0 20px -4px rgba(205, 127, 50, 0.25),
+    inset 0 0 12px rgba(205, 127, 50, 0.06);
+  text-shadow: 0 0 10px rgba(205, 127, 50, 0.35);
+}
+
+/* Generic positions for 4th through 8th */
+.pos-4th, .pos-5th, .pos-6th, .pos-7th, .pos-8th {
+  background: var(--surface-glass);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  font-size: var(--text-heading-m);
+}
+
+.pos-last {
+  background: rgba(255, 61, 90, 0.08);
+  color: var(--danger);
+  border: 1px dashed rgba(255, 61, 90, 0.3);
+  font-size: var(--text-heading-m);
+}
+
+/* Position change indicators */
+.pos-gained::after {
+  content: '↑';
+  color: var(--success);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.pos-lost::after {
+  content: '↓';
+  color: var(--danger);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+
+/* ============================================
+   LAP DISPLAY STYLES - Current/Complete/Final
+   ============================================ */
+
+.lap-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--surface-glass);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+.lap-number {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-l);
+  font-weight: 700;
+  color: var(--accent-primary);
+  min-width: 28px;
+  text-align: center;
+}
+
+.lap-current .lap-number {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: lapCurrentPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes lapCurrentPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 77, 46, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255, 77, 46, 0.7)); }
+}
+
+.lap-current {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 16px -4px rgba(255, 77, 46, 0.3);
+}
+
+.lap-complete {
+  opacity: 0.65;
+}
+
+.lap-complete .lap-number {
+  color: var(--success);
+}
+
+.lap-complete::after {
+  content: '✓';
+  color: var(--success);
+  font-size: 14px;
+  margin-left: auto;
+}
+
+.lap-final .lap-number {
+  color: var(--accent-tertiary);
+  animation: lapFinalPulse 0.8s ease-in-out infinite;
+}
+
+.lap-final {
+  border-color: var(--accent-tertiary);
+  box-shadow: 0 0 20px -4px rgba(255, 210, 63, 0.4);
+}
+
+@keyframes lapFinalPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.lap-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--border-subtle);
+}
+
+.lap-total {
+  font-family: var(--font-body);
+  font-size: var(--text-body-s);
+  color: var(--text-tertiary);
+}
+
+/* Lap counter compact variant */
+.lap-counter-mini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lap-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border-subtle);
+  transition: all var(--duration-fast);
+}
+
+.lap-dot.done {
+  background: var(--success);
+  border-color: var(--success);
+  box-shadow: 0 0 6px rgba(61, 220, 132, 0.5);
+}
+
+.lap-dot.current {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(255, 77, 46, 0.6);
+  animation: lapDotCurrent 1s ease-in-out infinite;
+}
+
+@keyframes lapDotCurrent {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+
+/* ============================================
+   COUNTDOWN TIMER - Race start sequence
+   ============================================ */
+
+.countdown-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(5, 6, 10, 0.85) 0%, transparent 70%);
+}
+
+.countdown-number {
+  font-family: var(--font-display);
+  font-size: clamp(120px, 25vw, 280px);
+  line-height: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation-duration: 0.95s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.countdown-3 {
+  color: #ff4d2e;
+  text-shadow: 
+    0 0 60px rgba(255, 77, 46, 0.8),
+    0 0 120px rgba(255, 77, 46, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  animation-name: countdown3;
+}
+
+@keyframes countdown3 {
+  0% { 
+    opacity: 0; 
+    transform: scale(2.5) rotate(-10deg); 
+    filter: blur(20px);
+  }
+  30% { 
+    opacity: 1; 
+    transform: scale(0.95) rotate(2deg); 
+    filter: blur(0);
+  }
+  70% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0.5) rotate(5deg); 
+    filter: blur(8px);
+  }
+}
+
+.countdown-2 {
+  color: #ffd23f;
+  text-shadow: 
+    0 0 60px rgba(255, 210, 63, 0.8),
+    0 0 120px rgba(255, 210, 63, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  animation-name: countdown2;
+}
+
+@keyframes countdown2 {
+  0% { 
+    opacity: 0; 
+    transform: scale(2.5) rotate(10deg); 
+    filter: blur(20px);
+  }
+  30% { 
+    opacity: 1; 
+    transform: scale(0.95) rotate(-2deg); 
+    filter: blur(0);
+  }
+  70% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0.5) rotate(-5deg); 
+    filter: blur(8px);
+  }
+}
+
+.countdown-1 {
+  color: #00e5ff;
+  text-shadow: 
+    0 0 60px rgba(0, 229, 255, 0.8),
+    0 0 120px rgba(0, 229, 255, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  animation-name: countdown1;
+}
+
+@keyframes countdown1 {
+  0% { 
+    opacity: 0; 
+    transform: scale(2.5) rotate(-5deg); 
+    filter: blur(20px);
+  }
+  30% { 
+    opacity: 1; 
+    transform: scale(0.95) rotate(2deg); 
+    filter: blur(0);
+  }
+  70% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0.5); rotate(5deg); 
+    filter: blur(8px);
+  }
+}
+
+.countdown-go {
+  font-size: clamp(100px, 22vw, 240px);
+  background: linear-gradient(
+    180deg,
+    #00ffa8 0%,
+    #00e5ff 40%,
+    #00c4e8 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  animation-name: countdownGo;
+  letter-spacing: 0.1em;
+}
+
+.countdown-go::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 168, 0.3) 0%,
+    transparent 60%
+  );
+  animation: goBurst 0.6s ease-out forwards;
+  z-index: -1;
+}
+
+@keyframes countdownGo {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3); 
+    filter: blur(30px);
+  }
+  40% { 
+    opacity: 1; 
+    transform: scale(1.2); 
+    filter: blur(0);
+  }
+  60% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(-20px);
+  }
+}
+
+@keyframes goBurst {
+  0% { 
+    transform: scale(0); 
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1.5); 
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(2); 
+    opacity: 0;
+  }
+}
+
+/* Ring effect for GO! */
+.countdown-go::after {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  border: 4px solid rgba(0, 255, 168, 0.4);
+  border-radius: 50%;
+  animation: goRingExpand 0.5s ease-out forwards;
+}
+
+@keyframes goRingExpand {
+  0% { 
+    transform: scale(0.5); 
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1.5); 
+    opacity: 0;
+  }
+}
+
+
+/* ============================================
+   RACE STATUS BADGES - Game state indicators
+   ============================================ */
+
+.race-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-body-s);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.race-status-starting {
+  background: rgba(255, 177, 61, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(255, 177, 61, 0.3);
+  animation: statusPulseYellow 1.5s ease-in-out infinite;
+}
+
+@keyframes statusPulseYellow {
+  0%, 100% { 
+    box-shadow: 0 0 12px rgba(255, 177, 61, 0.15); 
+  }
+  50% { 
+    box-shadow: 0 0 24px rgba(255, 177, 61, 0.35); 
+  }
+}
+
+.race-status-racing {
+  background: rgba(61, 220, 132, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(61, 220, 132, 0.25);
+  box-shadow: 0 0 20px -4px rgba(61, 220, 132, 0.3);
+  animation: statusGlowGreen 2s ease-in-out infinite;
+}
+
+@keyframes statusGlowGreen {
+  0%, 100% { 
+    box-shadow: 0 0 16px -4px rgba(61, 220, 132, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 0 28px -4px rgba(61, 220, 132, 0.45); 
+  }
+}
+
+.race-status-finished {
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-secondary);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  box-shadow: 0 0 16px -4px rgba(0, 229, 255, 0.15);
+}
+
+.race-status-paused {
+  background: rgba(255, 140, 0, 0.12);
+  color: #ff8c00;
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  animation: statusBlinkOrange 1s steps(2, end) infinite;
+}
+
+@keyframes statusBlinkOrange {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Status indicator dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.race-status-starting .status-dot {
+  animation: dotBlink 0.8s ease-in-out infinite alternate;
+}
+
+.race-status-paused .status-dot {
+  animation: dotBlink 0.5s step-end infinite;
+}
+
+@keyframes dotBlink {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.race-status-racing .status-dot {
+  animation: dotPulse 1s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  50% { 
+    transform: scale(1.3); 
+    box-shadow: 0 0 8px 2px currentColor;
+  }
+}
+
+
+/* ============================================
+   TRACK PROGRESS BAR - Linear & Circular
+   ============================================ */
+
+.track-progress-linear {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-pill);
+  overflow: visible;
+  border: 1px solid var(--border-subtle);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.track-progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary) 0%,
+    #ff8c00 50%,
+    var(--accent-tertiary) 100%
+  );
+  border-radius: inherit;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 
+    0 0 12px rgba(255, 77, 46, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+/* Progress marker (current player position) */
+.track-progress-fill::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  border: 3px solid var(--accent-secondary);
+  box-shadow: 
+    0 0 12px rgba(0, 229, 255, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Checkpoint markers */
+.track-checkpoints {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+.checkpoint-marker {
+  width: 4px;
+  height: 16px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  position: relative;
+  transition: all var(--duration-fast);
+}
+
+.checkpoint-marker.passed {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(61, 220, 132, 0.5);
+}
+
+.checkpoint-marker.current {
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px rgba(255, 77, 46, 0.7);
+  height: 20px;
+  width: 6px;
+}
+
+/* Checkpoint tooltip */
+.checkpoint-marker[data-label]::before {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+/* Circular track progress / Lap indicator */
+.track-progress-circular {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.track-progress-circular svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.progress-circ-track {
+  fill: none;
+  stroke: var(--bg-tertiary);
+  stroke-width: 8;
+}
+
+.progress-circ-fill {
+  fill: none;
+  stroke: url(#trackProgressGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 0 6px rgba(255, 77, 46, 0.5));
+}
+
+.progress-circ-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+}
+
+.progress-circ-percent {
+  font-size: var(--text-heading-l);
+  font-weight: 700;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.progress-circ-label {
+  font-size: var(--text-caption);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Mini circular progress for HUD */
+.track-progress-circular.mini {
+  width: 48px;
+  height: 48px;
+}
+
+.track-progress-circular.mini .progress-circ-track {
+  stroke-width: 4;
+}
+
+.track-progress-circular.mini .progress-circ-fill {
+  stroke-width: 4;
+  stroke-dasharray: 138;
+  stroke-dashoffset: 138;
+}
+
+.track-progress-circular.mini .progress-circ-percent {
+  font-size: var(--text-heading-s);
+}
+
+.track-progress-circular.mini .progress-circ-label {
+  display: none;
+}
+
+
+/* ============================================
+   RACING UTILITY CLASSES
+   ============================================ */
+
+/* Split time display */
+.split-time {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono);
+}
+
+.split-time-value {
+  font-size: var(--text-body);
+  color: var(--text-primary);
+}
+
+.split-time-delta {
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+.split-time-delta.negative {
+  color: var(--success);
+}
+
+.split-time-delta.positive {
+  color: var(--danger);
+}
+
+/* Best time highlight */
+.best-time {
+  color: var(--accent-tertiary);
+  text-shadow: 0 0 10px rgba(255, 210, 63, 0.4);
+}
+
+/* New record badge */
+.new-record {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, rgba(255, 210, 63, 0.2), rgba(255, 77, 46, 0.15));
+  border: 1px solid rgba(255, 210, 63, 0.4);
+  border-radius: var(--radius-pill);
+  color: var(--accent-tertiary);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  animation: newRecordPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes newRecordPulse {
+  0%, 100% { 
+    box-shadow: 0 0 12px rgba(255, 210, 63, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 0 24px rgba(255, 210, 63, 0.4); 
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .countdown-number {
+    font-size: clamp(80px, 30vw, 180px);
+  }
+  
+  .countdown-go {
+    font-size: clamp(64px, 26vw, 150px);
+  }
+  
+  .pos-indicator {
+    font-size: var(--text-heading-m);
+    padding: 6px 12px;
+    min-width: 48px;
+  }
+  
+  .track-progress-linear {
+    height: 8px;
+  }
+  
+  .track-progress-circular {
+    width: 72px;
+    height: 72px;
+  }
+  
+  .race-status-badge {
+    padding: 6px 12px;
+    font-size: var(--text-caption);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .speed-lines-bg::before,
+  .speed-lines-subtle::after {
+    animation: none !important;
+  }
+  
+  .countdown-number,
+  .countdown-go,
+  .countdown-go::before,
+  .countdown-go::after {
+    animation: reducedCountdown 0.3s ease forwards !important;
+  }
+  
+  @keyframes reducedCountdown {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .pos-1st::before,
+  .lap-current .lap-number,
+  .lap-final .lap-number,
+  .lap-dot.current,
+  .new-record,
+  .race-status-starting,
+  .race-status-racing,
+  .status-dot {
+    animation: none !important;
+  }
+  
+  .race-status-paused {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

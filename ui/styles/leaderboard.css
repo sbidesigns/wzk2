@@ -1,0 +1,874 @@
+/* ui/styles/leaderboard.css — Leaderboard & Statistics Styling for Warzone Kart: Neon Underground
+ * Features: Table layout, medal icons, player highlight, stats grid, responsive design, empty states
+ */
+
+/* ==================== DESIGN TOKENS ==================== */
+:root {
+  --lb-gold: #ffd700;
+  --lb-silver: #c0c0c0;
+  --lb-bronze: #cd7f32;
+  --lb-player-glow: rgba(0, 229, 255, 0.15);
+  --lb-row-hover: rgba(255, 255, 255, 0.04);
+  --lb-border: rgba(255, 255, 255, 0.08);
+  --lb-header-bg: rgba(0, 0, 0, 0.3);
+
+  /* Trend colors */
+  --trend-up: #3ddc84;
+  --trend-down: #ff3d5a;
+  --trend-neutral: #8a8a8a;
+
+  /* Animation */
+  --row-appear-duration: 0.4s;
+}
+
+/* ==================== MAIN CONTAINER ==================== */
+.lb-container {
+  background: linear-gradient(
+    180deg,
+    rgba(12, 14, 24, 0.98) 0%,
+    rgba(18, 21, 35, 0.97) 100%
+  );
+  border-radius: var(--radius-xl, 20px);
+  border: 1px solid var(--lb-border);
+  overflow: hidden;
+  font-family: var(--font-body, system-ui);
+  color: var(--text-primary, #f5f6fa);
+}
+
+.lb-animate-in {
+  animation: lbFadeIn var(--duration-base, 0.32s) ease-out both;
+}
+
+@keyframes lbFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== HEADER ==================== */
+.lb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-m, 16px);
+  padding: var(--space-l, 24px) var(--space-l, 24px) var(--space-m, 16px);
+  border-bottom: 1px solid var(--lb-border);
+}
+
+.lb-title {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-l, 28px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================== CONTROLS BAR ==================== */
+.lb-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  flex-wrap: wrap;
+}
+
+.lb-filters {
+  display: flex;
+  gap: var(--space-xs, 4px);
+}
+
+.lb-select {
+  padding: 8px 32px 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--lb-border);
+  border-radius: var(--radius-m, 8px);
+  color: var(--text-primary);
+  font-size: var(--text-body-s, 13px);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: all 0.2s ease;
+}
+
+.lb-select:focus {
+  outline: none;
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+}
+
+.lb-select:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.lb-actions {
+  display: flex;
+  gap: var(--space-xs, 4px);
+}
+
+.lb-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--lb-border);
+  border-radius: var(--radius-m, 8px);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lb-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+  transform: scale(1.05);
+}
+
+/* ==================== TABLE WRAPPER (with scroll) ==================== */
+.lb-table-wrapper {
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.lb-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.lb-table-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lb-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-pill, 999px);
+}
+
+.lb-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* ==================== TABLE ==================== */
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.lb-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lb-table th {
+  background: var(--lb-header-bg);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: var(--text-caption, 11px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--lb-border);
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+  transition: color 0.2s ease;
+}
+
+.lb-table th[data-sort]:hover {
+  color: var(--accent-secondary);
+}
+
+.lb-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+  font-size: var(--text-body, 15px);
+}
+
+/* Column widths */
+.lb-col-rank { width: 70px; }
+.lb-col-player { width: auto; }
+.lb-col-vehicle { width: 60px; text-align: center; }
+.lb-col-time { width: 120px; font-family: var(--font-mono, monospace); }
+.lb-col-laps { width: 60px; text-align: center; }
+.lb-col-date { width: 90px; }
+
+/* ==================== TABLE ROWS ==================== */
+.lb-row {
+  transition: all 0.25s ease;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: lbRowAppear var(--row-appear-duration) ease-out forwards;
+  animation-delay: var(--row-delay, 0ms);
+}
+
+@keyframes lbRowAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.lb-row:hover {
+  background: var(--lb-row-hover);
+}
+
+/* Medal rows - special styling */
+.lb-row.lb-medal-1 {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.08) 0%,
+    transparent 30%
+  );
+}
+
+.lb-row.lb-medal-1:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.12) 0%,
+    rgba(255, 215, 0, 0.04) 30%
+  );
+}
+
+.lb-row.lb-medal-2 {
+  background: linear-gradient(
+    90deg,
+    rgba(192, 192, 192, 0.06) 0%,
+    transparent 30%
+  );
+}
+
+.lb-row.lb-medal-3 {
+  background: linear-gradient(
+    90deg,
+    rgba(205, 127, 50, 0.06) 0%,
+    transparent 30%
+  );
+}
+
+/* Player row highlight with glow */
+.lb-row.lb-row-player {
+  background: linear-gradient(
+    90deg,
+    var(--lb-player-glow) 0%,
+    transparent 40%
+  );
+  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.03);
+}
+
+.lb-row.lb-row-player:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 229, 255, 0.12) 0%,
+    rgba(0, 229, 255, 0.03) 40%
+  );
+  box-shadow: inset 0 0 25px rgba(0, 229, 255, 0.06);
+}
+
+/* ==================== CELLS ==================== */
+.lb-cell-rank {
+  font-family: var(--font-display, system-ui);
+  font-weight: 800;
+  font-size: 18px;
+  text-align: center;
+}
+
+.lb-rank-num {
+  color: var(--text-secondary);
+}
+
+/* Medal icons in rank column */
+.lb-medal-1 .lb-cell-rank {
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.4));
+}
+
+.lb-medal-2 .lb-cell-rank {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(192, 192, 192, 0.3));
+}
+
+.lb-medal-3 .lb-cell-rank {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(205, 127, 50, 0.3));
+}
+
+.lb-cell-player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+}
+
+.lb-player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lb-row.lb-row-player .lb-player-name {
+  color: var(--accent-secondary);
+}
+
+.lb-player-flag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: var(--radius-pill, 999px);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.lb-cell-vehicle {
+  text-align: center;
+}
+
+.lb-vehicle-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.2s ease;
+}
+
+.lb-vehicle-icon:hover {
+  transform: scale(1.2) rotate(-5deg);
+}
+
+.lb-cell-time {
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.lb-medal-1 .lb-cell-time {
+  color: var(--lb-gold);
+}
+
+.lb-medal-2 .lb-cell-time {
+  color: var(--lb-silver);
+}
+
+.lb-medal-3 .lb-cell-time {
+  color: var(--lb-bronze);
+}
+
+.lb-cell-laps {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: var(--text-body-s, 13px);
+}
+
+.lb-cell-date {
+  color: var(--text-tertiary);
+  font-size: var(--text-body-s, 12px);
+}
+
+/* ==================== EMPTY STATE ==================== */
+.lb-empty-state-cell {
+  padding: 48px 24px !important;
+}
+
+.lb-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s, 8px);
+  padding: var(--space-xl, 40px);
+  text-align: center;
+}
+
+.lb-empty-icon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: var(--space-s, 8px);
+  opacity: 0.7;
+  animation: lbEmptyFloat 3s ease-in-out infinite;
+}
+
+@keyframes lbEmptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.lb-empty-state p {
+  margin: 0;
+  font-size: var(--text-heading-s, 18px);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.lb-empty-hint {
+  font-size: var(--text-body-s, 13px) !important;
+  color: var(--text-tertiary) !important;
+  font-weight: 400 !important;
+}
+
+.lb-empty-personal {
+  min-height: 300px;
+}
+
+/* ==================== FOOTER ==================== */
+.lb-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-m, 16px) var(--space-l, 24px);
+  border-top: 1px solid var(--lb-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.lb-entry-count {
+  font-size: var(--text-body-s, 13px);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono, monospace);
+}
+
+/* ==================== STATS SUMMARY GRID ==================== */
+.lb-stats-container {
+  padding: var(--space-xl, 24px);
+}
+
+.lb-stats-title {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-l, 24px);
+  font-weight: 800;
+  margin: 0 0 var(--space-l, 24px);
+  color: var(--text-primary);
+}
+
+.lb-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-m, 16px);
+}
+
+@media (min-width: 640px) {
+  .lb-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .lb-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.lb-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m, 16px);
+  padding: var(--space-m, 16px);
+  background: linear-gradient(
+    145deg,
+    rgba(20, 23, 38, 0.95) 0%,
+    rgba(15, 17, 28, 0.98) 100%
+  );
+  border: 1px solid var(--lb-border);
+  border-radius: var(--radius-l, 16px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--stat-color, var(--accent-primary));
+  opacity: 0.8;
+}
+
+.lb-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.lb-stat-card:hover::before {
+  opacity: 1;
+  width: 4px;
+}
+
+.lb-stat-icon {
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-m, 12px);
+  flex-shrink: 0;
+}
+
+.lb-stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.lb-stat-value {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-s, 20px);
+  font-weight: 800;
+  color: var(--stat-color, var(--text-primary));
+  line-height: 1.2;
+}
+
+.lb-stat-sub {
+  font-size: var(--text-body-s, 12px);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.lb-stat-label {
+  font-size: var(--text-caption, 11px);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* ==================== PERSONAL BESTS LIST ==================== */
+.lb-personal-container {
+  padding: var(--space-xl, 24px);
+}
+
+.lb-personal-title {
+  font-family: var(--font-display, system-ui);
+  font-size: var(--text-heading-l, 24px);
+  font-weight: 800;
+  margin: 0 0 var(--space-l, 24px);
+  color: var(--text-primary);
+}
+
+.lb-personal-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s, 8px);
+}
+
+.lb-personal-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: var(--space-m, 16px);
+  align-items: center;
+  padding: var(--space-m, 16px);
+  background: linear-gradient(
+    145deg,
+    rgba(20, 23, 38, 0.95) 0%,
+    rgba(15, 17, 28, 0.98) 100%
+  );
+  border: 1px solid var(--lb-border);
+  border-radius: var(--radius-m, 12px);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateX(-15px);
+  animation: lbPersonalAppear 0.4s ease-out forwards;
+  animation-delay: calc(var(--item-index, 0) * 60ms);
+}
+
+@keyframes lbPersonalAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.lb-personal-item:hover {
+  border-color: var(--accent-secondary);
+  background: linear-gradient(
+    145deg,
+    rgba(25, 30, 50, 0.95) 0%,
+    rgba(18, 21, 35, 0.98) 100%
+  );
+  transform: translateX(4px);
+}
+
+.lb-personal-track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s, 8px);
+  font-weight: 600;
+}
+
+.lb-personal-track span:last-child {
+  color: var(--text-secondary);
+}
+
+.lb-personal-vehicle {
+  font-size: 20px;
+}
+
+.lb-personal-time {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-heading-s, 18px);
+  font-weight: 700;
+  color: var(--accent-secondary);
+}
+
+.lb-personal-date {
+  font-size: var(--text-body-s, 12px);
+  color: var(--text-tertiary);
+}
+
+/* ==================== LOADING SKELETON ==================== */
+.lb-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: lbSkeletonShimmer 1.5s infinite;
+  border-radius: var(--radius-s, 4px);
+}
+
+@keyframes lbSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.lb-skeleton-row {
+  height: 52px;
+  margin-bottom: 1px;
+}
+
+.lb-skeleton-text {
+  height: 16px;
+  width: 80%;
+  margin-bottom: 8px;
+}
+
+.lb-skeleton-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+/* ==================== TREND INDICATORS ==================== */
+.lb-trend-up {
+  color: var(--trend-up);
+}
+
+.lb-trend-down {
+  color: var(--trend-down);
+}
+
+.lb-trend-neutral {
+  color: var(--trend-neutral);
+}
+
+.lb-trend-arrow {
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .lb-container {
+    border-radius: var(--radius-l, 16px);
+  }
+
+  .lb-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-m, 16px);
+  }
+
+  .lb-title {
+    font-size: 22px;
+  }
+
+  .lb-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .lb-filters {
+    flex: 1;
+  }
+
+  .lb-select {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    padding-right: 28px;
+  }
+
+  /* Hide less important columns on mobile */
+  .lb-col-date,
+  .lb-col-laps {
+    display: none;
+  }
+
+  .lb-table td {
+    padding: 12px 10px;
+  }
+
+  .lb-player-name {
+    font-size: 14px;
+  }
+
+  .lb-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .lb-stat-card {
+    padding: 12px;
+  }
+
+  .lb-stat-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .lb-stat-value {
+    font-size: 18px;
+  }
+
+  .lb-personal-item {
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+  }
+
+  .lb-personal-date {
+    display: none;
+  }
+}
+
+/* Mobile small */
+@media (max-width: 480px) {
+  .lb-container {
+    border-radius: var(--radius-m, 12px);
+  }
+
+  .lb-title {
+    font-size: 20px;
+  }
+
+  .lb-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .lb-filters {
+    width: 100%;
+  }
+
+  .lb-select {
+    width: 50%;
+  }
+
+  .lb-actions {
+    justify-content: flex-end;
+  }
+
+  .lb-table-wrapper {
+    max-height: 350px;
+  }
+
+  .lb-vehicle-icon {
+    font-size: 18px;
+  }
+
+  .lb-cell-time {
+    font-size: 13px;
+  }
+
+  .lb-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .lb-personal-item {
+    padding: 12px;
+  }
+
+  .lb-personal-time {
+    font-size: 16px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .lb-container {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .lb-table-wrapper {
+    max-height: 250px;
+  }
+}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .lb-animate-in,
+  .lb-row,
+  .lb-personal-item,
+  .lb-skeleton {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .lb-card:hover,
+  .lb-stat-card:hover,
+  .lb-personal-item:hover {
+    transform: none !important;
+  }
+}
+
+/* ==================== HIGH CONTRAST ==================== */
+@media (prefers-contrast: high) {
+  .lb-table th {
+    border-bottom-width: 2px;
+  }
+
+  .lb-row {
+    border-bottom-width: 1px;
+  }
+
+  .lb-stat-card {
+    border-width: 2px;
+  }
+
+  .lb-card::before,
+  .lb-stat-card::before {
+    width: 4px !important;
+  }
+}

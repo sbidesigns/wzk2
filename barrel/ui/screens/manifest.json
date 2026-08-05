@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../config/schemas/screen.schema.json",
+  "category": "screens",
+  "entries": [
+    { "id": "splash",                "displayName": "Splash",            "category": "primary",   "music": "menu-theme", "module": "./screen.splash.js" },
+    { "id": "main-menu",             "displayName": "Main Menu",         "category": "primary",   "music": "menu-theme", "module": "./screen.main-menu.js" },
+    { "id": "mode-select",           "displayName": "Mode Select",       "category": "primary",   "music": "menu-theme", "module": "./screen.mode-select.js" },
+    { "id": "track-select",          "displayName": "Track Select",      "category": "primary",   "music": "menu-theme", "module": "./screen.track-select.js" },
+    { "id": "vehicle-select",        "displayName": "Vehicle Select",    "category": "primary",   "music": "menu-theme", "module": "./screen.vehicle-select.js" },
+    { "id": "character-select",      "displayName": "Character Select",  "category": "primary",   "music": "menu-theme", "module": "./screen.character-select.js" },
+    { "id": "lobby",                 "displayName": "Pre-Game Lobby",    "category": "primary",   "music": "menu-theme", "module": "./screen.lobby.js" },
+    { "id": "garage",                "displayName": "Garage",            "category": "primary",   "music": "menu-theme", "module": "./screen.garage.js" },
+    { "id": "store",                 "displayName": "Store / Battle Pass","category": "primary",  "music": "menu-theme", "module": "./screen.store.js" },
+    { "id": "career",                "displayName": "Career",            "category": "primary",   "music": "menu-theme", "module": "./screen.career.js" },
+    { "id": "settings.root",         "displayName": "Settings",          "category": "settings",  "music": "menu-theme", "module": "./screen.settings.root.js" },
+    { "id": "settings.audio",        "displayName": "Audio Settings",    "category": "settings",  "music": "menu-theme", "module": "./screen.settings.audio.js" },
+    { "id": "settings.video",        "displayName": "Video Settings",    "category": "settings",  "music": "menu-theme", "module": "./screen.settings.video.js" },
+    { "id": "settings.controls",     "displayName": "Controls Settings", "category": "settings",  "music": "menu-theme", "module": "./screen.settings.controls.js" },
+    { "id": "settings.gameplay",     "displayName": "Gameplay Settings", "category": "settings",  "music": "menu-theme", "module": "./screen.settings.gameplay.js" },
+    { "id": "settings.accessibility","displayName": "Accessibility",     "category": "settings",  "music": "menu-theme", "module": "./screen.settings.accessibility.js" },
+    { "id": "pause",                 "displayName": "Pause",             "category": "overlay",   "music": null,         "module": "./screen.pause.js" },
+    { "id": "results",               "displayName": "Results",           "category": "primary",   "music": "results-theme","module": "./screen.results.js" },
+    { "id": "cutscene",              "displayName": "Cutscene",          "category": "primary",   "music": null,         "module": "./screen.cutscene.js" }
+  ]
+}

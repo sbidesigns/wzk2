@@ -1,0 +1,2590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#05060a" />
+  <meta name="description" content="Warzone Kart: Neon Underground - A high-octane racing game with grappling hook mechanics" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>WARZONE KART — Neon Underground</title>
+
+  <!-- Preconnect to external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="cdn.jsdelivr.net" crossorigin />
+
+  <!-- Import Map for Three.js - LOCAL FIRST, CDN fallback -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three.module.js",
+      "three/": "./vendor/jsm/"
+    }
+  }
+  </script>
+
+  <!-- Preload vendor libs (pinned in vendor/vendor.manifest.json) -->
+  <!-- Order matters: howler, gsap, localforage first (UMD globals), then three.js loaded as ES module by main.js -->
+  <!-- cannon-es loaded as ES module via inline wrapper to create window.CANNON global -->
+  <script type="module">
+    import * as CANNON from 'https://cdn.skypack.dev/cannon-es@0.20.0';
+    window.CANNON = CANNON;
+    console.log('[Vendor] cannon-es loaded via Skypack');
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js" crossorigin="anonymous"></script>
+
+  <!-- Preload Three.js from local cache -->
+  <link rel="modulepreload" href="./vendor/three.module.js" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Styles (design tokens first, then animations, components, screens) -->
+  <link rel="stylesheet" href="./ui/styles/tokens.css" />
+  <link rel="stylesheet" href="./ui/styles/animations.css" />
+  <link rel="stylesheet" href="./ui/styles/transitions.css" />
+  <link rel="stylesheet" href="./ui/styles/racing.css" />
+  <link rel="stylesheet" href="./ui/styles/effects.css" />
+  <link rel="stylesheet" href="./ui/styles/components.css" />
+  <link rel="stylesheet" href="./ui/styles/screens.css" />
+  <link rel="stylesheet" href="./ui/styles/ambient.css" />
+  <link rel="stylesheet" href="./ui/styles/particles.css" />
+  <link rel="stylesheet" href="./ui/styles/typography.css" />
+  <link rel="stylesheet" href="./ui/styles/touch-controls.css" />
+  <link rel="stylesheet" href="./ui/styles/main-menu.css" />
+  <link rel="stylesheet" href="./ui/styles/mode-select.css" />
+  <link rel="stylesheet" href="./ui/styles/race-countdown.css" />
+  <link rel="stylesheet" href="./ui/styles/pause-menu.css" />
+  <link rel="stylesheet" href="./ui/styles/race-results.css" />
+  <link rel="stylesheet" href="./ui/styles/tutorial.css" />
+  <link rel="stylesheet" href="./ui/styles/notification-system.css" />
+  <link rel="stylesheet" href="./ui/styles/track-loading.css" />
+  <link rel="stylesheet" href="./ui/styles/race-environment.css" />
+  <link rel="stylesheet" href="./ui/styles/vehicle-controller.css" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Critical inline styles for enhanced boot screen -->
+  <style>
+    #boot-fallback {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #05060a 0%, #0a0c14 40%, #0d1020 70%, #12141f 100%);
+      color: #f5f6fa;
+      font-family: system-ui, -apple-system, sans-serif;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    /* Animated background grid */
+    #boot-fallback::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,77,46,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,77,46,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Noise texture overlay - cyberpunk grit */
+    #boot-fallback::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 5;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+      animation: noiseShift 8s steps(10) infinite;
+    }
+
+    @keyframes gridMove {
+      from { background-position: 0 0; }
+      to { background-position: 60px 60px; }
+    }
+
+    @keyframes noiseShift {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2%, -1%); }
+      20% { transform: translate(1%, 2%); }
+      30% { transform: translate(-1%, -2%); }
+      40% { transform: translate(2%, 1%); }
+      50% { transform: translate(-2%, 2%); }
+      60% { transform: translate(1%, -1%); }
+      70% { transform: translate(-1%, 1%); }
+      80% { transform: translate(2%, -2%); }
+      90% { transform: translate(-2%, -1%); }
+    }
+
+    /* Glow orbs - Enhanced dynamic animation */
+    .boot-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: floatOrb 12s ease-in-out infinite;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .boot-orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #ff4d2e 0%, #ff2200 50%, transparent 70%);
+      top: -200px; left: -150px;
+      animation-delay: 0s;
+      animation-name: floatOrb1;
+    }
+
+    .boot-orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #00e5ff 0%, #0088cc 50%, transparent 70%);
+      bottom: -150px; right: -120px;
+      animation-delay: -4s;
+      animation-name: floatOrb2;
+    }
+
+    .boot-orb-3 {
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, #ffd23f 0%, #ff8c00 50%, transparent 70%);
+      top: 40%; right: -80px;
+      animation-delay: -7s;
+      animation-name: floatOrb3;
+      opacity: 0.2;
+    }
+
+    @keyframes floatOrb1 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.3; }
+      20% { transform: translate(50px, 30px) scale(1.15) rotate(10deg); opacity: 0.45; }
+      40% { transform: translate(20px, -40px) scale(0.9) rotate(-5deg); opacity: 0.25; }
+      60% { transform: translate(-30px, 20px) scale(1.05) rotate(5deg); opacity: 0.4; }
+      80% { transform: translate(-20px, -30px) scale(0.95) rotate(-10deg); opacity: 0.28; }
+    }
+
+    @keyframes floatOrb2 {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.28; }
+      25% { transform: translate(-40px, -30px) scale(1.12) rotate(-8deg); opacity: 0.42; }
+      50% { transform: translate(30px, -50px) scale(0.88) rotate(12deg); opacity: 0.22; }
+      75% { transform: translate(20px, 30px) scale(1.08) rotate(-6deg); opacity: 0.38; }
+    }
+
+    @keyframes floatOrb3 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.18; }
+      33% { transform: translate(-25px, 35px) scale(1.2); opacity: 0.3; }
+      66% { transform: translate(15px, -25px) scale(0.85); opacity: 0.15; }
+    }
+
+    /* ============================================ */
+    /* NEON PARTICLE SYSTEM - Pure CSS Performance */
+    /* ============================================ */
+    .particles-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      will-change: transform, opacity;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+    }
+
+    /* Particle size variants - Enhanced dynamic range */
+    .particle-xs { width: 2px; height: 2px; box-shadow: 0 0 4px currentColor, 0 0 8px currentColor; }
+    .particle-sm { width: 3px; height: 3px; box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+    .particle-md { width: 4px; height: 4px; box-shadow: 0 0 6px currentColor, 0 0 14px currentColor; }
+    .particle-lg { width: 5px; height: 5px; box-shadow: 0 0 8px currentColor, 0 0 18px currentColor; }
+    .particle-xl { width: 7px; height: 7px; box-shadow: 0 0 10px currentColor, 0 0 24px currentColor; }
+    .particle-xxl { width: 10px; height: 10px; box-shadow: 0 0 14px currentColor, 0 0 30px currentColor; }
+
+    /* Speed variants for particles */
+    .speed-slow { animation-duration: 16s !important; }
+    .speed-medium { animation-duration: 10s !important; }
+    .speed-fast { animation-duration: 6s !important; }
+    .speed-vfast { animation-duration: 4s !important; }
+
+    /* Particle color variants - neon palette */
+   .particle-orange {
+      background: #ff4d2e;
+      box-shadow: 0 0 6px #ff4d2e, 0 0 12px rgba(255, 77, 46, 0.5);
+    }
+    .particle-cyan {
+      background: #00e5ff;
+      box-shadow: 0 0 6px #00e5ff, 0 0 12px rgba(0, 229, 255, 0.5);
+    }
+    .particle-gold {
+      background: #ffd23f;
+      box-shadow: 0 0 6px #ffd23f, 0 0 12px rgba(255, 210, 63, 0.5);
+    }
+    .particle-magenta {
+      background: #ff00aa;
+      box-shadow: 0 0 6px #ff00aa, 0 0 12px rgba(255, 0, 170, 0.4);
+    }
+    .particle-white {
+      background: #ffffff;
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Particle drift animations - varied paths */
+    @keyframes drift1 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+      25% { transform: translate(30px, -40px) scale(1.2); opacity: 1; }
+      50% { transform: translate(60px, 10px) scale(0.8); opacity: 0.5; }
+      75% { transform: translate(20px, 50px) scale(1.1); opacity: 0.9; }
+    }
+    @keyframes drift2 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+      25% { transform: translate(-40px, -30px) scale(0.9); opacity: 0.9; }
+      50% { transform: translate(-70px, 20px) scale(1.15); opacity: 0.7; }
+      75% { transform: translate(-30px, 60px) scale(0.85); opacity: 1; }
+    }
+    @keyframes drift3 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+      33% { transform: translate(50px, 30px) scale(1.1); opacity: 0.5; }
+      66% { transform: translate(-20px, 70px) scale(0.9); opacity: 1; }
+    }
+    @keyframes drift4 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      50% { transform: translate(-60px, -50px) scale(1.2); opacity: 1; }
+    }
+    @keyframes drift5 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+      50% { transform: translate(40px, 60px) scale(0.75); opacity: 0.4; }
+    }
+    @keyframes driftSlow {
+      0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+      50% { transform: translate(25px, -20px); opacity: 0.8; }
+    }
+
+    /* Individual particle positioning & animation assignments */
+    .p1 { top: 8%; left: 12%; animation: drift1 8s 0s infinite; }
+    .p2 { top: 15%; left: 78%; animation: drift2 10s -2s infinite; }
+    .p3 { top: 72%; left: 8%; animation: drift3 9s -4s infinite; }
+    .p4 { top: 65%; left: 88%; animation: drift4 11s -1s infinite; }
+    .p5 { top: 35%; left: 5%; animation: drift5 7s -3s infinite; }
+    .p6 { top: 22%; left: 92%; animation: drift1 9s -5s infinite; }
+    .p7 { top: 82%; left: 25%; animation: drift2 8s -2.5s infinite; }
+    .p8 { top: 45%; left: 95%; animation: drift3 10s -4.5s infinite; }
+    .p9 { top: 55%; left: 3%; animation: drift4 8s -1.5s infinite; }
+    .p10 { top: 12%; left: 55%; animation: drift5 11s -6s infinite; }
+    .p11 { top: 78%; left: 62%; animation: drift1 9s -3s infinite; }
+    .p12 { top: 28%; left: 18%; animation: drift2 7s -5s infinite; }
+    .p13 { top: 88%; left: 78%; animation: drift3 10s -2s infinite; }
+    .p14 { top: 42%; left: 85%; animation: drift4 8s -4s infinite; }
+    .p15 { top: 58%; left: 15%; animation: drift5 9s -1s infinite; }
+    .p16 { top: 5%; left: 38%; animation: driftSlow 15s -3s infinite; }
+    .p17 { top: 92%; left: 45%; animation: driftSlow 14s -7s infinite; }
+    .p18 { top: 48%; left: 72%; animation: driftSlow 16s -5s infinite; }
+    .p19 { top: 32%; left: 28%; animation: drift1 12s -8s infinite; }
+    .p20 { top: 68%; left: 52%; animation: drift2 13s -6s infinite; }
+    .p21 { top: 18%; left: 68%; animation: drift3 11s -9s infinite; }
+    .p22 { top: 85%; left: 12%; animation: drift4 12s -7s infinite; }
+    .p23 { top: 52%; left: 38%; animation: drift5 10s -10s infinite; }
+    .p24 { top: 38%; left: 58%; animation: driftSlow 18s -4s infinite; }
+    .p25 { top: 72%; left: 35%; animation: drift1 14s -11s infinite; }
+
+    .boot-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    
+    .boot-logo {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: clamp(40px, 12vw, 96px);
+      letter-spacing: 0.15em;
+      background: 
+        linear-gradient(90deg, 
+          #ff4d2e 0%, 
+          #ff6b35 10%,
+          #ff8c00 25%,
+          #ffd23f 45%,
+          #fff 55%,
+          #ffd23f 65%,
+          #ff8c00 80%,
+          #ff4d2e 95%,
+          #ff2200 100%
+        );
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      animation: logoPulse 3s ease-in-out infinite, gradientFlow 4s linear infinite;
+      text-shadow: none;
+      line-height: 1.1;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    .logo-subtitle {
+      font-size: clamp(11px, 2vw, 14px);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #00e5ff;
+      margin-top: -12px;
+      opacity: 0.9;
+      font-weight: 500;
+      animation: subtitlePulse 2.5s ease-in-out infinite;
+      text-shadow: 0 0 20px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 229, 255, 0.2);
+    }
+
+    @keyframes subtitlePulse {
+      0%, 100% { 
+        opacity: 0.85; 
+        text-shadow: 0 0 15px rgba(0, 229, 255, 0.4), 0 0 30px rgba(0, 229, 255, 0.15);
+        transform: scale(1);
+      }
+      50% { 
+        opacity: 1; 
+        text-shadow: 0 0 25px rgba(0, 229, 255, 0.7), 0 0 50px rgba(0, 229, 255, 0.3), 0 0 75px rgba(0, 229, 255, 0.1);
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { 
+        filter: drop-shadow(0 0 30px rgba(255, 77, 46, 0.5)) drop-shadow(0 0 60px rgba(255, 77, 46, 0.2));
+        transform: scale(1);
+      }
+      50% { 
+        filter: drop-shadow(0 0 50px rgba(255, 140, 0, 0.6)) drop-shadow(0 0 90px rgba(255, 210, 63, 0.3));
+        transform: scale(1.02);
+      }
+    }
+
+    .boot-loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* ============================================ */
+    /* SOPHISTICATED LOADER - Segmented Ring + Core */
+    /* ============================================ */
+    .loader-wrapper {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+
+    /* Outer segmented ring */
+    .spinner-ring {
+      width: 64px;
+      height: 64px;
+      position: relative;
+    }
+
+    .spinner-ring::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #ff4d2e;
+      border-right-color: #ff8c00;
+      animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    /* Inner segmented track */
+    .spinner-ring::after {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background:
+        conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(0, 229, 255, 0.3) 30deg,
+          transparent 60deg,
+          transparent 120deg,
+          rgba(255, 210, 63, 0.3) 150deg,
+          transparent 180deg,
+          transparent 240deg,
+          rgba(255, 77, 46, 0.3) 270deg,
+          transparent 300deg,
+          transparent 360deg
+        );
+      animation: spin 2s linear infinite reverse;
+    }
+
+    /* Pulsing core */
+    .loader-core {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin-left: -8px;
+      margin-top: -8px;
+      background: radial-gradient(circle, #fff 0%, #ffd23f 40%, #ff4d2e 100%);
+      border-radius: 50%;
+      animation: corePulse 1.5s ease-in-out infinite;
+      box-shadow:
+        0 0 10px #ff4d2e,
+        0 0 20px rgba(255, 77, 46, 0.6),
+        0 0 40px rgba(255, 77, 46, 0.3);
+    }
+
+    /* Core glow ring */
+    .loader-core::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 210, 63, 0.4);
+      animation: coreRing 2s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes corePulse {
+      0%, 100% { 
+        transform: scale(1); 
+        opacity: 1;
+        box-shadow: 0 0 10px #ff4d2e, 0 0 20px rgba(255, 77, 46, 0.6), 0 0 40px rgba(255, 77, 46, 0.3);
+      }
+      50% { 
+        transform: scale(0.7); 
+        opacity: 0.7;
+        box-shadow: 0 0 15px #ffd23f, 0 0 30px rgba(255, 210, 63, 0.7), 0 0 50px rgba(255, 210, 63, 0.4);
+      }
+    }
+
+    @keyframes coreRing {
+      0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.6;
+        border-color: rgba(255, 210, 63, 0.4);
+      }
+      50% { 
+        transform: scale(1.5); 
+        opacity: 0.2;
+        border-color: rgba(0, 229, 255, 0.3);
+      }
+    }
+
+    /* Loading complete state */
+    .loader-complete .loader-core {
+      animation: coreComplete 0.5s ease-out forwards;
+      background: radial-gradient(circle, #00ffa8 0%, #00e5ff 50%, #0088cc 100%);
+      box-shadow: 0 0 15px #00ffa8, 0 0 30px rgba(0, 255, 168, 0.6);
+    }
+
+    .loader-complete .spinner-ring::before {
+      border-top-color: #00ffa8;
+      border-right-color: #00e5ff;
+      animation-duration: 0.3s;
+    }
+
+    @keyframes coreComplete {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .boot-status {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #a0a4b0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
+    .boot-progress-container {
+      width: min(280px, 75vw);
+      height: 4px;
+      background: rgba(18, 20, 31, 0.8);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .boot-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff4d2e 0%, #ff8c00 50%, #ffd23f 100%);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 999px;
+      box-shadow: 0 0 15px rgba(255, 77, 46, 0.6);
+      position: relative;
+    }
+
+    .boot-progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* ============================================ */
+    /* PROGRESS MILESTONE INDICATORS               */
+    /* ============================================ */
+    .boot-milestones {
+      display: flex;
+      justify-content: space-between;
+      width: min(280px, 75vw);
+      margin-top: 10px;
+      padding: 0 4px;
+    }
+
+    .milestone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .milestone-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(18, 20, 31, 0.8);
+      border: 1.5px solid #3a3e4a;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .milestone-dot.active {
+      background: #ff4d2e;
+      border-color: #ff4d2e;
+      box-shadow: 0 0 12px rgba(255, 77, 46, 0.7), 0 0 24px rgba(255, 77, 46, 0.3);
+    }
+
+    .milestone-dot.active-blue {
+      background: #00e5ff;
+      border-color: #00e5ff;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.7), 0 0 24px rgba(0, 229, 255, 0.3);
+    }
+
+    .milestone-dot.active-purple {
+      background: #a855f7;
+      border-color: #a855f7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.7), 0 0 24px rgba(168, 85, 247, 0.3);
+    }
+
+    .milestone-dot.active-green {
+      background: #00ffa8;
+      border-color: #00ffa8;
+      box-shadow: 0 0 12px rgba(0, 255, 168, 0.7), 0 0 24px rgba(0, 255, 168, 0.3);
+    }
+
+    .milestone-dot.active-gold {
+      background: #ffd23f;
+      border-color: #ffd23f;
+      box-shadow: 0 0 12px rgba(255, 210, 63, 0.7), 0 0 24px rgba(255, 210, 63, 0.3);
+    }
+
+    .milestone-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5a5e6a;
+      transition: color 0.4s ease;
+      white-space: nowrap;
+    }
+
+    .milestone.active .milestone-label {
+      color: #a0a4b0;
+    }
+
+    /* ============================================ */
+    /* ENHANCED LOADING COLOR STATES               */
+    /* ============================================ */
+    
+    /* State 0-17%: Initializing (default orange) */
+    .loader-state-init .spinner-ring::before {
+      border-top-color: #ff4d2e;
+      border-right-color: #ff8c00;
+    }
+    .loader-state-init .loader-core {
+      background: radial-gradient(circle, #fff 0%, #ffd23f 40%, #ff4d2e 100%);
+      box-shadow: 0 0 10px #ff4d2e, 0 0 20px rgba(255, 77, 46, 0.6), 0 0 40px rgba(255, 77, 46, 0.3);
+    }
+    .loader-state-init .boot-progress-bar {
+      background: linear-gradient(90deg, #ff4d2e 0%, #ff8c00 50%, #ffd23f 100%);
+      box-shadow: 0 0 15px rgba(255, 77, 46, 0.6);
+    }
+
+    /* State 18-27%: Loading 3D Engine (blue) */
+    .loader-state-engine .spinner-ring::before {
+      border-top-color: #00e5ff;
+      border-right-color: #0088cc;
+    }
+    .loader-state-engine .loader-core {
+      background: radial-gradient(circle, #fff 0%, #00e5ff 50%, #0088cc 100%);
+      box-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0, 229, 255, 0.6), 0 0 40px rgba(0, 229, 255, 0.3);
+    }
+    .loader-state-engine .boot-progress-bar {
+      background: linear-gradient(90deg, #00c4e8 0%, #00e5ff 50%, #80eeff 100%);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+    }
+
+    /* State 28-41%: Config loading (purple) */
+    .loader-state-config .spinner-ring::before {
+      border-top-color: #a855f7;
+      border-right-color: #7c3aed;
+    }
+    .loader-state-config .loader-core {
+      background: radial-gradient(circle, #fff 0%, #c084fc 50%, #a855f7 100%);
+      box-shadow: 0 0 10px #a855f7, 0 0 20px rgba(168, 85, 247, 0.6), 0 0 40px rgba(168, 85, 247, 0.3);
+    }
+    .loader-state-config .boot-progress-bar {
+      background: linear-gradient(90deg, #9333ea 0%, #a855f7 50%, #d8b4fe 100%);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+    }
+
+    /* State 42-69%: Assets loading (green) */
+    .loader-state-assets .spinner-ring::before {
+      border-top-color: #00ffa8;
+      border-right-color: #059669;
+    }
+    .loader-state-assets .loader-core {
+      background: radial-gradient(circle, #fff 0%, #34d399 50%, #00ffa8 100%);
+      box-shadow: 0 0 10px #00ffa8, 0 0 20px rgba(0, 255, 168, 0.6), 0 0 40px rgba(0, 255, 168, 0.3);
+    }
+    .loader-state-assets .boot-progress-bar {
+      background: linear-gradient(90deg, #059669 0%, #00ffa8 50%, #6ee7b7 100%);
+      box-shadow: 0 0 15px rgba(0, 255, 168, 0.6);
+    }
+
+    /* State 70-99%: UI launching (gold) */
+    .loader-state-ui .spinner-ring::before {
+      border-top-color: #ffd23f;
+      border-right-color: #f59e0b;
+    }
+    .loader-state-ui .loader-core {
+      background: radial-gradient(circle, #fff 0%, #fcd34d 50%, #ffd23f 100%);
+      box-shadow: 0 0 10px #ffd23f, 0 0 20px rgba(255, 210, 63, 0.6), 0 0 40px rgba(255, 210, 63, 0.3);
+    }
+    .loader-state-ui .boot-progress-bar {
+      background: linear-gradient(90deg, #f59e0b 0%, #ffd23f 50%, #fef08a 100%);
+      box-shadow: 0 0 15px rgba(255, 210, 63, 0.6);
+    }
+
+    /* Complete state: Green/Cyan celebration */
+    .loader-complete.boot-state-complete .loader-core {
+      background: radial-gradient(circle, #00ffa8 0%, #00e5ff 50%, #00ffa8 100%);
+      box-shadow: 0 0 15px #00ffa8, 0 0 30px rgba(0, 255, 168, 0.6), 0 0 50px rgba(0, 229, 255, 0.3);
+      animation: coreComplete 0.5s ease-out forwards, coreCelebration 1s ease-in-out 0.5s infinite;
+    }
+
+    .loader-complete.boot-state-complete .spinner-ring::before {
+      border-top-color: #00ffa8;
+      border-right-color: #00e5ff;
+      animation-duration: 0.3s;
+    }
+
+    .loader-complete.boot-state-complete .boot-progress-bar {
+      background: linear-gradient(90deg, #00ffa8 0%, #00e5ff 50%, #00ffa8 100%);
+      box-shadow: 0 0 20px rgba(0, 255, 168, 0.8), 0 0 40px rgba(0, 229, 255, 0.4);
+    }
+
+    @keyframes coreCelebration {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.9; filter: brightness(1.2); }
+    }
+
+    .boot-percent {
+      font-size: 11px;
+      font-weight: 600;
+      color: #ffd23f;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+      transition: color 0.3s ease;
+    }
+
+    /* Continue hint - shows after loading completes */
+    .continue-hint {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: rgba(0, 229, 255, 0.06);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 999px;
+      color: #00e5ff;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: hintGlow 2s ease-in-out infinite;
+      cursor: default;
+      user-select: none;
+      transition: all 0.3s ease;
+    }
+
+    .continue-hint.visible {
+      display: flex;
+      animation: hintFadeIn 0.6s ease-out, hintGlow 2s ease-in-out infinite;
+    }
+
+    .continue-hint:hover {
+      background: rgba(0, 229, 255, 0.12);
+      border-color: rgba(0, 229, 255, 0.4);
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+    }
+
+    .continue-hint svg {
+      width: 18px;
+      height: 18px;
+      animation: hintBounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes hintFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes hintGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.1); }
+      50% { box-shadow: 0 0 35px rgba(0, 229, 255, 0.25); }
+    }
+
+    @keyframes hintBounce {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(4px); }
+    }
+    
+    .boot-error {
+      color: #ff3d5a;
+      max-width: 420px;
+      text-align: center;
+      padding: 24px;
+      background: rgba(255, 61, 90, 0.08);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 61, 90, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .boot-tips {
+      font-size: 11px;
+      color: #5a5e6a;
+      max-width: 360px;
+      text-align: center;
+      line-height: 1.7;
+      margin-top: 8px;
+    }
+
+    .retry-btn {
+      margin-top: 20px;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #ff4d2e, #ff8c00);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 24px rgba(255, 77, 46, 0.4);
+    }
+
+    .retry-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 77, 46, 0.6);
+    }
+
+    /* Version badge */
+    .version-badge {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: #3a3e4a;
+      text-transform: uppercase;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .version-badge::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: #00e5ff;
+      border-radius: 50%;
+      animation: versionPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes versionPulse {
+      0%, 100% { opacity: 0.5; box-shadow: 0 0 4px #00e5ff; }
+      50% { opacity: 1; box-shadow: 0 0 8px #00e5ff; }
+    }
+
+    /* Scanline effect for extra cyberpunk feel */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.03) 2px,
+        rgba(0, 0, 0, 0.03) 4px
+      );
+      opacity: 0.5;
+    }
+
+    /* Vignette Effect Overlay */
+    .vignette-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0, 0, 0, 0.15) 80%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vignette-overlay {
+        opacity: 0.7;
+      }
+    }
+
+    /* Quick Start Button */
+    .quick-start-btn {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      font-family: var(--font-display, system-ui);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: var(--tracking-wide, 0.04em);
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 77, 46, 0.9) 0%,
+        rgba(255, 77, 46, 0.7) 100%
+      );
+      border: 1px solid rgba(255, 140, 0, 0.4);
+      border-radius: var(--radius-pill, 999px);
+      cursor: pointer;
+      z-index: calc(var(--z-toast, 100) + 5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-base, 0.32s) cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow:
+        0 8px 32px rgba(255, 77, 46, 0.3),
+        0 0 60px rgba(255, 77, 46, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .quick-start-btn.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .quick-start-btn:hover {
+      transform: translateX(-50%) translateY(-2px) scale(1.03);
+      box-shadow:
+        0 12px 40px rgba(255, 77, 46, 0.45),
+        0 0 80px rgba(255, 77, 46, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      background: linear-gradient(
+        135deg,
+        rgba(255, 100, 70, 0.95) 0%,
+        rgba(255, 77, 46, 0.85) 100%
+      );
+    }
+
+    .quick-start-btn:active {
+      transform: translateX(-50%) translateY(0) scale(0.98);
+    }
+
+    .quick-start-btn svg {
+      width: 18px;
+      height: 18px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .quick-start-btn span {
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Pulse animation for quick start when ready */
+    @keyframes quickStartPulse {
+      0%, 100% { 
+        box-shadow:
+          0 8px 32px rgba(255, 77, 46, 0.3),
+          0 0 60px rgba(255, 77, 46, 0.15);
+      }
+      50% { 
+        box-shadow:
+          0 8px 40px rgba(255, 77, 46, 0.5),
+          0 0 80px rgba(255, 77, 46, 0.25),
+          0 0 120px rgba(255, 77, 46, 0.1);
+      }
+    }
+
+    .quick-start-btn.visible {
+      animation: quickStartPulse 2.5s ease-in-out infinite;
+    }
+
+    @media (max-width: 480px) {
+      .quick-start-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+        bottom: 50px;
+      }
+
+      .quick-start-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    /* ============================================ */
+    /* LOADING TIPS SECTION - Cycles gameplay tips  */
+    /* ============================================ */
+    .loading-tips {
+      position: fixed;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, rgba(255, 210, 63, 0.08) 0%, rgba(255, 77, 46, 0.05) 100%);
+      border: 1px solid rgba(255, 210, 63, 0.15);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 20;
+      animation: tipSlideIn 0.8s ease-out both;
+      max-width: min(420px, 85vw);
+    }
+
+    @keyframes tipSlideIn {
+      from { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(0); 
+      }
+    }
+
+    .tips-icon {
+      font-size: 18px;
+      line-height: 1;
+      animation: tipIconPulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 210, 63, 0.5));
+    }
+
+    @keyframes tipIconPulse {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+
+    .tips-content {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .tip-text {
+      font-size: 12px;
+      color: #a0a4b0;
+      letter-spacing: 0.03em;
+      line-height: 1.5;
+      white-space: nowrap;
+      animation: textFadeCycle 6s ease-in-out infinite;
+    }
+
+    @keyframes textFadeCycle {
+      0%, 80% { opacity: 1; }
+      90%, 95% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Additional particle drift patterns for variety */
+    @keyframes drift6 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+      33% { transform: translate(60px, -25px) scale(1.3); opacity: 1; }
+      66% { transform: translate(-40px, 45px) scale(0.8); opacity: 0.5; }
+    }
+    @keyframes drift7 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+      50% { transform: translate(-55px, -65px) scale(1.25); opacity: 1; }
+    }
+
+    /* ============================================ */
+    /* AUDIO VISUALIZER BARS                       */
+    /* ============================================ */
+    .audio-visualizer {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(calc(-50% + 120px));
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 24px;
+      z-index: 15;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .viz-bar {
+      width: 3px;
+      background: linear-gradient(180deg, 
+        var(--viz-color-1, #ff4d2e) 0%, 
+        var(--viz-color-2, #00e5ff) 100%
+      );
+      border-radius: 2px;
+      animation: vizPulse 0.8s ease-in-out infinite alternate;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Varied heights and delays for organic feel */
+    .viz-bar-1 { height: 40%; animation-delay: 0s; --viz-color-1: #ff4d2e; --viz-color-2: #ff8c00; }
+    .viz-bar-2 { height: 65%; animation-delay: 0.08s; --viz-color-1: #ff4d2e; --viz-color-2: #ffd23f; }
+    .viz-bar-3 { height: 45%; animation-delay: 0.15s; --viz-color-1: #ffd23f; --viz-color-2: #00ffa8; }
+    .viz-bar-4 { height: 80%; animation-delay: 0.22s; --viz-color-1: #00ffa8; --viz-color-2: #00e5ff; }
+    .viz-bar-5 { height: 55%; animation-delay: 0.30s; --viz-color-1: #00e5ff; --viz-color-2: #a855f7; }
+    .viz-bar-6 { height: 90%; animation-delay: 0.38s; --viz-color-1: #a855f7; --viz-color-2: #ff4d2e; }
+    .viz-bar-7 { height: 35%; animation-delay: 0.45s; --viz-color-1: #ff4d2e; --viz-color-2: #00e5ff; }
+    .viz-bar-8 { height: 70%; animation-delay: 0.52s; --viz-color-1: #00e5ff; --viz-color-2: #ffd23f; }
+    .viz-bar-9 { height: 50%; animation-delay: 0.60s; --viz-color-1: #ffd23f; --viz-color-2: #a855f7; }
+    .viz-bar-10 { height: 85%; animation-delay: 0.68s; --viz-color-1: #a855f7; --viz-color-2: #00ffa8; }
+    .viz-bar-11 { height: 42%; animation-delay: 0.75s; --viz-color-1: #00ffa8; --viz-color-2: #ff4d2e; }
+    .viz-bar-12 { height: 60%; animation-delay: 0.82s; --viz-color-1: #ff4d2e; --viz-color-2: #ffd23f; }
+
+    @keyframes vizPulse {
+      0% { 
+        transform: scaleY(0.3);
+        opacity: 0.5;
+      }
+      100% { 
+        transform: scaleY(1);
+        opacity: 1;
+      }
+    }
+
+    /* ============================================ */
+    /* FPS/PERFORMANCE COUNTER                    */
+    /* ============================================ */
+    .fps-counter {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(18, 20, 31, 0.85);
+      border: 1px solid rgba(255, 77, 46, 0.15);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 11px;
+      z-index: 25;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .fps-label {
+      color: #5a5e6a;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .fps-value {
+      color: #00ffa8;
+      font-weight: 600;
+      font-size: 12px;
+      min-width: 36px;
+      text-align: right;
+      text-shadow: 0 0 8px rgba(0, 255, 168, 0.4);
+      transition: color 0.3s ease;
+    }
+
+    .fps-value.loading {
+      color: #ffd23f;
+      text-shadow: 0 0 8px rgba(255, 210, 63, 0.4);
+    }
+
+    .fps-value.good {
+      color: #00ffa8;
+    }
+
+    .fps-value.medium {
+      color: #ffd23f;
+    }
+
+    .fps-value.poor {
+      color: #ff4d2e;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .audio-visualizer {
+        height: 16px;
+        gap: 2px;
+        bottom: 14px;
+      }
+      
+      .viz-bar {
+        width: 2px;
+      }
+      
+      .fps-counter {
+        top: 10px;
+        right: 10px;
+        padding: 4px 8px;
+      }
+      
+      .fps-counter .fps-label,
+      .fps-counter .fps-value {
+        font-size: 9px;
+      }
+      
+      .boot-milestones .milestone-label {
+        font-size: 7px;
+      }
+      
+      .boot-milestones .milestone-dot {
+        width: 6px;
+        height: 6px;
+      }
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      .viz-bar {
+        animation: none;
+        transform: scaleY(0.6);
+      }
+      
+      .audio-visualizer {
+        opacity: 0.2;
+      }
+
+      /* Disable ready celebration animations */
+      .confetti-burst,
+      .ready-text,
+      .play-pulse-btn,
+      .ready-flash-overlay {
+        animation: none !important;
+      }
+    }
+
+    /* ============================================ */
+    /* KEYBOARD SHORTCUT HINTS PANEL               */
+    /* ============================================ */
+    .keyboard-hints-panel {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 77, 46, 0.05));
+      border: 1px solid rgba(0, 229, 255, 0.15);
+      border-radius: var(--radius-l);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 25;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .keyboard-hints-panel.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .keyboard-hint-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      font-size: 11px;
+      color: #00e5ff;
+      border: 1px solid rgba(0, 229, 255, 0.25);
+    }
+
+    .keyboard-hint-key {
+      padding: 4px 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ffd23f;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08);
+    }
+
+    .keyboard-hint-text {
+      font-size: 12px;
+      color: #a0a4b0;
+      letter-spacing: 0.02em;
+    }
+
+    @keyframes hintPanelPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.05); }
+      50% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.12); }
+    }
+
+    .keyboard-hints-panel.visible {
+      animation: hintPanelPulse 3s ease-in-out infinite;
+    }
+
+    /* ============================================ */
+    /* ENHANCED READY STATE - Celebration Effects   */
+    /* ============================================ */
+    .ready-celebration-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 30;
+      display: none;
+    }
+
+    .ready-celebration-container.active {
+      display: block;
+    }
+
+    /* Confetti particles - Pure CSS burst effect */
+    .confetti-burst {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      opacity: 0;
+    }
+
+    .ready-celebration-container.active .confetti-burst {
+      animation: confettiBurst 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .confetti-burst:nth-child(1) { --conf-x: -120px; --conf-y: -150px; --conf-r: 45deg; --delay: 0s; --color: #ff4d2e; }
+    .confetti-burst:nth-child(2) { --conf-x: -80px; --conf-y: -180px; --conf-r: 30deg; --delay: 0.03s; --color: #ffd23f; }
+    .confetti-burst:nth-child(3) { --conf-x: -30px; --conf-y: -200px; --conf-r: 60deg; --delay: 0.06s; --color: #00e5ff; }
+    .confetti-burst:nth-child(4) { --conf-x: 30px; --conf-y: -190px; --conf-r: -30deg; --delay: 0.09s; --color: #ff4d2e; }
+    .confetti-burst:nth-child(5) { --conf-x: 80px; --conf-y: -160px; --conf-r: -60deg; --delay: 0.12s; --color: #00ffa8; }
+    .confetti-burst:nth-child(6) { --conf-x: 120px; --conf-y: -120px; --conf-r: 15deg; --delay: 0.15s; --color: #ffd23f; }
+    .confetti-burst:nth-child(7) { --conf-x: -140px; --conf-y: -100px; --conf-r: -15deg; --delay: 0.18s; --color: #a855f7; }
+    .confetti-burst:nth-child(8) { --conf-x: 140px; --conf-y: -90px; --conf-r: 75deg; --delay: 0.21s; --color: #00e5ff; }
+    .confetti-burst:nth-child(9) { --conf-x: -100px; --conf-y: -200px; --conf-r: -45deg; --delay: 0.24s; --color: #ffd23f; }
+    .confetti-burst:nth-child(10) { --conf-x: 100px; --conf-y: -210px; --conf-r: 90deg; --delay: 0.27s; --color: #ff4d2e; }
+    .confetti-burst:nth-child(11) { --conf-x: -160px; --conf-y: -170px; --conf-r: 120deg; --delay: 0.3s; --color: #00ffa8; }
+    .confetti-burst:nth-child(12) { --conf-x: 160px; --conf-y: -140px; --conf-r: -120deg; --delay: 0.33s; --color: #ffd23f; }
+    .confetti-burst:nth-child(13) { --conf-x: -50px; --conf-y: -220px; --conf-r: 0deg; --delay: 0.36s; --color: #ff4d2e; }
+    .confetti-burst:nth-child(14) { --conf-x: 50px; --conf-y: -230px; --conf-r: 180deg; --delay: 0.39s; --color: #00e5ff; }
+    .confetti-burst:nth-child(15) { --conf-x: 0px; --conf-y: -240px; --conf-r: 270deg; --delay: 0.42s; --color: #a855f7; }
+    .confetti-burst:nth-child(16) { --conf-x: -70px; --conf-y: -130px; --conf-r: -75deg; --delay: 0.18s; --color: #00ffa8; }
+    .confetti-burst:nth-child(17) { --conf-x: 70px; --conf-y: -110px; --conf-r: 105deg; --delay: 0.21s; --color: #ff4d2e; }
+    .confetti-burst:nth-child(18) { --conf-x: -110px; --conf-y: -180px; --conf-r: 135deg; --delay: 0.27s; --color: #ffd23f; }
+    .confetti-burst:nth-child(19) { --conf-x: 110px; --conf-y: -175px; --conf-r: -135deg; --delay: 0.33s; --color: #00e5ff; }
+    .confetti-burst:nth-child(20) { --conf-x: 0px; --conf-y: -250px; --conf-r: 225deg; --delay: 0.36s; --color: #ff4d2e; }
+
+    .confetti-burst::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: var(--color, #ff4d2e);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--color, #ff4d2e);
+    }
+
+    @keyframes confettiBurst {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--conf-x), var(--conf-y)) rotate(var(--conf-r)) scale(0.3);
+      }
+    }
+
+    /* Rainbow gradient READY text */
+    .ready-text {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: clamp(32px, 8vw, 64px);
+      letter-spacing: 0.2em;
+      background: linear-gradient(
+        90deg,
+        #ff4d2e 0%,
+        #ff8c00 14%,
+        #ffd23f 28%,
+        #00ffa8 42%,
+        #00e5ff 56%,
+        #a855f7 70%,
+        #ff4d2e 85%,
+        #ffd23f 100%
+      );
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-align: center;
+      animation: rainbowFlow 2s linear infinite, readyTextPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      filter: drop-shadow(0 0 30px rgba(255, 77, 46, 0.5)) drop-shadow(0 0 60px rgba(0, 229, 255, 0.3));
+      margin-top: 16px;
+      opacity: 0;
+    }
+
+    .ready-celebration-container.active .ready-text {
+      opacity: 1;
+    }
+
+    @keyframes rainbowFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
+    @keyframes readyTextPopIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-10deg);
+        filter: blur(20px) drop-shadow(0 0 0px transparent);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1.1) rotate(2deg);
+        filter: blur(0) drop-shadow(0 0 40px rgba(255, 77, 46, 0.6));
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0) drop-shadow(0 0 30px rgba(255, 77, 46, 0.5)) drop-shadow(0 0 60px rgba(0, 229, 255, 0.3));
+      }
+    }
+
+    /* Pulsing play button icon */
+    .play-pulse-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      margin-top: 16px;
+      background: linear-gradient(135deg, rgba(0, 255, 168, 0.15), rgba(0, 229, 255, 0.1));
+      border: 2px solid rgba(0, 255, 168, 0.4);
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0;
+      animation: playBtnFadeIn 0.4s ease-out 0.5s forwards, playBtnPulse 2s ease-in-out infinite 0.9s;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .play-pulse-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 168, 0.25), rgba(0, 229, 255, 0.2));
+      border-color: rgba(0, 255, 168, 0.7);
+      box-shadow: 0 0 32px rgba(0, 255, 168, 0.4);
+      transform: scale(1.1);
+    }
+
+    .play-pulse-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #00ffa8;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 168, 0.6));
+      margin-left: 4px;
+    }
+
+    .ready-celebration-container.active .play-pulse-btn {
+      opacity: 1;
+    }
+
+    @keyframes playBtnFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes playBtnPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 0 rgba(0, 255, 168, 0.4),
+          0 0 20px rgba(0, 255, 168, 0.2);
+      }
+      50% {
+        box-shadow:
+          0 0 0 12px rgba(0, 255, 168, 0),
+          0 0 35px rgba(0, 255, 168, 0.35);
+      }
+    }
+
+    /* Background flash on completion */
+    .ready-flash-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0, 255, 168, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 29;
+      opacity: 0;
+    }
+
+    .ready-flash-overlay.flash {
+      animation: readyFlash 1s ease-out forwards;
+    }
+
+    @keyframes readyFlash {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Easter Egg - Cheat Mode Message */
+    .cheat-mode-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      padding: 24px 48px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(255, 77, 46, 0.15));
+      border: 2px solid rgba(168, 85, 247, 0.5);
+      border-radius: var(--radius-xl);
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: clamp(24px, 6vw, 42px);
+      letter-spacing: 0.15em;
+      color: #a855f7;
+      text-align: center;
+      text-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+      box-shadow: 
+        0 0 60px rgba(168, 85, 247, 0.3),
+        inset 0 0 30px rgba(168, 85, 247, 0.1);
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .cheat-mode-message.active {
+      animation: cheatModeActivate 2.5s ease-in-out forwards;
+    }
+
+    @keyframes cheatModeActivate {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(-10deg);
+        visibility: visible;
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1) rotate(2deg);
+      }
+      30% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95) rotate(5deg);
+        visibility: hidden;
+      }
+    }
+
+    .cheat-mode-subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: #a0a4b0;
+      letter-spacing: normal;
+      margin-top: 8px;
+      text-shadow: none;
+    }
+
+    /* ============================================ */
+    /* CYCLE 7: ENHANCED BOOT SCREEN EFFECTS        */
+    /* ============================================ */
+
+    /* Enhanced Vignette - Stronger corner darkening for depth */
+    .boot-vignette-enhanced {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      background:
+        radial-gradient(
+          ellipse 70% 70% at 50% 50%,
+          transparent 0%,
+          transparent 35%,
+          rgba(0, 0, 0, 0.25) 65%,
+          rgba(0, 0, 0, 0.55) 85%,
+          rgba(0, 0, 0, 0.75) 100%
+        );
+    }
+
+    /* Ambient Particle Layer - Subtle floating dust motes */
+    .boot-ambient-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .boot-ambient-layer .ambient-dust-mote {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      filter: blur(1px);
+      animation: ambientDustMote 20s ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+
+    .boot-ambient-layer .m1 { top: 15%; left: 10%; animation-delay: 0s; animation-duration: 22s; }
+    .boot-ambient-layer .m2 { top: 45%; left: 25%; animation-delay: -4s; animation-duration: 18s; }
+    .boot-ambient-layer .m3 { top: 75%; left: 15%; animation-delay: -8s; animation-duration: 25s; }
+    .boot-ambient-layer .m4 { top: 25%; left: 60%; animation-delay: -12s; animation-duration: 20s; }
+    .boot-ambient-layer .m5 { top: 55%; left: 80%; animation-delay: -3s; animation-duration: 23s; }
+    .boot-ambient-layer .m6 { top: 85%; left: 55%; animation-delay: -7s; animation-duration: 19s; }
+    .boot-ambient-layer .m7 { top: 35%; left: 90%; animation-delay: -15s; animation-duration: 21s; }
+    .boot-ambient-layer .m8 { top: 65%; left: 40%; animation-delay: -10s; animation-duration: 24s; }
+
+    @keyframes ambientDustMote {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.15;
+      }
+      25% {
+        transform: translate(30px, -20px) scale(1.5);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translate(-15px, -35px) scale(1);
+        opacity: 0.2;
+      }
+      75% {
+        transform: translate(20px, -10px) scale(1.3);
+        opacity: 0.28;
+      }
+    }
+
+    /* Loading Complete Celebration Container */
+    .boot-celebration-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      margin-top: -150px;
+      margin-left: -150px;
+      pointer-events: none;
+      z-index: 25;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .boot-celebration-container.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Celebration rings that expand outward */
+    .boot-celebration-container .celebration-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      will-change: transform, opacity;
+    }
+
+    .boot-celebration-container.active .celebration-ring {
+      animation: celebrationRingExpand 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .boot-celebration-container .ring1 {
+      --ring-color: var(--accent-primary, #ff4d2e);
+      width: 60px; height: 60px;
+      border: 2px solid var(--ring-color);
+      box-shadow: 0 0 15px var(--ring-color), inset 0 0 10px var(--ring-color);
+      animation-delay: 0s;
+    }
+
+    .boot-celebration-container .ring2 {
+      --ring-color: var(--accent-secondary, #00e5ff);
+      width: 120px; height: 120px;
+      border: 1.5px solid var(--ring-color);
+      box-shadow: 0 0 12px var(--ring-color), inset 0 0 8px var(--ring-color);
+      animation-delay: 0.08s;
+    }
+
+    .boot-celebration-container .ring3 {
+      --ring-color: var(--accent-tertiary, #ffd23f);
+      width: 200px; height: 200px;
+      border: 1px solid var(--ring-color);
+      box-shadow: 0 0 10px var(--ring-color), inset 0 0 6px var(--ring-color);
+      animation-delay: 0.16s;
+    }
+
+    @keyframes celebrationRingExpand {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+      }
+      70% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Celebration particles burst outward */
+    .boot-celebration-container .celebration-particle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      margin: -3px 0 0 -3px;
+      border-radius: 50%;
+      will-change: transform, opacity;
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    .boot-celebration-container.active .celebration-particle {
+      animation: celebrationParticleBurst 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .boot-celebration-container .cp1 { --cp-color: #ff4d2e; --cp-dist: 140px; --cp-angle: 0deg; animation-delay: 0s; }
+    .boot-celebration-container .cp2 { --cp-color: #00e5ff; --cp-dist: 130px; --cp-angle: 45deg; animation-delay: 0.05s; }
+    .boot-celebration-container .cp3 { --cp-color: #ffd23f; --cp-dist: 150px; --cp-angle: 90deg; animation-delay: 0.1s; }
+    .boot-celebration-container .cp4 { --cp-color: #00ffa8; --cp-dist: 125px; --cp-angle: 135deg; animation-delay: 0.03s; }
+    .boot-celebration-container .cp5 { --cp-color: #a855f7; --cp-dist: 145px; --cp-angle: 180deg; animation-delay: 0.08s; }
+    .boot-celebration-container .cp6 { --cp-color: #ff4d2e; --cp-dist: 135px; --cp-angle: 225deg; animation-delay: 0.13s; }
+    .boot-celebration-container .cp7 { --cp-color: #00e5ff; --cp-dist: 140px; --cp-angle: 270deg; animation-delay: 0.06s; }
+    .boot-celebration-container .cp8 { --cp-color: #ffd23f; --cp-dist: 128px; --cp-angle: 315deg; animation-delay: 0.11s; }
+
+    .boot-celebration-container .celebration-particle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--cp-color, #ff4d2e);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--cp-color, #ff4d2e), 0 0 12px var(--cp-color, #ff4d2e);
+    }
+
+    @keyframes celebrationParticleBurst {
+      0% {
+        transform: translate(-50%, -50%) rotate(var(--cp-angle, 0deg)) translateY(0) scale(0);
+        opacity: 0;
+      }
+      15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(var(--cp-angle, 0deg)) translateY(calc(var(--cp-dist, 130px) * -0.2)) scale(1);
+      }
+      100% {
+        transform: translate(-50%, -50%) rotate(var(--cp-angle, 0deg)) translateY(calc(var(--cp_dist, 130px) * -1)) scale(0.3);
+        opacity: 0;
+      }
+    }
+
+    /* Sparkle effects that appear during celebration */
+    .boot-celebration-container .celebration-sparkle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      margin: -2px 0 0 -2px;
+      background: radial-gradient(circle, #fff 0%, transparent 70%);
+      border-radius: 50%;
+      will-change: transform, opacity;
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    .boot-celebration-container.active .celebration-sparkle {
+      animation: celebrationSparkleFloat 1.5s ease-out forwards;
+    }
+
+    .boot-celebration-container .cs1 { --cs-x: -80px; --cs-y: -90px; animation-delay: 0.15s; }
+    .boot-celebration-container .cs2 { --cs-x: 90px; --cs-y: -70px; animation-delay: 0.22s; }
+    .boot-celebration-container .cs3 { --cs-x: -70px; --cs-y: 85px; animation-delay: 0.28s; }
+    .boot-celebration-container .cs4 { --cs-x: 85px; --cs-y: 80px; animation-delay: 0.35s; }
+
+    @keyframes celebrationSparkleFloat {
+      0% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(0);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translate(calc(var(--cs_x, 50px) * 0.3), calc(var(--cs_y, 50px) * 0.3)) scale(1);
+      }
+      100% {
+        transform: translate(-50%, -50%) translate(var(--cs-x, 50px), var(--cs_y, 50px)) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    /* Ready state enhancement with smooth transition */
+    .boot-ready-state {
+      animation: readyStateGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes readyStateGlow {
+      0% {
+        box-shadow: 
+          inset 0 0 60px rgba(0, 255, 168, 0.03),
+          0 0 40px rgba(0, 255, 168, 0.05);
+      }
+      100% {
+        box-shadow: 
+          inset 0 0 80px rgba(0, 255, 168, 0.06),
+          0 0 60px rgba(0, 255, 168, 0.1),
+          0 0 100px rgba(0, 229, 255, 0.05);
+      }
+    }
+
+    /* Reduced motion support for Cycle 7 additions */
+    @media (prefers-reduced-motion: reduce) {
+      .boot-vignette-enhanced,
+      .boot-ambient-layer .ambient-dust-mote,
+      .boot-celebration-container .celebration-ring,
+      .boot-celebration-container .celebration-particle,
+      .boot-celebration-container .celebration-sparkle,
+      .boot-ready-state {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .boot-ambient-layer .ambient-dust-mote {
+        display: none;
+      }
+
+      .boot-celebration-container.active {
+        opacity: 0.5;
+        visibility: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Enhanced Boot Screen -->
+  <div id="boot-fallback">
+    <!-- Noise texture overlay (via ::after pseudo) -->
+    
+    <!-- Scanlines overlay for cyberpunk feel -->
+    <div class="scanlines"></div>
+    
+    <!-- Enhanced Vignette - Stronger depth effect (Cycle 7) -->
+    <div class="boot-vignette-enhanced" aria-hidden="true"></div>
+    
+    <!-- Ambient Particle Layer - Subtle floating dust motes (Cycle 7) -->
+    <div class="boot-ambient-layer" aria-hidden="true">
+      <div class="ambient-dust-mote m1"></div>
+      <div class="ambient-dust-mote m2"></div>
+      <div class="ambient-dust-mote m3"></div>
+      <div class="ambient-dust-mote m4"></div>
+      <div class="ambient-dust-mote m5"></div>
+      <div class="ambient-dust-mote m6"></div>
+      <div class="ambient-dust-mote m7"></div>
+      <div class="ambient-dust-mote m8"></div>
+    </div>
+    
+    <!-- Loading Complete Celebration Container (Cycle 7) -->
+    <div class="boot-celebration-container" id="boot-celebration" aria-hidden="true">
+      <div class="celebration-ring ring1"></div>
+      <div class="celebration-ring ring2"></div>
+      <div class="celebration-ring ring3"></div>
+      <div class="celebration-particle cp1"></div>
+      <div class="celebration-particle cp2"></div>
+      <div class="celebration-particle cp3"></div>
+      <div class="celebration-particle cp4"></div>
+      <div class="celebration-particle cp5"></div>
+      <div class="celebration-particle cp6"></div>
+      <div class="celebration-particle cp7"></div>
+      <div class="celebration-particle cp8"></div>
+      <div class="celebration-sparkle cs1"></div>
+      <div class="celebration-sparkle cs2"></div>
+      <div class="celebration-sparkle cs3"></div>
+      <div class="celebration-sparkle cs4"></div>
+    </div>
+    
+    <!-- Dynamic Glow Orbs -->
+    <div class="boot-orb boot-orb-1"></div>
+    <div class="boot-orb boot-orb-2"></div>
+    <div class="boot-orb boot-orb-3"></div>
+    
+    <!-- Neon Particle System - Pure CSS -->
+    <div class="particles-container">
+      <!-- Row 1 - Varied sizes and speeds for depth -->
+      <div class="particle particle-xxl particle-orange p1 speed-medium"></div>
+      <div class="particle particle-xl particle-cyan p2 speed-fast"></div>
+      <div class="particle particle-lg particle-gold p3 speed-slow"></div>
+      <div class="particle particle-sm particle-magenta p4 speed-vfast"></div>
+      <div class="particle particle-md particle-white p5 speed-medium"></div>
+      <!-- Row 2 -->
+      <div class="particle particle-xl particle-orange p6 speed-fast"></div>
+      <div class="particle particle-xs particle-cyan p7 speed-slow"></div>
+      <div class="particle particle-lg particle-gold p8 speed-medium"></div>
+      <div class="particle particle-sm particle-magenta p9 speed-vfast"></div>
+      <div class="particle particle-xs particle-white p10 speed-fast"></div>
+      <!-- Row 3 -->
+      <div class="particle particle-xxl particle-orange p11 speed-slow"></div>
+      <div class="particle particle-sm particle-cyan p12 speed-fast"></div>
+      <div class="particle particle-md particle-gold p13 speed-medium"></div>
+      <div class="particle particle-lg particle-magenta p14 speed-vfast"></div>
+      <div class="particle particle-xs particle-white p15 speed-slow"></div>
+      <!-- Row 4 - Fast particles near edges -->
+      <div class="particle particle-sm particle-orange p16 speed-vfast"></div>
+      <div class="particle particle-xs particle-cyan p17 speed-fast"></div>
+      <div class="particle particle-xl particle-gold p18 speed-slow"></div>
+      <div class="particle particle-md particle-magenta p19 speed-medium"></div>
+      <div class="particle particle-lg particle-white p20 speed-vfast"></div>
+      <!-- Row 5 - Extra dynamic particles -->
+      <div class="particle particle-sm particle-orange p21 speed-medium"></div>
+      <div class="particle particle-xs particle-cyan p22 speed-slow"></div>
+      <div class="particle particle-xxl particle-gold p23 speed-fast"></div>
+      <div class="particle particle-sm particle-magenta p24 speed-vfast"></div>
+      <div class="particle particle-md particle-white p25 speed-medium"></div>
+      <!-- Additional particles for richer effect -->
+      <div class="particle particle-xs particle-orange p26 speed-fast" style="top:25%;left:42%;animation:drift3 8s -3s infinite;"></div>
+      <div class="particle particle-sm particle-cyan p27 speed-slow" style="top:62%;left:68%;animation:drift1 11s -7s infinite;"></div>
+      <div class="particle particle-lg particle-gold p28 speed-vfast" style="top:38%;left:22%;animation:drift4 7s -2s infinite;"></div>
+      <div class="particle particle-xs particle-magenta p29 speed-medium" style="top:78%;left:88%;animation:drift5 13s -8s infinite;"></div>
+      <div class="particle particle-md particle-white p30 speed-fast" style="top:92%;left:15%;animation:drift2 9s -5s infinite;"></div>
+    </div>
+    
+    <div class="boot-content">
+      <div class="boot-logo">WARZONE KART</div>
+      <div class="logo-subtitle">Neon Underground</div>
+      
+      <div class="boot-loader-container">
+        <!-- Sophisticated Segmented Ring + Pulsing Core Loader -->
+        <div class="loader-wrapper" id="loader-wrapper">
+          <div class="spinner-ring"></div>
+          <div class="loader-core"></div>
+        </div>
+        <div class="boot-status">
+          <span id="boot-text">Initializing</span>
+          <span class="status-dots"></span>
+        </div>
+        <div class="boot-progress-container">
+          <div class="boot-progress-bar" id="boot-progress"></div>
+        </div>
+        <div class="boot-percent" id="boot-percent">0%</div>
+        <!-- Progress Milestones -->
+        <div class="boot-milestones" id="boot-milestones">
+          <div class="milestone" data-threshold="18">
+            <div class="milestone-dot"></div>
+            <span class="milestone-label">Engine</span>
+          </div>
+          <div class="milestone" data-threshold="28">
+            <div class="milestone-dot"></div>
+            <span class="milestone-label">Config</span>
+          </div>
+          <div class="milestone" data-threshold="42">
+            <div class="milestone-dot"></div>
+            <span class="milestone-label">Assets</span>
+          </div>
+          <div class="milestone" data-threshold="70">
+            <div class="milestone-dot"></div>
+            <span class="milestone-label">UI</span>
+          </div>
+          <div class="milestone" data-threshold="100">
+            <div class="milestone-dot"></div>
+            <span class="milestone-label">Ready</span>
+          </div>
+        </div>
+        <!-- Continue Hint - shows after loading completes -->
+        <div class="continue-hint" id="continue-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          <span>Press any key or tap to continue</span>
+        </div>
+      </div>
+      
+      <noscript>
+        <div class="boot-error">
+          <strong>⚠️ JavaScript Required</strong><br/>
+          This game requires ES Modules, WebGL, and Gamepad API.<br/>
+          Please enable JavaScript to play.
+        </div>
+      </noscript>
+    </div>
+    
+    <div class="version-badge">v1.2.0 · Build 2025.01.23</div>
+    
+    <!-- ============================================ -->
+    <!-- VIGNETTE EFFECT OVERLAY - Extra depth       -->
+    <!-- ============================================ -->
+    <div class="vignette-overlay" id="vignette-overlay"></div>
+    
+    <!-- ============================================ -->
+    <!-- QUICK START BUTTON - Appears after loading   -->
+    <!-- ============================================ -->
+    <button class="quick-start-btn" id="quick-start-btn" style="display: none;" onclick="window.dispatchEvent(new CustomEvent('boot-continue', { source: 'quick-start' }))">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5,3 19,12 5,21"/>
+      </svg>
+      <span>QUICK START</span>
+    </button>
+    
+    <!-- ============================================ -->
+    <!-- BACKGROUND MUSIC VISUALIZER BARS           -->
+    <!-- ============================================ -->
+    <div class="audio-visualizer" id="audio-visualizer">
+      <div class="viz-bar viz-bar-1"></div>
+      <div class="viz-bar viz-bar-2"></div>
+      <div class="viz-bar viz-bar-3"></div>
+      <div class="viz-bar viz-bar-4"></div>
+      <div class="viz-bar viz-bar-5"></div>
+      <div class="viz-bar viz-bar-6"></div>
+      <div class="viz-bar viz-bar-7"></div>
+      <div class="viz-bar viz-bar-8"></div>
+      <div class="viz-bar viz-bar-9"></div>
+      <div class="viz-bar viz-bar-10"></div>
+      <div class="viz-bar viz-bar-11"></div>
+      <div class="viz-bar viz-bar-12"></div>
+    </div>
+
+    <!-- FPS/Performance Counter -->
+    <div class="fps-counter" id="fps-counter">
+      <span class="fps-label">FPS</span>
+      <span class="fps-value" id="fps-value">INIT</span>
+    </div>
+
+    <!-- Loading Tips Section - Cycles through gameplay tips -->
+    <div class="loading-tips" id="loading-tips">
+      <div class="tips-icon">💡</div>
+      <div class="tips-content">
+        <span class="tip-text" id="tip-text">Use boost pads on the track for extra speed!</span>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcut Hints Panel - Appears after 10 seconds of loading -->
+    <div class="keyboard-hints-panel" id="keyboard-hints">
+      <div class="keyboard-hint-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h8M6 16h.001M18 16h.001M10 16h4"/>
+        </svg>
+      </div>
+      <span class="keyboard-hint-key">SPACE</span>
+      <span class="keyboard-hint-text">to skip loading</span>
+    </div>
+
+    <!-- Ready State Celebration Container -->
+    <div class="ready-celebration-container" id="ready-celebration">
+      <!-- Confetti Particles (20 particles) -->
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <div class="confetti-burst"></div>
+      <!-- READY Text with Rainbow Animation -->
+      <div class="ready-text">READY</div>
+      <!-- Pulsing Play Button Icon -->
+      <button class="play-pulse-btn" id="play-pulse-btn" aria-label="Start game">
+        <svg viewBox="0 0 24 24">
+          <polygon points="5,3 19,12 5,21"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Flash overlay for completion effect -->
+    <div class="ready-flash-overlay" id="ready-flash"></div>
+
+    <!-- Easter Egg: Cheat Mode Message (Konami Code) -->
+    <div class="cheat-mode-message" id="cheat-mode-message">
+      CHEAT MODE ACTIVATED
+      <div class="cheat-mode-subtitle">🎮 Secret commands enabled! 🎮</div>
+    </div>
+  </div>
+
+  <script>
+    // Update boot status text helper
+    function setBootStatus(text) {
+      var el = document.getElementById('boot-text');
+      if (el) el.textContent = text;
+    }
+
+    function setBootPercent(pct) {
+      var el = document.getElementById('boot-percent');
+      if (el) el.textContent = Math.round(pct) + '%';
+      
+      // Update progress bar
+      var progressBar = document.getElementById('boot-progress');
+      if (progressBar) progressBar.style.width = pct + '%';
+      
+      // Update milestones and color states
+      updateLoaderState(pct);
+      
+      // Auto-show continue hint when loading reaches 100%
+      if (pct >= 100) {
+        showContinueHint();
+      }
+    }
+
+    /**
+     * Updates loader visual state based on progress percentage.
+     * Handles color scheme changes and milestone activation.
+     * @param {number} pct - Current progress (0-100)
+     */
+    function updateLoaderState(pct) {
+      var loaderContainer = document.querySelector('.boot-loader-container');
+      var milestonesContainer = document.getElementById('boot-milestones');
+      
+      if (!loaderContainer) return;
+      
+      // Remove all state classes first
+      loaderContainer.classList.remove(
+        'loader-state-init', 
+        'loader-state-engine', 
+        'loader-state-config', 
+        'loader-state-assets', 
+        'loader-state-ui'
+      );
+      
+      // Determine and apply state class
+      var stateClass;
+      var dotActiveClass;
+      
+      if (pct < 18) {
+        stateClass = 'loader-state-init';
+        dotActiveClass = 'active';
+      } else if (pct < 28) {
+        stateClass = 'loader-state-engine';
+        dotActiveClass = 'active-blue';
+      } else if (pct < 42) {
+        stateClass = 'loader-state-config';
+        dotActiveClass = 'active-purple';
+      } else if (pct < 70) {
+        stateClass = 'loader-state-assets';
+        dotActiveClass = 'active-green';
+      } else if (pct < 100) {
+        stateClass = 'loader-state-ui';
+        dotActiveClass = 'active-gold';
+      } else {
+        stateClass = 'loader-state-complete';
+        dotActiveClass = 'active-gold';
+      }
+      
+      loaderContainer.classList.add(stateClass);
+      
+      // Update milestone dots
+      if (milestonesContainer) {
+        var milestones = milestonesContainer.querySelectorAll('.milestone');
+        milestones.forEach(function(milestone, index) {
+          var threshold = parseInt(milestone.getAttribute('data-threshold')) || 0;
+          var dot = milestone.querySelector('.milestone-dot');
+          
+          if (dot) {
+            // Remove all active classes first
+            dot.classList.remove(
+              'active', 
+              'active-blue', 
+              'active-purple', 
+              'active-green', 
+              'active-gold'
+            );
+            
+            // Activate if progress has reached threshold
+            if (pct >= threshold) {
+              // Use the appropriate color class for this milestone's stage
+              var milestoneColorClasses = ['active-blue', 'active-purple', 'active-green', 'active-gold', 'active-gold'];
+              dot.classList.add(index < milestoneColorClasses.length ? milestoneColorClasses[index] : 'active');
+              milestone.classList.add('active');
+            } else {
+              milestone.classList.remove('active');
+            }
+          }
+        });
+      }
+    }
+
+    // Show continue hint with animation - called when loading completes
+    function showContinueHint() {
+      var loaderWrapper = document.getElementById('loader-wrapper');
+      var continueHint = document.getElementById('continue-hint');
+      var bootStatus = document.querySelector('.boot-status');
+      var loaderContainer = document.querySelector('.boot-loader-container');
+      
+      if (loaderWrapper && !loaderWrapper.classList.contains('loader-complete')) {
+        loaderWrapper.classList.add('loader-complete');
+        
+        // Set complete state on loader container
+        if (loaderContainer) {
+          loaderContainer.classList.remove(
+            'loader-state-init', 
+            'loader-state-engine', 
+            'loader-state-config', 
+            'loader-state-assets', 
+            'loader-state-ui'
+          );
+          loaderContainer.classList.add('loader-state-complete');
+        }
+        
+        // Update status text after short delay
+        setTimeout(function() {
+          if (bootStatus) bootStatus.innerHTML = '<span style="color: #00ffa8;">Ready</span>';
+          
+          // Show continue hint with fade-in
+          if (continueHint) {
+            continueHint.classList.add('visible');
+          }
+        }, 400);
+      }
+    }
+
+    /**
+     * Updates the FPS counter display
+     * @param {number|null} fps - FPS value, or null for loading state
+     */
+    function updateFPSCounter(fps) {
+      var fpsValueEl = document.getElementById('fps-value');
+      if (!fpsValueEl) return;
+      
+      if (fps === null || fps === undefined) {
+        fpsValueEl.textContent = 'INIT';
+        fpsValueEl.className = 'fps-value loading';
+      } else if (fps >= 60) {
+        fpsValueEl.textContent = Math.round(fps);
+        fpsValueEl.className = 'fps-value good';
+      } else if (fps >= 30) {
+        fpsValueEl.textContent = Math.round(fps);
+        fpsValueEl.className = 'fps-value medium';
+      } else {
+        fpsValueEl.textContent = Math.round(fps);
+        fpsValueEl.className = 'fps-value poor';
+      }
+    }
+
+    // Initialize loader state on page load
+    (function() {
+      updateLoaderState(0);
+      updateFPSCounter(null);
+    })();
+
+    // Handle user interaction to proceed (called by game engine or can be used standalone)
+    function onBootInteraction(callback) {
+      var hintEl = document.getElementById('continue-hint');
+      if (hintEl && hintEl.classList.contains('visible') && typeof callback === 'function') {
+        callback();
+      }
+    }
+
+    // Listen for keyboard/tap events when ready
+    (function() {
+      var interacted = false;
+      
+      function handleInteraction(e) {
+        if (interacted) return;
+        var hintEl = document.getElementById('continue-hint');
+        if (!hintEl || !hintEl.classList.contains('visible')) return;
+        
+        interacted = true;
+        
+        // Visual feedback on the hint
+        hintEl.style.transform = 'scale(0.95)';
+        hintEl.style.opacity = '0.7';
+        
+        // Dispatch custom event for main.js to pick up
+        window.dispatchEvent(new CustomEvent('boot-continue', { 
+          detail: { source: e.type } 
+        }));
+        
+        // Reset visual state after delay
+        setTimeout(function() {
+          hintEl.style.transform = '';
+          hintEl.style.opacity = '';
+        }, 150);
+      }
+      
+      // Keyboard listener
+      document.addEventListener('keydown', handleInteraction);
+      
+      // Touch/click listener  
+      document.addEventListener('touchstart', handleInteraction, { passive: true });
+      document.addEventListener('click', handleInteraction);
+    })();
+
+    // Show a message if loading takes too long
+    window.__bootTimeout = setTimeout(function() {
+      var progress = document.getElementById('boot-progress');
+      if (progress && parseFloat(progress.style.width || '0') < 85) {
+        setBootStatus('Loading 3D resources');
+        document.querySelector('.boot-status').style.color = '#ffb13d';
+      }
+    }, 20000);
+
+    // Extreme timeout - show error with retry button
+    window.__bootErrorTimeout = setTimeout(function() {
+      var progress = document.getElementById('boot-progress');
+      if (progress && parseFloat(progress.style.width || '0') < 98) {
+        var container = document.getElementById('boot-fallback');
+        if (container) {
+          container.innerHTML = `
+            <div class=\"boot-orb boot-orb-1\"></div>
+            <div class=\"boot-content\">
+              <div style=\"font-size: 48px; margin-bottom: 16px;\">⏱️</div>
+              <div class=\"boot-error\">
+                <h2 style=\"margin-bottom:12px;font-size:18px;color:#ff3d5a;\">Loading Taking Too Long</h2>
+                <p style=\"color:#a0a4b0;margin-bottom:8px;\">The game resources are taking longer than expected.</p>
+                <button class=\"retry-btn\" onclick=\"location.reload()\">🔄 Refresh Page</button>
+              </div>
+              <div class=\"boot-tips\">Tip: Check your internet connection or try refreshing the page.</div>
+            </div>
+            <div class=\"version-badge\">v0.2.0 · Timeout</div>
+          `;
+        }
+      }
+    }, 90000);
+
+    // Expose functions globally for main.js integration
+    window.bootScreenAPI = {
+      setStatus: setBootStatus,
+      setPercent: setBootPercent,
+      showContinue: showContinueHint,
+      isReady: function() { 
+        var hintEl = document.getElementById('continue-hint');
+        return hintEl && hintEl.classList.contains('visible'); 
+      },
+      updateFPS: updateFPSCounter,
+      updateState: updateLoaderState
+    };
+
+    // ============================================
+    // LOADING TIPS - Cycles through gameplay tips
+    // ============================================
+    (function() {
+      var tips = [
+        "Use boost pads on the track for extra speed!",
+        "The grappling hook can swing you around corners faster.",
+        "Collect power-ups by driving through item boxes on the track.",
+        "Draft behind opponents to build speed, then slingshot past them!",
+        "Each vehicle has unique stats - pick the one that fits your racing style.",
+        "Time your boosts right before a jump for maximum air distance.",
+        "Watch for shortcuts - some tracks have hidden paths!",
+        "Use the brake while turning for sharper drift corners.",
+        "Shields protect you from one hit - save them for critical moments.",
+        "Missiles lock onto the nearest racer ahead of you."
+      ];
+      
+      var currentTip = 0;
+      var tipElement = document.getElementById('tip-text');
+      
+      if (tipElement) {
+        setInterval(function() {
+          currentTip = (currentTip + 1) % tips.length;
+          
+          // Fade out
+          tipElement.style.opacity = '0';
+          tipElement.style.transform = 'translateY(10px)';
+          
+          setTimeout(function() {
+            tipElement.textContent = tips[currentTip];
+            // Fade in
+            tipElement.style.opacity = '1';
+            tipElement.style.transform = 'translateY(0)';
+          }, 400);
+        }, 6000);
+      }
+    })();
+
+    // ============================================
+    // KEYBOARD HINTS PANEL - Shows after 10 seconds
+    // ============================================
+    (function() {
+      var hintsPanel = document.getElementById('keyboard-hints');
+      if (!hintsPanel) return;
+      
+      var hintsShown = false;
+      
+      function showKeyboardHints() {
+        if (hintsShown || !hintsPanel) return;
+        
+        var progress = document.getElementById('boot-progress');
+        var currentProgress = progress ? parseFloat(progress.style.width || '0') : 0;
+        
+        // Only show if loading hasn't completed yet
+        if (currentProgress < 100) {
+          hintsPanel.classList.add('visible');
+          hintsShown = true;
+        }
+      }
+      
+      // Show keyboard hints after 10 seconds
+      setTimeout(showKeyboardHints, 10000);
+      
+      // Hide when user interacts or loading completes
+      document.addEventListener('boot-continue', function() {
+        hintsPanel.classList.remove('visible');
+      });
+    })();
+
+    // ============================================
+    // ENHANCED READY STATE CELEBRATION
+    // ============================================
+    (function() {
+      var celebrationTriggered = false;
+      var celebrationContainer = document.getElementById('ready-celebration');
+      var flashOverlay = document.getElementById('ready-flash');
+      var playBtn = document.getElementById('play-pulse-btn');
+      
+      function triggerReadyCelebration() {
+        if (celebrationTriggered || !celebrationContainer) return;
+        celebrationTriggered = true;
+        
+        // Trigger background flash first
+        if (flashOverlay) {
+          flashOverlay.classList.add('flash');
+        }
+        
+        // Show celebration container with slight delay for effect sequencing
+        setTimeout(function() {
+          if (celebrationContainer) {
+            celebrationContainer.classList.add('active');
+          }
+          
+          // Show Quick Start Button with slight delay after celebration appears
+          var quickStartBtn = document.getElementById('quick-start-btn');
+          if (quickStartBtn) {
+            setTimeout(function() {
+              quickStartBtn.classList.add('visible');
+            }, 500);
+          }
+        }, 100);
+        
+        // Hide flash overlay after animation completes
+        setTimeout(function() {
+          if (flashOverlay) {
+            flashOverlay.classList.remove('flash');
+          }
+        }, 1200);
+      }
+      
+      // Play button click handler
+      if (playBtn) {
+        playBtn.addEventListener('click', function() {
+          // Dispatch continue event to proceed to game
+          window.dispatchEvent(new CustomEvent('boot-continue', { 
+            source: 'play-button' 
+          }));
+        });
+      }
+      
+      // Override showContinueHint to also trigger celebration
+      var originalShowContinue = typeof showContinueHint === 'function' ? showContinueHint : null;
+      if (originalShowContinue) {
+        window.showContinueHintEnhanced = function() {
+          originalShowContinue();
+          triggerReadyCelebration();
+        };
+        
+        // Hook into bootScreenAPI
+        if (window.bootScreenAPI) {
+          window.bootScreenAPI.showContinueEnhanced = function() {
+            originalShowContinue();
+            triggerReadyCelebration();
+          };
+        }
+      }
+    })();
+
+    // ============================================
+    // QUICK START BUTTON - Hide on interaction
+    // ============================================
+    (function() {
+      document.addEventListener('boot-continue', function() {
+        var btn = document.getElementById('quick-start-btn');
+        if (btn) {
+          btn.classList.remove('visible');
+          // Fade out then hide completely
+          setTimeout(function() {
+            btn.style.display = 'none';
+          }, 300);
+        }
+      });
+    })();
+
+    // ============================================
+    // KONAMI CODE EASTER EGG - Cheat Mode!
+    // Code: ↑ ↑ ↓ ↓ ← → ← → B A
+    // ============================================
+    (function() {
+      // The famous Konami code sequence
+      var konamiCode = [
+        'ArrowUp', 'ArrowUp', 
+        'ArrowDown', 'ArrowDown', 
+        'ArrowLeft', 'ArrowRight', 
+        'ArrowLeft', 'ArrowRight', 
+        'KeyB', 'KeyA'
+      ];
+      
+      var konamiIndex = 0;
+      var cheatMessageEl = document.getElementById('cheat-mode-message');
+      var cheatActivated = false;
+      
+      function handleKonamiInput(e) {
+        // Ignore if inside input fields
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        // Check if current key matches expected key in sequence
+        if (e.code === konamiCode[konamiIndex]) {
+          konamiIndex++;
+          
+          // Full sequence completed!
+          if (konamiIndex === konamiCode.length) {
+            activateCheatMode();
+            konamiIndex = 0; // Reset for re-triggering
+          }
+        } else {
+          // Reset on wrong key (allow starting over)
+          konamiIndex = 0;
+          // Check if the current wrong key is actually the start of a new sequence
+          if (e.code === konamiCode[0]) {
+            konamiIndex = 1;
+          }
+        }
+      }
+      
+      function activateCheatMode() {
+        if (!cheatMessageEl || cheatActivated) return;
+        cheatActivated = true;
+        
+        // Show cheat mode message with animation
+        cheatMessageEl.classList.add('active');
+        
+        // Log to console for developers
+        console.log('%c🎮 CHEAT MODE ACTIVATED! 🎮', 'color: #a855f7; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #a855f7;');
+        console.log('%cSecret commands enabled! You found the Konami code!', 'color: #ffd23f; font-size: 12px;');
+        
+        // Dispatch custom event for game engine to listen
+        window.dispatchEvent(new CustomEvent('cheat-mode-activated', {
+          detail: { timestamp: Date.now(), code: 'konami' }
+        }));
+        
+        // Reset after animation completes so it can be triggered again
+        setTimeout(function() {
+          cheatMessageEl.classList.remove('active');
+          cheatActivated = false;
+        }, 3000);
+      }
+      
+      // Listen for keyboard events
+      document.addEventListener('keydown', handleKonamiInput);
+    })();
+  </script>
+
+  <!-- main.js is an ES module; loads three.js dynamically and boots the engine -->
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

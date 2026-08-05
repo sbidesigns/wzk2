@@ -1,0 +1,50 @@
+{
+  "_comment": "Single source of truth for all third-party library versions. Pinned as of 2026-08-03. Do NOT bump without updating ARCHITECTURE.md and re-testing.",
+  "_pinnedDate": "2026-08-03T07:04:00-08:00",
+  "libraries": {
+    "three": {
+      "version": "0.160.0",
+      "cdn": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "globalName": null,
+      "moduleType": "esm",
+      "purpose": "3D rendering, scene graph, PBR materials, post-processing",
+      "additions": {
+        "OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js",
+        "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
+        "EffectComposer": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js",
+        "RenderPass": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js",
+        "UnrealBloomPass": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+        "OutputPass": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/OutputPass.js"
+      }
+    },
+    "cannon-es": {
+      "version": "0.20.0",
+      "cdn": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js",
+      "globalName": "CANNON",
+      "moduleType": "umd",
+      "purpose": "Rigid-body physics, raycast vehicle, collision detection"
+    },
+    "howler": {
+      "version": "2.2.4",
+      "cdn": "https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js",
+      "globalName": "Howler",
+      "moduleType": "umd",
+      "purpose": "Audio playback, bus routing, positional audio"
+    },
+    "gsap": {
+      "version": "3.12.5",
+      "cdn": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js",
+      "globalName": "gsap",
+      "moduleType": "umd",
+      "purpose": "Tweening engine for UI transitions, cutscenes, micro-animations"
+    },
+    "localforage": {
+      "version": "1.10.0",
+      "cdn": "https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js",
+      "globalName": "localforage",
+      "moduleType": "umd",
+      "purpose": "IndexedDB-backed persistence for save data, settings, progression"
+    }
+  },
+  "_fallbackStrategy": "If jsdelivr is unreachable, swap to unpkg.com by replacing 'cdn.jsdelivr.net/npm' with 'unpkg.com'. Versions stay pinned."
+}

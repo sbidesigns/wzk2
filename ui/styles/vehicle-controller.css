@@ -1,0 +1,736 @@
+/* ui/styles/vehicle-controller.css */
+/* VEHICLE CONTROLLER STYLING — Speed display, tachometer, nitro, drift indicator */
+
+/* ============================================
+   VEHICLE HUD CONTAINER
+   ============================================ */
+
+.vehicle-hud {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  padding: 15px 25px;
+  background: linear-gradient(to top, rgba(5, 6, 16, 0.95), transparent);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ============================================
+   SPEED DISPLAY
+   ============================================ */
+
+.speed-display {
+  position: absolute;
+  bottom: 20px;
+  left: 25px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.speed-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  
+  /* Monospace alignment for numbers */
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-value.boosting {
+  color: #e94560;
+  text-shadow: 
+    0 0 30px rgba(233, 69, 96, 0.7),
+    0 0 60px rgba(233, 69, 96, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  animation: speedBoostPulse 0.2s ease-in-out infinite;
+}
+
+@keyframes speedBoostPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.speed-unit {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+/* Speed change indicator (accelerating/braking) */
+.speed-change-indicator {
+  position: absolute;
+  top: -5px;
+  right: -40px;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.speed-change-indicator.accelerating {
+  background: linear-gradient(90deg, transparent, #00ff88);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.speed-change-indicator.braking {
+  background: linear-gradient(90deg, #ff4444, transparent);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+/* ============================================
+   TACHOMETER / RPM BAR
+   ============================================ */
+
+.tachometer-container {
+  position: absolute;
+  bottom: 85px;
+  left: 25px;
+  width: 180px;
+}
+
+.tachometer-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.tachometer-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tachometer-gear {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: #00ffff;
+}
+
+.tachometer-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tachometer-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.05s linear;
+  background: linear-gradient(90deg, 
+    #00ff88 0%, 
+    #88ff00 25%,
+    #ffff00 50%, 
+    #ff8800 75%,
+    #ff0000 100%
+  );
+  box-shadow: 0 0 8px currentColor;
+}
+
+.tachometer-fill.high-rpm {
+  animation: rpmWarning 0.15s ease-in-out infinite;
+}
+
+@keyframes rpmWarning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Gear shift flash effect */
+.gear-shift-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: #00ffff;
+  text-shadow: 0 0 30px #00ffff;
+  opacity: 0;
+  pointer-events: none;
+  animation: gearShiftFlash 0.5s ease-out forwards;
+}
+
+@keyframes gearShiftFlash {
+  0% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.5); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+}
+
+/* ============================================
+   NITRO / BOOST METER
+   ============================================ */
+
+.nitro-container {
+  position: absolute;
+  bottom: 20px;
+  right: 25px;
+  width: 150px;
+}
+
+.nitro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.nitro-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nitro-icon {
+  width: 14px;
+  height: 14px;
+  fill: #e94560;
+  filter: drop-shadow(0 0 4px rgba(233, 69, 96, 0.6));
+}
+
+.nitro-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #e94560;
+}
+
+.nitro-bar-container {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.nitro-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b35, #e94560);
+  border-radius: 4px;
+  transition: width 0.1s ease-out;
+  position: relative;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(233, 69, 96, 0.4);
+}
+
+.nitro-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 4px 4px 0 0;
+}
+
+.nitro-bar-fill.active {
+  animation: nitroActive 0.1s ease-in-out infinite;
+}
+
+@keyframes nitroActive {
+  0%, 100% { 
+    filter: brightness(1); 
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(233, 69, 96, 0.6);
+  }
+  50% { 
+    filter: brightness(1.3); 
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 30px rgba(233, 69, 96, 0.8);
+  }
+}
+
+/* Nitro segments (visual divisions) */
+.nitro-segments {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 2px;
+  padding: 1px;
+}
+
+.nitro-segment {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 1px;
+}
+
+/* ============================================
+   DRIFT INDICATOR
+   ============================================ */
+
+.drift-indicator {
+  position: absolute;
+  bottom: 90px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+}
+
+.drift-indicator.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.drift-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: #ffd700;
+  text-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.7),
+    0 0 40px rgba(255, 215, 0, 0.3);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: driftLabelGlow 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes driftLabelGlow {
+  from { text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.3); }
+  to { text-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.5); }
+}
+
+.drift-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.drift-score-value {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.drift-multiplier {
+  font-size: 12px;
+  color: #00ffff;
+  margin-left: 8px;
+}
+
+/* Drift angle visual */
+.drift-angle-ring {
+  width: 50px;
+  height: 50px;
+  margin-top: 8px;
+  position: relative;
+}
+
+.drift-angle-bg {
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 215, 0, 0.2);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.drift-angle-fill {
+  width: 100%;
+  height: 100%;
+  border: 2px solid transparent;
+  border-top-color: #ffd700;
+  border-right-color: #ffd700;
+  border-radius: 50%;
+  position: absolute;
+  transform: rotate(-45deg);
+  transition: transform 0.1s ease;
+}
+
+.drift-angle-indicator {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  box-shadow: 0 0 10px #ffd700;
+  transition: transform 0.05s ease;
+}
+
+/* ============================================
+   HEALTH / DAMAGE INDICATOR
+   ============================================ */
+
+.health-indicator {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(5, 6, 16, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.health-icon {
+  width: 18px;
+  height: 18px;
+  fill: #00ff88;
+  transition: fill 0.3s ease;
+}
+
+.health-icon.damaged {
+  fill: #ff4444;
+  animation: healthPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes healthPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.health-bar-container {
+  width: 120px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4444, #ffaa00, #00ff88);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.health-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* Damage overlay effect */
+.damage-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(255, 0, 0, 0.3) 100%
+  );
+  transition: opacity 0.1s ease;
+}
+
+.damage-overlay.active {
+  opacity: 1;
+  animation: damageFlash 0.3s ease-out;
+}
+
+@keyframes damageFlash {
+  0% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ============================================
+   POSITION / LAP INFO
+   ============================================ */
+
+.position-display {
+  position: absolute;
+  bottom: 55px;
+  left: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.position-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.position-suffix {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.position-value.p1 { color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+.position-value.p2 { color: #c0c0c0; text-shadow: 0 0 15px rgba(192, 192, 192, 0.4); }
+.position-value.p3 { color: #cd7f32; text-shadow: 0 0 15px rgba(205, 127, 50, 0.4); }
+
+.lap-counter {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.lap-current {
+  color: #00ffff;
+  font-weight: 700;
+}
+
+/* ============================================
+   INPUT PROMPTS
+   ============================================ */
+
+.input-prompt-overlay {
+  position: fixed;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.input-key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+
+.input-key.active {
+  opacity: 1;
+}
+
+.input-key-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.1s ease;
+}
+
+.input-key.active .input-key-icon {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.input-key-label {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* ============================================
+   VEHICLE VISUAL EFFECTS
+   ============================================ */
+
+/* Tire smoke during drift */
+.tire-smoke-particle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, rgba(200, 200, 200, 0.4), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: tireSmokeExpand 0.8s ease-out forwards;
+}
+
+@keyframes tireSmokeExpand {
+  0% { 
+    transform: scale(0.5); 
+    opacity: 0.6; 
+  }
+  100% { 
+    transform: scale(2); 
+    opacity: 0; 
+  }
+}
+
+/* Boost flame effect */
+.boost-flame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 80px;
+  background: linear-gradient(to top, 
+    rgba(233, 69, 96, 0.9) 0%,
+    rgba(255, 165, 0, 0.6) 40%,
+    transparent 100%
+  );
+  clip-path: polygon(30% 100%, 70% 100%, 85% 0%, 50% 20%, 15% 0%);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  filter: blur(2px);
+}
+
+.boost-flame.active {
+  opacity: 1;
+  animation: boostFlameFlicker 0.05s ease-in-out infinite alternate;
+}
+
+@keyframes boostFlameFlicker {
+  from { transform: translateX(-50%) scaleX(1) scaleY(1); }
+  to { transform: translateX(-50%) scaleX(1.1) scaleY(1.15); }
+}
+
+/* Speed lines effect */
+.speed-lines-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.speed-lines-container.active {
+  opacity: 1;
+}
+
+.speed-line {
+  position: absolute;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: speedLineMove var(--duration, 0.3s) linear infinite;
+}
+
+@keyframes speedLineMove {
+  from { transform: translateY(-100px); }
+  to { transform: translateY(calc(100vh + 100px)); }
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .vehicle-hud {
+    height: 120px;
+    padding: 10px 15px;
+  }
+  
+  .speed-value {
+    font-size: 52px;
+  }
+  
+  .speed-unit {
+    font-size: 12px;
+  }
+  
+  .tachometer-container {
+    width: 120px;
+    bottom: 70px;
+  }
+  
+  .nitro-container {
+    width: 110px;
+    right: 15px;
+  }
+  
+  .drift-indicator {
+    right: 15px;
+    bottom: 75px;
+  }
+  
+  .position-display {
+    left: 115px;
+    bottom: 45px;
+  }
+  
+  .position-value {
+    font-size: 32px;
+  }
+  
+  .input-prompt-overlay {
+    bottom: 130px;
+  }
+  
+  .input-key-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vehicle-hud {
+    height: 100px;
+  }
+  
+  .speed-value {
+    font-size: 40px;
+  }
+  
+  .tachometer-container {
+    display: none;
+  }
+  
+  .drift-indicator {
+    display: none;
+  }
+  
+  .health-indicator {
+    top: auto;
+    bottom: 105px;
+    padding: 5px 10px;
+  }
+  
+  .health-bar-container {
+    width: 80px;
+  }
+}

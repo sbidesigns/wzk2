@@ -1,0 +1,46 @@
+{
+  "_comment": "Engine-level configuration. Editing this changes renderer/physics/audio behavior WITHOUT touching core code.",
+  "renderer": {
+    "qualityPresets": {
+      "low":    { "pixelRatio": 0.75, "shadowMapEnabled": false, "bloom": false, "antialias": false },
+      "medium": { "pixelRatio": 1.0,  "shadowMapEnabled": true,  "bloom": false, "antialias": true,  "shadowMapSize": 1024 },
+      "high":   { "pixelRatio": 1.5,  "shadowMapEnabled": true,  "bloom": true,  "antialias": true,  "shadowMapSize": 2048, "bloomStrength": 0.6 },
+      "ultra":  { "pixelRatio": 2.0,  "shadowMapEnabled": true,  "bloom": true,  "antialias": true,  "shadowMapSize": 4096, "bloomStrength": 0.85 }
+    },
+    "defaultPreset": "high",
+    "toneMapping": "ACESFilmic",
+    "toneMappingExposure": 1.0,
+    "outputColorSpace": "srgb",
+    "fog": { "enabled": true, "color": "#0a0a14", "near": 60, "far": 320 },
+    "clearColor": "#05060a"
+  },
+  "physics": {
+    "stepRate": 60,
+    "maxSubSteps": 4,
+    "gravity": [0, -19.6, 0],
+    "broadphase": "sweep",
+    "defaultMaterial": { "friction": 0.4, "restitution": 0.1 }
+  },
+  "audio": {
+    "buses": {
+      "master": { "volume": 1.0, "muted": false },
+      "music":  { "volume": 0.7, "muted": false },
+      "sfx":    { "volume": 0.9, "muted": false },
+      "voice":  { "volume": 0.85, "muted": false },
+      "ui":     { "volume": 0.6, "muted": false },
+      "engine": { "volume": 0.8, "muted": false }
+    },
+    "positionalAudio": true,
+    "defaultFadeTime": 0.6
+  },
+  "loop": {
+    "fixedStep": true,
+    "maxFrameDelta": 0.1,
+    "catchUpFrames": 5
+  },
+  "diagnostics": {
+    "showOverlay": false,
+    "logLevel": "info",
+    "trackResolverEvents": true
+  }
+}

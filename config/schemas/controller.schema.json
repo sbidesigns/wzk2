@@ -1,0 +1,15 @@
+{
+  "$id": "controller.schema.json",
+  "type": "object",
+  "required": ["id", "displayName", "platform", "module"],
+  "properties": {
+    "id":          { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "displayName": { "type": "string" },
+    "platform":    { "type": "string", "enum": ["keyboard", "gamepad", "touch", "ai"] },
+    "priority":    { "type": "integer", "minimum": 0, "maximum": 100 },
+    "autoActivate":{ "type": "boolean" },
+    "module":      { "type": "string", "pattern": "^\\.\\/.*\\.js$" }
+  },
+  "requiredInterface": ["poll", "activate", "deactivate"],
+  "additionalProperties": false
+}

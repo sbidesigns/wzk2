@@ -1,0 +1,84 @@
+{
+  "_comment": "Input bindings. Action names are used by gameplay code; bindings map physical input to actions. Swap bindings without touching code.",
+  "actions": [
+    { "id": "throttle",    "category": "driving", "label": "Accelerate" },
+    { "id": "brake",       "category": "driving", "label": "Brake / Reverse" },
+    { "id": "steerLeft",   "category": "driving", "label": "Steer Left" },
+    { "id": "steerRight",  "category": "driving", "label": "Steer Right" },
+    { "id": "drift",       "category": "driving", "label": "Drift / Handbrake" },
+    { "id": "burnout",     "category": "driving", "label": "Burnout (throttle+brake hold from stop)" },
+    { "id": "useItem",     "category": "driving", "label": "Use Item" },
+    { "id": "lookBack",    "category": "driving", "label": "Look Back" },
+    { "id": "resetVehicle","category": "driving", "label": "Reset to Track" },
+    { "id": "pause",       "category": "system",  "label": "Pause" },
+    { "id": "confirm",     "category": "ui",      "label": "Confirm" },
+    { "id": "back",        "category": "ui",      "label": "Back" },
+    { "id": "up",          "category": "ui",      "label": "Navigate Up" },
+    { "id": "down",        "category": "ui",      "label": "Navigate Down" },
+    { "id": "left",        "category": "ui",      "label": "Navigate Left" },
+    { "id": "right",       "category": "ui",      "label": "Navigate Right" },
+    { "id": "tabLeft",     "category": "ui",      "label": "Tab Left" },
+    { "id": "tabRight",    "category": "ui",      "label": "Tab Right" }
+  ],
+  "controllers": {
+    "keyboard": {
+      "enabled": true,
+      "defaultBindings": {
+        "throttle":     ["KeyW", "ArrowUp"],
+        "brake":        ["KeyS", "ArrowDown"],
+        "steerLeft":    ["KeyA", "ArrowLeft"],
+        "steerRight":   ["KeyD", "ArrowRight"],
+        "drift":        ["Space"],
+        "burnout":      ["Space"],
+        "useItem":      ["KeyE"],
+        "lookBack":     ["KeyC"],
+        "resetVehicle": ["KeyR"],
+        "pause":        ["Escape"],
+        "confirm":      ["Enter"],
+        "back":         ["Escape"],
+        "up":           ["ArrowUp", "KeyW"],
+        "down":         ["ArrowDown", "KeyS"],
+        "left":         ["ArrowLeft", "KeyA"],
+        "right":        ["ArrowRight", "KeyD"],
+        "tabLeft":      ["KeyQ"],
+        "tabRight":     ["KeyE"]
+      }
+    },
+    "gamepad": {
+      "enabled": true,
+      "deadzone": 0.18,
+      "deadzoneCurve": "exponential",
+      "defaultBindings": {
+        "throttle":     { "type": "axis", "index": 7, "threshold": 0.15, "positive": true },
+        "brake":        { "type": "axis", "index": 6, "threshold": 0.15, "positive": true },
+        "steerLeft":    { "type": "axis", "index": 0, "threshold": -0.2, "positive": false },
+        "steerRight":   { "type": "axis", "index": 0, "threshold": 0.2,  "positive": true },
+        "drift":        { "type": "button", "index": 0 },
+        "burnout":      { "type": "button", "index": 0 },
+        "useItem":      { "type": "button", "index": 2 },
+        "lookBack":     { "type": "button", "index": 4 },
+        "resetVehicle": { "type": "button", "index": 3 },
+        "pause":        { "type": "button", "index": 9 },
+        "confirm":      { "type": "button", "index": 0 },
+        "back":         { "type": "button", "index": 1 },
+        "up":           { "type": "hat", "value": "up" },
+        "down":         { "type": "hat", "value": "down" },
+        "left":         { "type": "hat", "value": "left" },
+        "right":        { "type": "hat", "value": "right" },
+        "tabLeft":      { "type": "button", "index": 4 },
+        "tabRight":     { "type": "button", "index": 5 }
+      }
+    },
+    "touch": {
+      "enabled": true,
+      "_comment": "Touch shows on-screen controls only when a touch primary pointer is detected",
+      "layout": {
+        "leftSide":  ["steerLeft", "steerRight"],
+        "rightSide": ["throttle", "brake", "drift", "useItem"],
+        "topRight":  ["pause"]
+      },
+      "buttonSize": 96,
+      "opacity": 0.55
+    }
+  }
+}

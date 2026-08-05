@@ -1,0 +1,63 @@
+{
+  "$schema": "../../config/schemas/vehicle.schema.json",
+  "category": "vehicles",
+  "entries": [
+    {
+      "id": "spectre",
+      "displayName": "Spectre GT",
+      "class": "sports",
+      "stats": { "topSpeed": 8, "acceleration": 7, "handling": 8, "weight": 5 },
+      "tuning": {
+        "enginePower": 1800,
+        "maxSteer": 0.55,
+        "driftGripMultiplier": 0.35,
+        "burnoutTorqueBoost": 1.4,
+        "boostAccelerationCurve": "ease-out-cubic",
+        "suspensionStiffness": 30,
+        "suspensionDamping": 4.5,
+        "bodyRollFactor": 0.35
+      },
+      "unlock": { "type": "default" },
+      "cosmetic": { "bodyColor": "#ff4d2e", "accentColor": "#ffd23f", "wheelColor": "#0a0a0a" },
+      "module": "./vehicle.spectre.js"
+    },
+    {
+      "id": "titan",
+      "displayName": "Titan V8",
+      "class": "muscle",
+      "stats": { "topSpeed": 9, "acceleration": 9, "handling": 5, "weight": 8 },
+      "tuning": {
+        "enginePower": 2600,
+        "maxSteer": 0.42,
+        "driftGripMultiplier": 0.28,
+        "burnoutTorqueBoost": 1.8,
+        "boostAccelerationCurve": "ease-out-quart",
+        "suspensionStiffness": 22,
+        "suspensionDamping": 3.5,
+        "bodyRollFactor": 0.55
+      },
+      "unlock": { "type": "default" },
+      "cosmetic": { "bodyColor": "#1a1a1a", "accentColor": "#ff3d5a", "wheelColor": "#1a1a1a" },
+      "module": "./vehicle.titan.js"
+    },
+    {
+      "id": "vixen",
+      "displayName": "Vixen RS",
+      "class": "agile",
+      "stats": { "topSpeed": 6, "acceleration": 8, "handling": 10, "weight": 3 },
+      "tuning": {
+        "enginePower": 1400,
+        "maxSteer": 0.72,
+        "driftGripMultiplier": 0.22,
+        "burnoutTorqueBoost": 1.2,
+        "boostAccelerationCurve": "ease-out-cubic",
+        "suspensionStiffness": 42,
+        "suspensionDamping": 6.5,
+        "bodyRollFactor": 0.2
+      },
+      "unlock": { "type": "level", "value": 5 },
+      "cosmetic": { "bodyColor": "#00e5ff", "accentColor": "#ff4d2e", "wheelColor": "#0a0a0a" },
+      "module": "./vehicle.vixen.js"
+    }
+  ]
+}
