@@ -1827,3 +1827,200 @@
   .hud-countdown .countdown-number { animation: none; }
   .position-change.up, .position-change.down { animation: none; }
 }
+
+/* ==================== CYCLE 24: HUD POLISH ==================== */
+
+/* Animated panel entry */
+.hud-panel {
+  animation: hudPanelSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+@keyframes hudPanelSlideIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered entry for each panel */
+.hud-speed-panel { animation-delay: 0s; }
+.hud-position-panel { animation-delay: 0.08s; }
+.hud-timer-panel { animation-delay: 0.16s; }
+.hud-nitro-panel { animation-delay: 0.24s; }
+.hud-item-panel { animation-delay: 0.32s; }
+.hud-status-panel { animation-delay: 0.40s; }
+
+/* Speed display glow ring */
+.speed-container::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background: conic-gradient(from 0deg, rgba(0,229,255,0.15), transparent 25%, transparent 75%, rgba(255,77,46,0.15)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0, #fff 0 0) content-box, linear-gradient(#fff 0 0, #fff 0 0);
+  mask: linear-gradient(#fff 0 0, #fff 0 0) content-box, linear-gradient(#fff 0 0, #fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: speedRingRotate 4s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes speedRingRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Minimap compass glow pulse */
+.hud-minimap-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  box-shadow: 0 0 20px rgba(0,229,255,0.08);
+  animation: minimapGlow 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes minimapGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(0,229,255,0.06); }
+  50% { box-shadow: 0 0 25px rgba(0,229,255,0.15); }
+}
+
+/* Timer panel accent animation */
+.hud-timer-panel::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,229,255,0.2), transparent);
+}
+
+/* Nitro panel animated top accent */
+.hud-nitro-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: linear-gradient(90deg, #00ccff, #00ffaa, #00ccff);
+  background-size: 200% 100%;
+  animation: nitroAccentSlide 3s linear infinite;
+  border-radius: 0 0 2px 2px;
+}
+
+@keyframes nitroAccentSlide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Lap times panel glass effect */
+.hud-lap-times {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-top: 1px solid rgba(255,255,255,0.04) !important;
+}
+
+.lap-time-row {
+  transition: background 0.3s ease;
+}
+
+.lap-time-row:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Item panel side glow */
+.hud-item-panel::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--color-accent, #00e5ff), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.hud-item-panel.has-item::after {
+  opacity: 0.6;
+}
+
+/* Status panel bar animation */
+.bar-track {
+  height: 6px !important;
+  border-radius: 3px !important;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+}
+
+/* FPS counter blink on low FPS */
+.hud-fps-counter.low-fps {
+  animation: fpsBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes fpsBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Controls hint glassmorphism */
+.hud-controls-hint {
+  background: rgba(8, 10, 18, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+  animation: controlsHintFadeOut 8s ease forwards !important;
+}
+
+@keyframes controlsHintFadeOut {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
+
+/* Drift score panel entry */
+.hud-drift-score {
+  animation: driftPanelPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes driftPanelPop {
+  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Rearview mirror enhanced */
+.hud-rearview-container {
+  border: 1.5px solid rgba(0, 229, 255, 0.2) !important;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.5) !important;
+  animation: rearviewFadeIn 0.5s ease-out !important;
+}
+
+@keyframes rearviewFadeIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Sector dots enhanced pulse */
+.sector-dot {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sector-dot.passed {
+  box-shadow: 0 0 10px rgba(0,229,255,0.5), 0 0 4px rgba(0,229,255,0.3) !important;
+}
+
+@media (max-width: 768px) {
+  .hud-lap-times { display: none !important; }
+  .hud-rearview-container { width: 160px !important; height: 90px !important; }
+  .rearview-canvas { width: 160px !important; height: 90px !important; }
+  .hud-fps-counter { display: none !important; }
+}
+

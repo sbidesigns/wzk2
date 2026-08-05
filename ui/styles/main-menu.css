@@ -2054,3 +2054,176 @@
   .btn-neon-trail::before { animation: none; }
   .main-menu-eyebrow::after { animation: none; opacity: 1; }
 }
+
+/* ==================== CYCLE 24: MENU BACKGROUND ANIMATION ==================== */
+
+.main-menu-hero::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,77,46,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(0,229,255,0.06) 0%, transparent 50%);
+  animation: menuBgFloat 8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes menuBgFloat {
+  0% { transform: translate(-2%, 1%) scale(1); opacity: 0.5; }
+  100% { transform: translate(2%, -1%) scale(1.05); opacity: 0.8; }
+}
+
+/* ==================== CYCLE 24: MENU BUTTON ENHANCEMENT ==================== */
+
+.main-menu-left .btn {
+  position: relative;
+  overflow: hidden;
+  border-left: 3px solid transparent !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.main-menu-left .btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #ff4d2e, #00e5ff);
+  transform: scaleY(0);
+  transition: transform 0.25s ease;
+}
+
+.main-menu-left .btn:hover {
+  border-left-color: transparent !important;
+  padding-left: 20px !important;
+}
+
+.main-menu-left .btn:hover::before {
+  transform: scaleY(1);
+}
+
+/* ==================== CYCLE 24: SEASON TICKER ENHANCED ==================== */
+
+.season-ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 8px 0;
+}
+
+.ticker-infinite {
+  display: inline-flex;
+  animation: tickerScroll 40s linear infinite;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  padding: 0 24px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ==================== CYCLE 24: CARD HOVER GLOW ==================== */
+
+.mode-card, .track-card, .vehicle-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+}
+
+.mode-card:hover, .track-card:hover, .vehicle-card:hover {
+  border-color: rgba(0,229,255,0.15) !important;
+  box-shadow: 0 0 24px rgba(0,229,255,0.08), 0 8px 32px rgba(0,0,0,0.3) !important;
+  transform: translateY(-4px);
+}
+
+/* ==================== CYCLE 24: FOOTER AREA ==================== */
+
+.menu-footer {
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.menu-footer-text {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* ==================== CYCLE 24: MODE SELECT ENHANCEMENT ==================== */
+
+.selection-step {
+  opacity: 0.4;
+  transition: all 0.3s ease;
+}
+
+.selection-step.active {
+  opacity: 1;
+}
+
+.selection-step.completed {
+  opacity: 0.7;
+}
+
+.selection-progress [role="generic"] {
+  transition: all 0.3s ease;
+}
+
+.selection-progress [role="generic"].active {
+  color: #00e5ff !important;
+  transform: scale(1.1);
+}
+
+/* ==================== CYCLE 24: SETTINGS ENHANCEMENT ==================== */
+
+.settings-panel {
+  background: rgba(12, 14, 24, 0.95) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+.settings-section {
+ border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 20px 0;
+}
+
+.settings-section-title {
+  font-size: 11px;
+  color: rgba(0,229,255,0.6);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+}
+
+.settings-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+}
+
+.settings-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-menu-hero::before { animation: none; }
+  .ticker-infinite { animation: none; }
+}

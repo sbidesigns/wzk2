@@ -130,6 +130,25 @@ export class RaceScene {
     this._positionAnnounceTimer = 0;
     
 
+
+    // === CYCLE 24: SLIPSTREAM/DRAFTING SYSTEM ===
+    this._slipstreamActive = false;
+    this._slipstreamTimer = 0;
+    this._slipstreamBoost = 0;
+
+    // === CYCLE 24: TRACK OBSTACLES ===
+    this._obstacles = [];
+    this._obstacleHitCooldown = 0;
+
+    // === CYCLE 24: TURBO ZONES ===
+    this._turboZones = [];
+
+    // === CYCLE 24: EXHAUST BACKFIRE ===
+    this._backfireTimer = 0;
+    this._backfireFlash = null;
+
+    // === CYCLE 24: ANIMATED SKY ===
+    this._skyStars = null;
     // === CYCLE 23: ITEM PICKUP SYSTEM ===
     this._itemPickups = [];
     this._currentItem = null;
@@ -284,6 +303,10 @@ export class RaceScene {
         // === CYCLE 21: SETUP REAR-VIEW MIRROR ===
     try { this._setupRearviewMirror(); } catch (e) { console.error('[RaceScene] Rear-view mirror failed:', e); }
     
+    // === CYCLE 24: NEW FEATURES ===
+    try { this._createObstacles(); } catch (e) { console.error('[RaceScene] Obstacles failed:', e); }
+    try { this._createTurboZones(); } catch (e) { console.error('[RaceScene] Turbo zones failed:', e); }
+
     // === CYCLE 23: NEW FEATURES ===
     try { this._createItemPickups(); } catch (e) { console.error('[RaceScene] Item pickups failed:', e); }
     try { this._createStartFinishArch(); } catch (e) { console.error('[RaceScene] Start/Finish arch failed:', e); }
@@ -879,6 +902,11 @@ export class RaceScene {
     this._updateMissile(dt);
     this._updateNearMissDetection(dt);
     this._updateHolographicSigns(dt);
+    // === CYCLE 24: NEW SYSTEM UPDATES ===
+    this._updateSlipstream(dt);
+    this._updateObstacles(dt);
+    this._updateTurboZones(dt);
+    this._updateBackfire(dt);
     
   }
   
